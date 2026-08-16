@@ -34,6 +34,9 @@ kotlin {
             
             // Icons
             implementation("androidx.compose.material:material-icons-extended:1.7.8")
+
+            // Custom Library
+            implementation(libs.tay.compose.library)
         }
         commonMain.dependencies {
             implementation(compose.runtime)
