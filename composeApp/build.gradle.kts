@@ -6,6 +6,7 @@ plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
+    alias(libs.plugins.google.services)
 }
 
 kotlin {
@@ -44,7 +45,6 @@ kotlin {
             implementation(libs.androidx.lifecycle.viewmodelCompose)
             implementation(libs.androidx.lifecycle.runtimeCompose)
             implementation(project(":shared"))
-            implementation(project(":sharedUI"))
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
@@ -53,11 +53,11 @@ kotlin {
 }
 
 android {
-    namespace = "com.tayler.appvalutay"
+    namespace = "com.tayler.pizzzaapp"
     compileSdk = libs.versions.android.compileSdk.get().toInt()
 
     defaultConfig {
-        applicationId = "com.tayler.appvalutay"
+        applicationId = "com.tayler.pizzzaapp"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
         versionCode = 1
@@ -89,4 +89,8 @@ android {
 
 dependencies {
     debugImplementation(compose.uiTooling)
+    
+    // Firebase
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.messaging)
 }

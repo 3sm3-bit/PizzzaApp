@@ -7,12 +7,15 @@ plugins {
     alias(libs.plugins.ksp)
     alias(libs.plugins.room)
     alias(libs.plugins.buildConfig)
+    alias(libs.plugins.kotlinx.serialization)
 }
 
 buildConfig {
-    packageName.set("com.tayler.appvalutay.shared")
+    packageName.set("com.tayler.pizzzaapp.shared")
+    val isDebug = project.hasProperty("debug") || project.gradle.startParameter.taskNames.any { it.contains("Debug", ignoreCase = true) }
+    buildConfigField("Boolean", "IS_DEBUG", isDebug.toString())
     buildConfigField("String", "BASE_URL_SERVICE", "\"https://servertay.onrender.com/services\"")
-    buildConfigField("String", "BASE_URL_SERVICE_DEV", "\"https://servertay.onrender.com/services\"")
+    buildConfigField("String", "BASE_URL_SERVICE_DEV", "\"https://servertay.onrender.com/services\"") // Ejemplo de URL de dev
 }
 
 kotlin {
@@ -66,7 +69,7 @@ kotlin {
 }
 
 android {
-    namespace = "com.tayler.appvalutay.shared"
+    namespace = "com.tayler.pizzzaapp.shared"
     compileSdk = libs.versions.android.compileSdk.get().toInt()
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
@@ -77,7 +80,7 @@ android {
     }
 
     buildFeatures {
-        buildConfig = true
+        buildConfig = false
     }
 }
 

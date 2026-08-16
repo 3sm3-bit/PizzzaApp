@@ -26,6 +26,8 @@ sqlite-bundled = "2.5.0-alpha13"
 datastore = "1.1.7"
 navigation-compose = "2.8.8"
 accompanist = "0.28.0"
+google-services = "4.4.2"
+firebase-bom = "33.9.0"
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
@@ -78,6 +80,10 @@ datastore-preferences = { module = "androidx.datastore:datastore-preferences", v
 navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigation-compose" }
 accompanist-systemuicontroller = { module = "com.google.accompanist:accompanist-systemuicontroller", version.ref = "accompanist" }
 
+# Firebase
+firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebase-bom" }
+firebase-messaging = { module = "com.google.firebase:firebase-messaging" }
+
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
 androidLibrary = { id = "com.android.library", version.ref = "agp" }
@@ -88,3 +94,5 @@ kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref =
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 room = { id = "androidx.room", version.ref = "room" }
 buildConfig = { id = "com.github.gmazzo.buildconfig", version = "5.6.8" }
+kotlinx-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+google-services = { id = "com.google.gms.google-services", version.ref = "google-services" }
