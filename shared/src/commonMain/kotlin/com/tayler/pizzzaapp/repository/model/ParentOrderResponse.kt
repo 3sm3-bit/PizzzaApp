@@ -13,7 +13,7 @@ class ParentOrderResponse(
     val nameClient: String? = "",
     @SerialName("description")
     val description: String? = "",
-    @SerialName("price")
+    @SerialName("priceTotal")
     val price: String? = "",
     @SerialName("phone")
     val phone: String? = "",

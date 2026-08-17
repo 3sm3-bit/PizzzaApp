@@ -8,8 +8,8 @@ class DataUseCase(private val iDataNetwork: IDataNetwork) {
 
     suspend fun loadOrder() = iDataNetwork.loadOrder()
 
-    suspend fun loadParentOrder() = iDataNetwork.loadParentOrder()
+    suspend fun loadParentOrder(forceRefresh: Boolean = false) = iDataNetwork.loadParentOrder(forceRefresh)
 
-    suspend fun updateOrder(data : ParentOrderModel) = iDataNetwork.updateOrder(data)
+    suspend fun updateOrder(data: ParentOrderModel) = iDataNetwork.updateOrder(data)
 
 }

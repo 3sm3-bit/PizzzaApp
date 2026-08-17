@@ -1,5 +1,6 @@
 package com.tayler.pizzzaapp.di
 
+import com.tayler.pizzzaapp.manager.db.AppDataBase
 import com.tayler.pizzzaapp.repository.exception.CompleteErrorModel
 import com.tayler.pizzzaapp.repository.exception.UiTayApiException
 import com.tayler.pizzzaapp.repository.exception.UnAuthorizedException
@@ -74,4 +75,10 @@ val networkModule = module {
     }
 
     single { KmmService(get()) }
+}
+
+fun getDatabaseBuilder(): androidx.room.RoomDatabase.Builder<AppDataBase> {
+    // Esta función debe ser implementada en cada plataforma (expect/actual)
+    // O usar un factory de Koin que ya esté configurado.
+    throw Exception("Use platform specific builder")
 }

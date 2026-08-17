@@ -5,10 +5,10 @@ import com.tayler.pizzzaapp.entity.ParentOrderModel
 
 interface IDataNetwork {
 
-    suspend fun loadOrder( ): List<OrderModel>
+    suspend fun loadOrder(): List<OrderModel>
 
-    suspend fun updateOrder(data :ParentOrderModel ): String
+    suspend fun updateOrder(data: ParentOrderModel): String
 
-    suspend fun loadParentOrder( ): List<ParentOrderModel>
+    suspend fun loadParentOrder(forceRefresh: Boolean = false): List<ParentOrderModel>
 
 }
