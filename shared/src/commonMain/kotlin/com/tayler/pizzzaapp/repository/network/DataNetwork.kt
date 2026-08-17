@@ -26,7 +26,10 @@ class DataNetwork(
 
     override suspend fun updateOrder(data: ParentOrderModel): String = apiCall {
         if (!connectivityManager.isConnected()) throw ErrorNetwork()
-        apiService.updateParentOrder(data.toParentOrderRequest())
+        val response = apiService.updateParentOrder(data.toParentOrderRequest())
+        // Borramos la base de datos local para que la próxima carga traiga los datos actualizados
+        database.parentOrderDao().deleteAll()
+        response
     }
 
     override suspend fun loadParentOrder(forceRefresh: Boolean): List<ParentOrderModel> {

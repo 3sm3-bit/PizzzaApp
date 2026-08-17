@@ -17,6 +17,7 @@ class MyFirebaseMessagingService : FirebaseMessagingService(), TextToSpeech.OnIn
 
     private var tts: TextToSpeech? = null
     private var isTtsReady = false
+    private var pendingMessage: String? = null
 
     override fun onCreate() {
         super.onCreate()
@@ -46,6 +47,10 @@ class MyFirebaseMessagingService : FirebaseMessagingService(), TextToSpeech.OnIn
                 }
                 
                 isTtsReady = true
+                pendingMessage?.let {
+                    speakMessage(it)
+                    pendingMessage = null
+                }
             }
         } else {
             Log.e("FCM", "TTS Initialization failed")
@@ -74,8 +79,18 @@ class MyFirebaseMessagingService : FirebaseMessagingService(), TextToSpeech.OnIn
     }
 
     private fun speakMessage(text: String) {
+        Log.d("FCM", "Attempting to speak: $text (Ready: $isTtsReady)")
         if (isTtsReady) {
-            tts?.speak(text, TextToSpeech.QUEUE_FLUSH, null, "OrderArrival")
+            val result = tts?.speak(text, TextToSpeech.QUEUE_FLUSH, null, "OrderArrival")
+            if (result == TextToSpeech.ERROR) {
+                Log.e("FCM", "Error occurred while trying to speak")
+            }
+        } else {
+            Log.w("FCM", "TTS not ready yet. Queuing message.")
+            pendingMessage = text
+            if (tts == null) {
+                tts = TextToSpeech(this, this)
+            }
         }
     }
 
