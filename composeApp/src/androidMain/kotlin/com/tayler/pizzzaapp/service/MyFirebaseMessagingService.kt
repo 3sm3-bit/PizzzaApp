@@ -4,7 +4,9 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.os.PowerManager
 import android.speech.tts.TextToSpeech
+import android.speech.tts.UtteranceProgressListener
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import com.google.firebase.messaging.FirebaseMessagingService
@@ -18,6 +20,7 @@ class MyFirebaseMessagingService : FirebaseMessagingService(), TextToSpeech.OnIn
     private var tts: TextToSpeech? = null
     private var isTtsReady = false
     private var pendingMessage: String? = null
+    private var wakeLock: PowerManager.WakeLock? = null
 
     override fun onCreate() {
         super.onCreate()
@@ -26,34 +29,40 @@ class MyFirebaseMessagingService : FirebaseMessagingService(), TextToSpeech.OnIn
 
     override fun onInit(status: Int) {
         if (status == TextToSpeech.SUCCESS) {
-            val locale = Locale("es", "ES")
-            val result = tts?.setLanguage(locale)
+            tts?.setLanguage(Locale("es", "ES"))
             
-            if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
-                Log.e("FCM", "Language not supported for TTS")
-            } else {
-                // Intentar buscar una voz de mujer en español
-                try {
-                    val femaleVoice = tts?.voices?.find { 
-                        it.locale.language == locale.language && 
-                        (it.name.lowercase().contains("female") || it.name.lowercase().contains("mujer"))
-                    } ?: tts?.voices?.find { 
-                        it.locale.language == locale.language 
-                    }
-                    
-                    femaleVoice?.let { tts?.voice = it }
-                } catch (e: Exception) {
-                    Log.w("FCM", "Could not set specific female voice, using default")
+            tts?.setOnUtteranceProgressListener(object : UtteranceProgressListener() {
+                override fun onStart(utteranceId: String?) {
+                    Log.d("FCM", "TTS started speaking")
                 }
-                
-                isTtsReady = true
-                pendingMessage?.let {
-                    speakMessage(it)
-                    pendingMessage = null
+                override fun onDone(utteranceId: String?) {
+                    Log.d("FCM", "TTS finished speaking, releasing WakeLock")
+                    releaseWakeLock()
                 }
+                override fun onError(utteranceId: String?) {
+                    Log.e("FCM", "TTS error, releasing WakeLock")
+                    releaseWakeLock()
+                }
+            })
+            
+            isTtsReady = true
+            pendingMessage?.let {
+                speakMessage(it)
+                pendingMessage = null
             }
         } else {
             Log.e("FCM", "TTS Initialization failed")
+            releaseWakeLock()
+        }
+    }
+
+    private fun releaseWakeLock() {
+        try {
+            if (wakeLock?.isHeld == true) {
+                wakeLock?.release()
+            }
+        } catch (e: Exception) {
+            Log.e("FCM", "Error releasing WakeLock: ${e.message}")
         }
     }
 
@@ -65,29 +74,45 @@ class MyFirebaseMessagingService : FirebaseMessagingService(), TextToSpeech.OnIn
     override fun onMessageReceived(message: RemoteMessage) {
         super.onMessageReceived(message)
         
-        // Extraer datos con validaciones solicitadas
+        Log.d("FCM", "Message received from: ${message.from}")
+        Log.d("FCM", "Data payload: ${message.data}")
+
+        // Adquirir WakeLock para mantener la CPU activa mientras hablamos
+        val powerManager = getSystemService(Context.POWER_SERVICE) as PowerManager
+        wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "PizzzaApp:TTSLock")
+        wakeLock?.acquire(30000) // 30 segundos máximo
+
+        // Extraer datos intentando varias llaves comunes (Data-only)
+        val titulo = message.data["title"] ?: message.data["titulo"] ?: message.notification?.title ?: "PizzzaApp"
+        val cuerpo = message.data["body"] ?: message.data["mensaje"] ?: message.data["message"] ?: message.notification?.body ?: "Nuevo pedido recibido"
+        
         val tipoEntrega = message.data["receiver"]?.uppercase() ?: "DELIVERY"
         val cliente = message.data["client"] ?: "Tayler"
 
         val voiceMessage = "Llegó un pedido de $tipoEntrega para $cliente"
 
-        message.notification?.let {
-            showNotification(it.title ?: "PizzzaApp", it.body ?: "")
-        }
-
+        // Mostrar notificación (necesario manualmente si se usa data-only)
+        Log.d("FCM", "Showing notification: $titulo - $cuerpo")
+        showNotification(titulo, cuerpo)
+        
+        // Ejecutar voz
         speakMessage(voiceMessage)
     }
 
     private fun speakMessage(text: String) {
         Log.d("FCM", "Attempting to speak: $text (Ready: $isTtsReady)")
         if (isTtsReady) {
+            val params = HashMap<String, String>()
+            params[TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID] = "OrderArrival"
             val result = tts?.speak(text, TextToSpeech.QUEUE_FLUSH, null, "OrderArrival")
             if (result == TextToSpeech.ERROR) {
                 Log.e("FCM", "Error occurred while trying to speak")
+                releaseWakeLock()
             }
         } else {
             Log.w("FCM", "TTS not ready yet. Queuing message.")
             pendingMessage = text
+            // Si por alguna razón el tts es nulo, re-inicializar
             if (tts == null) {
                 tts = TextToSpeech(this, this)
             }
@@ -120,6 +145,7 @@ class MyFirebaseMessagingService : FirebaseMessagingService(), TextToSpeech.OnIn
     override fun onDestroy() {
         tts?.stop()
         tts?.shutdown()
+        releaseWakeLock()
         super.onDestroy()
     }
 }
