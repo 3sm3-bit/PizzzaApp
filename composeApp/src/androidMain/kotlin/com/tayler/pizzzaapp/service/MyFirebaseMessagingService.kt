@@ -62,8 +62,8 @@ class MyFirebaseMessagingService : FirebaseMessagingService(), TextToSpeech.OnIn
         super.onMessageReceived(message)
         
         // Extraer datos con validaciones solicitadas
-        val tipoEntrega = message.data["tipo_entrega"]?.uppercase() ?: "DELIVERY"
-        val cliente = message.data["cliente"] ?: "Tayler"
+        val tipoEntrega = message.data["receiver"]?.uppercase() ?: "DELIVERY"
+        val cliente = message.data["client"] ?: "Tayler"
 
         val voiceMessage = "Llegó un pedido de $tipoEntrega para $cliente"
 
