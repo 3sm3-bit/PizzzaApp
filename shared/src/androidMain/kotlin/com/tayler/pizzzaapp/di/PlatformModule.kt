@@ -8,7 +8,7 @@ import com.tayler.pizzzaapp.utils.AndroidConnectivityManager
 import com.tayler.pizzzaapp.utils.ConnectivityManager
 import org.koin.dsl.module
 
-val platformModule = module {
+actual val platformModule = module {
     single<ConnectivityManager> { AndroidConnectivityManager(get()) }
     
     single<AppDataBase> {

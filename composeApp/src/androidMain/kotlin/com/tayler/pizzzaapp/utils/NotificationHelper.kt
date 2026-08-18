@@ -17,6 +17,8 @@ object NotificationHelper {
                 description = CHANNEL_DESCRIPTION
                 enableLights(true)
                 enableVibration(true)
+                setShowBadge(true)
+                lockscreenVisibility = android.app.Notification.VISIBILITY_PUBLIC
             }
             val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             notificationManager.createNotificationChannel(channel)

@@ -12,10 +12,15 @@ plugins {
 
 buildConfig {
     packageName.set("com.tayler.pizzzaapp.shared")
-    val isDebug = project.hasProperty("debug") || project.gradle.startParameter.taskNames.any { it.contains("Debug", ignoreCase = true) }
+    
+    // Detectar si es Debug en Android o iOS (Xcode pasa la variable CONFIGURATION)
+    val isIosDebug = System.getenv("CONFIGURATION") == "Debug"
+    val isAndroidDebug = project.gradle.startParameter.taskNames.any { it.contains("Debug", ignoreCase = true) }
+    val isDebug = isAndroidDebug || isIosDebug || project.hasProperty("debug")
+    
     buildConfigField("Boolean", "IS_DEBUG", isDebug.toString())
     buildConfigField("String", "BASE_URL_SERVICE", "\"https://servertay.onrender.com/services\"")
-    buildConfigField("String", "BASE_URL_SERVICE_DEV", "\"https://servertay.onrender.com/services\"") // Ejemplo de URL de dev
+    buildConfigField("String", "BASE_URL_SERVICE_DEV", "\"https://servertay.onrender.com/services\"")
 }
 
 kotlin {

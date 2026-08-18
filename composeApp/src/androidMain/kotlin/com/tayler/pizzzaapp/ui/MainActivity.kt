@@ -17,8 +17,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.google.firebase.messaging.FirebaseMessaging
 import com.tayler.pizzzaapp.entity.ParentOrderModel
 import com.tayler.pizzzaapp.ui.base.BaseActivity
@@ -118,8 +119,8 @@ fun App(viewModel: AppViewModel) {
             }
 
             LazyColumn(
-                verticalArrangement = Arrangement.spacedBy(16.dp),
-                contentPadding = PaddingValues(bottom = 16.dp)
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+                contentPadding = PaddingValues(bottom = 12.dp)
             ) {
                 items(uiState.filteredOrders) { order ->
                     OrderCard(order = order, backgroundColor = cardBackground, textColor = darkText)
@@ -184,112 +185,114 @@ fun FilterHeader(
 @Composable
 fun OrderCard(order: ParentOrderModel, backgroundColor: Color, textColor: Color) {
     val statusColor = when (order.state.uppercase()) {
-        "PENDIENTE" -> Color(0xFFF59E0B) // Amber
-        "CONFIRMADO" -> Color(0xFF3B82F6) // Blue
-        "PREPARANDO" -> Color(0xFF10B981) // Green
-        else -> Color(0xFF6B7280) // Grey
+        "PENDIENTE" -> Color(0xFFF59E0B)
+        "CONFIRMADO" -> Color(0xFF3B82F6)
+        "PREPARANDO" -> Color(0xFF10B981)
+        else -> Color(0xFF6B7280)
     }
 
     Card(
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(12.dp),
+        shape = RoundedCornerShape(8.dp),
         colors = CardDefaults.cardColors(containerColor = backgroundColor),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Row(modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Min)) {
             Box(
                 modifier = Modifier
-                    .width(6.dp)
+                    .width(4.dp)
                     .fillMaxHeight()
                     .background(statusColor)
             )
 
-            Column(modifier = Modifier.padding(16.dp)) {
+            Column(modifier = Modifier.padding(10.dp)) {
+                // Fila 1: ID, Cliente y Estado
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     Text(
-                        text = "Pedido #${order.uid.takeLast(4)}",
-                        style = textB14,
+                        text = "#${order.uid.takeLast(4)}",
+                        style = textB12,
                         color = Color(0xFF65676B)
                     )
-                    
+                    Text(
+                        text = order.nameClient,
+                        style = textB14,
+                        color = textColor,
+                        maxLines = 1,
+                        modifier = Modifier.weight(1f)
+                    )
                     Surface(
                         color = statusColor.copy(alpha = 0.1f),
-                        shape = RoundedCornerShape(8.dp),
-                        border = androidx.compose.foundation.BorderStroke(1.dp, statusColor.copy(alpha = 0.5f))
+                        shape = RoundedCornerShape(4.dp)
                     ) {
                         Text(
                             text = order.state.uppercase(),
-                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
-                            style = textB12,
+                            modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
+                            style = textB10,
                             color = statusColor
                         )
                     }
                 }
 
-                Spacer(modifier = Modifier.height(12.dp))
+                Spacer(modifier = Modifier.height(6.dp))
 
-                OrderInfoRow(icon = Icons.Default.Person, label = "Cliente", value = order.nameClient, textColor = textColor)
-                OrderInfoRow(icon = Icons.Default.Edit, label = "Nota", value = order.description, textColor = textColor)
-                OrderInfoRow(icon = Icons.Default.AccountBalanceWallet, label = "Total", value = "$${order.price}", textColor = textColor)
+                // Fila 2: Nota y Precio
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(6.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Edit,
+                        contentDescription = null,
+                        modifier = Modifier.size(14.dp),
+                        tint = Color(0xFF8A8D91)
+                    )
+                    Text(
+                        text = order.description,
+                        style = textS12,
+                        color = Color(0xFF65676B),
+                        maxLines = 3,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.weight(1f)
+                    )
+                    Text(
+                        text = "$${order.price}",
+                        style = textB14,
+                        color = Color(0xFF10B981)
+                    )
+                }
 
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(10.dp))
 
+                // Fila 3: Botones
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    OutlinedButton(
+                    Button(
                         onClick = { /* TODO */ },
-                        modifier = Modifier.weight(1f),
-                        shape = RoundedCornerShape(8.dp),
-                        border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFFDDDFE2))
+                        modifier = Modifier.weight(1f).height(26.dp),
+                        contentPadding = PaddingValues(horizontal = 4.dp, vertical = 0.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFF0F2F5)),
+                        shape = RoundedCornerShape(4.dp)
                     ) {
-                        Text("Detalles", style = textS14, color = Color(0xFF1C1E21))
+                        Text("Detalles", style = textS12, fontSize = 11.sp, color = Color(0xFF1C1E21))
                     }
                     Button(
                         onClick = { /* TODO */ },
-                        modifier = Modifier.weight(1f),
+                        modifier = Modifier.weight(1f).height(26.dp),
+                        contentPadding = PaddingValues(horizontal = 4.dp, vertical = 0.dp),
                         colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF007BFF)),
-                        shape = RoundedCornerShape(8.dp)
+                        shape = RoundedCornerShape(4.dp)
                     ) {
-                        Text("Avanzar", style = textS14, color = Color.White)
+                        Text("Avanzar", style = textS12, fontSize = 11.sp, color = Color.White)
                     }
                 }
             }
         }
-    }
-}
-
-@Composable
-fun OrderInfoRow(icon: ImageVector, label: String, value: String, textColor: Color) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 4.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Icon(
-            imageVector = icon,
-            contentDescription = null,
-            modifier = Modifier.size(16.dp),
-            tint = Color(0xFF8A8D91)
-        )
-        Spacer(modifier = Modifier.width(8.dp))
-        Text(
-            text = "$label:",
-            style = textS14,
-            color = Color(0xFF65676B),
-            modifier = Modifier.width(60.dp)
-        )
-        Text(
-            text = value,
-            style = textM14,
-            color = textColor,
-            modifier = Modifier.weight(1f)
-        )
     }
 }

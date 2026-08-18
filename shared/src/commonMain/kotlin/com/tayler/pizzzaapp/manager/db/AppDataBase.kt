@@ -9,6 +9,9 @@ import androidx.room.Query
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
+import androidx.room.ConstructedBy
+import androidx.room.RoomDatabaseConstructor
+
 @Entity(tableName = "parent_orders")
 data class ParentOrderEntity(
     @PrimaryKey val uid: String,
@@ -33,6 +36,11 @@ interface ParentOrderDao {
 }
 
 @Database(entities = [ParentOrderEntity::class], version = 1)
+@ConstructedBy(AppDataBaseConstructor::class)
 abstract class AppDataBase : RoomDatabase() {
     abstract fun parentOrderDao(): ParentOrderDao
 }
+
+// Room KMP constructor
+expect object AppDataBaseConstructor : RoomDatabaseConstructor<AppDataBase>
+

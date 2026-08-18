@@ -2,11 +2,15 @@ import UIKit
 import FirebaseCore
 import FirebaseMessaging
 import UserNotifications
+import Shared
 
 class AppDelegate: NSObject, UIApplicationDelegate {
     
     func application(_ application: UIApplication,
                      didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
+        
+        // Inicializar Koin desde el módulo compartido
+        KoinInitKt.doInitKoin()
         
         // Configurar Firebase
         FirebaseApp.configure()
@@ -35,6 +39,8 @@ class AppDelegate: NSObject, UIApplicationDelegate {
 
 // MARK: - UNUserNotificationCenterDelegate
 extension AppDelegate: UNUserNotificationCenterDelegate {
+    
+    // Recibir notificación cuando la app está en primer plano
     func userNotificationCenter(_ center: UNUserNotificationCenter,
                                 willPresent notification: UNNotification,
                                 withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
@@ -42,6 +48,16 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
         let userInfo = notification.request.content.userInfo
         print("Notificación recibida en primer plano: \(userInfo)")
         
+        // Extraer datos para la voz
+        let receiver = userInfo["receiver"] as? String ?? "delivery"
+        let client = userInfo["client"] as? String ?? "Tayler"
+        
+        let voiceMessage = "Llegó un pedido de \(receiver.uppercased()) para \(client)"
+        
+        // Hablar el mensaje
+        VoiceManager.shared.speak(text: voiceMessage)
+        
+        // Mostrar el banner visualmente
         completionHandler([[.banner, .list, .sound]])
     }
     
@@ -60,6 +76,5 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
 extension AppDelegate: MessagingDelegate {
     func messaging(_ messaging: Messaging, didReceiveRegistrationToken fcmToken: String?) {
         print("Firebase registration token: \(String(describing: fcmToken))")
-        // Aquí enviarías el token a tu servidor si fuera necesario
     }
 }

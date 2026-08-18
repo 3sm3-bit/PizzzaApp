@@ -24,6 +24,7 @@ class MyFirebaseMessagingService : FirebaseMessagingService(), TextToSpeech.OnIn
 
     override fun onCreate() {
         super.onCreate()
+        Log.d("FCM", "MyFirebaseMessagingService CREADO (onCreate)")
         tts = TextToSpeech(this, this)
     }
 
@@ -74,8 +75,27 @@ class MyFirebaseMessagingService : FirebaseMessagingService(), TextToSpeech.OnIn
     override fun onMessageReceived(message: RemoteMessage) {
         super.onMessageReceived(message)
         
-        Log.d("FCM", "Message received from: ${message.from}")
-        Log.d("FCM", "Data payload: ${message.data}")
+        Log.d("FCM", "======= NUEVO PUSH RECIBIDO =======")
+        Log.d("FCM", "De: ${message.from}")
+        Log.d("FCM", "Prioridad: ${message.priority}")
+        
+        // Log de todos los datos en el objeto 'data'
+        if (message.data.isNotEmpty()) {
+            Log.d("FCM", "Contenido de DATA:")
+            message.data.forEach { (key, value) ->
+                Log.d("FCM", "   Key: $key | Value: $value")
+            }
+        } else {
+            Log.d("FCM", "El objeto DATA está VACÍO")
+        }
+
+        // Log del objeto 'notification' si existe
+        message.notification?.let {
+            Log.d("FCM", "Contenido de NOTIFICATION:")
+            Log.d("FCM", "   Title: ${it.title}")
+            Log.d("FCM", "   Body: ${it.body}")
+        } ?: Log.d("FCM", "El objeto NOTIFICATION es NULO")
+        Log.d("FCM", "===================================")
 
         // Adquirir WakeLock para mantener la CPU activa mientras hablamos
         val powerManager = getSystemService(Context.POWER_SERVICE) as PowerManager
@@ -134,8 +154,10 @@ class MyFirebaseMessagingService : FirebaseMessagingService(), TextToSpeech.OnIn
             .setContentTitle(title)
             .setContentText(message)
             .setAutoCancel(true)
-            .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .setPriority(NotificationCompat.PRIORITY_MAX) // Prioridad máxima para Samsung
+            .setCategory(NotificationCompat.CATEGORY_MESSAGE)
             .setDefaults(NotificationCompat.DEFAULT_ALL)
+            .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
             .setContentIntent(pendingIntent)
 
         val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
