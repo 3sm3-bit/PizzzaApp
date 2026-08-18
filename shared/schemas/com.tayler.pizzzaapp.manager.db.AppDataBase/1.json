@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "0971421f3485896295bac55fc038ad50",
+    "identityHash": "0700e6e9d0eb147b9c992f9707b49096",
     "entities": [
       {
         "tableName": "parent_orders",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`uid` TEXT NOT NULL, `nameClient` TEXT NOT NULL, `description` TEXT NOT NULL, `price` TEXT NOT NULL, `phone` TEXT NOT NULL, `date` TEXT NOT NULL, `state` TEXT NOT NULL, PRIMARY KEY(`uid`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`uid` TEXT NOT NULL, `nameClient` TEXT NOT NULL, `description` TEXT NOT NULL, `price` TEXT NOT NULL, `phone` TEXT NOT NULL, `date` TEXT NOT NULL, `state` TEXT NOT NULL, `address` TEXT NOT NULL, `reception` TEXT NOT NULL, PRIMARY KEY(`uid`))",
         "fields": [
           {
             "fieldPath": "uid",
@@ -49,6 +49,18 @@
             "columnName": "state",
             "affinity": "TEXT",
             "notNull": true
+          },
+          {
+            "fieldPath": "address",
+            "columnName": "address",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "reception",
+            "columnName": "reception",
+            "affinity": "TEXT",
+            "notNull": true
           }
         ],
         "primaryKey": {
@@ -61,7 +73,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '0971421f3485896295bac55fc038ad50')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '0700e6e9d0eb147b9c992f9707b49096')"
     ]
   }
 }

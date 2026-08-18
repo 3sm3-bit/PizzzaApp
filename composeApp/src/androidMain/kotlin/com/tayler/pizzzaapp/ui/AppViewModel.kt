@@ -11,7 +11,9 @@ import com.tayler.pizzzaapp.usecases.DataUseCase
 data class OrderUiState(
     val orders: List<ParentOrderModel> = emptyList(),
     val filteredOrders: List<ParentOrderModel> = emptyList(),
-    val selectedFilter: String = "TODOS"
+    val selectedFilter: String = "TODOS",
+    val countConfirmado: Int = 0,
+    val countListo: Int = 0
 )
 
 class AppViewModel(
@@ -22,41 +24,79 @@ class AppViewModel(
         private set
 
     fun getGeneralOrderList() {
+        Log.d("AppViewModel", "getGeneralOrderList: Iniciando ejecución")
         execute {
-            val response = dataUseCase.loadParentOrder()
-            orderUiState = orderUiState.copy(
-                orders = response,
-                filteredOrders = applyFilter(response, orderUiState.selectedFilter)
-            )
-            Log.d("dataservice", response.toString())
+            try {
+                val response = dataUseCase.loadParentOrder()
+                updateStateWithOrders(response)
+            } catch (e: Exception) {
+                Log.e("AppViewModel", "Error en getGeneralOrderList: ${e.message}", e)
+                throw e
+            }
         }
     }
 
     fun refresh() {
+        Log.d("AppViewModel", "refresh: Forzando refresco")
         execute {
-            val response = dataUseCase.loadParentOrder(forceRefresh = true)
-            orderUiState = orderUiState.copy(
-                orders = response,
-                filteredOrders = applyFilter(response, orderUiState.selectedFilter)
-            )
+            try {
+                val response = dataUseCase.loadParentOrder(forceRefresh = true)
+                updateStateWithOrders(response)
+            } catch (e: Exception) {
+                Log.e("AppViewModel", "Error en refresh: ${e.message}", e)
+                throw e
+            }
         }
     }
 
-    fun updateFilter(filter: String) {
+    private fun updateStateWithOrders(orders: List<ParentOrderModel>) {
+        val sortedOrders = orders.sortedBy {
+            when (it.state.trim().uppercase()) {
+                "CONFIRMADO" -> 1
+                "LISTO" -> 2
+                else -> 3
+            }
+        }
+
+        val countConfirmado = orders.count { it.state.trim().uppercase() == "CONFIRMADO" }
+        val countListo = orders.count { it.state.trim().uppercase() == "LISTO" }
+
         orderUiState = orderUiState.copy(
-            selectedFilter = filter,
-            filteredOrders = applyFilter(orderUiState.orders, filter)
+            orders = sortedOrders,
+            filteredOrders = sortedOrders, // Mostramos todos por defecto ya que no hay filtros
+            countConfirmado = countConfirmado,
+            countListo = countListo
         )
     }
 
-    private fun applyFilter(orders: List<ParentOrderModel>, filter: String): List<ParentOrderModel> {
-        val cleanFilter = filter.trim().uppercase()
-        return if (cleanFilter == "TODOS") {
-            orders
+    fun applyFilter(filter: String) {
+        val filtered = if (filter == "TODOS") {
+            orderUiState.orders
         } else {
-            orders.filter { 
-                it.state.trim().uppercase() == cleanFilter
-            }
+            orderUiState.orders.filter { it.state.trim().uppercase() == filter.uppercase() }
         }
+        orderUiState = orderUiState.copy(
+            filteredOrders = filtered,
+            selectedFilter = filter
+        )
+    }
+
+    fun updateOrderState(order: ParentOrderModel, newState: String) {
+        if (order.state.trim().uppercase() == newState.uppercase()) return
+
+        execute {
+            dataUseCase.updateOrder(order.copy(state = newState))
+            getGeneralOrderList()
+        }
+    }
+
+    fun avanzarEstado(order: ParentOrderModel) {
+        val currentState = order.state.trim().uppercase()
+        val nextState = when (currentState) {
+            "CONFIRMADO" -> "LISTO"
+            "LISTO" -> "ENTREGADO" // O el estado final que manejes
+            else -> "CONFIRMADO"
+        }
+        updateOrderState(order, nextState)
     }
 }

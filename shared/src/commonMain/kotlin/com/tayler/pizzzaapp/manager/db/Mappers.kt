@@ -10,7 +10,10 @@ fun ParentOrderEntity.toModel() = ParentOrderModel(
     price = price,
     phone = phone,
     date = date,
-    state = state
+    state = state,
+    address = address,
+    reception = reception,
+    orders = emptyList() // No orders stored in Entity for now
 )
 
 fun ParentOrderModel.toEntity() = ParentOrderEntity(
@@ -20,7 +23,9 @@ fun ParentOrderModel.toEntity() = ParentOrderEntity(
     price = price,
     phone = phone,
     date = date,
-    state = state
+    state = state,
+    address = address,
+    reception = reception
 )
 
 fun List<ParentOrderEntity>.toModelList() = map { it.toModel() }
@@ -34,6 +39,8 @@ fun List<ParentOrderResponse>.toEntityListFromResponse() = map {
         price = it.price ?: "",
         phone = it.phone ?: "",
         date = it.date ?: "",
-        state = it.state ?: ""
+        state = it.state ?: "",
+        address = it.address ?: "",
+        reception = it.reception ?: ""
     )
 }

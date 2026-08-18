@@ -20,19 +20,26 @@ class ParentOrderResponse(
     @SerialName("date")
     val date: String? = "",
     @SerialName("state")
-    val state: String? = ""
-) {
-    companion object {
-        fun List<ParentOrderResponse>.loadParentOrder() = this.map {
-            ParentOrderModel(
-                uid = it.uid ?: "",
-                nameClient = it.nameClient ?: "",
-                description = it.description ?: "",
-                price = it.price ?: "",
-                phone = it.phone ?: "",
-                date = it.date ?: "",
-                state = it.state ?: ""
-            )
-        }
-    }
+    val state: String? = "",
+    @SerialName("address")
+    val address: String? = "",
+    @SerialName("reception")
+    val reception: String? = "",
+    @SerialName("orders")
+    val orders: List<OrderResponse>? = emptyList()
+)
+
+fun List<ParentOrderResponse>.loadParentOrder() = this.map {
+    ParentOrderModel(
+        uid = it.uid ?: "",
+        nameClient = it.nameClient ?: "",
+        description = it.description ?: "",
+        price = it.price ?: "",
+        phone = it.phone ?: "",
+        date = it.date ?: "",
+        state = it.state ?: "",
+        address = it.address ?: "",
+        reception = it.reception ?: "",
+        orders = it.orders?.loadOrder() ?: emptyList()
+    )
 }

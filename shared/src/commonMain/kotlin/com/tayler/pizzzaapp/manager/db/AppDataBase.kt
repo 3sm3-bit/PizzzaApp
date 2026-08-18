@@ -20,7 +20,9 @@ data class ParentOrderEntity(
     val price: String,
     val phone: String,
     val date: String,
-    val state: String
+    val state: String,
+    val address: String,
+    val reception: String
 )
 
 @Dao

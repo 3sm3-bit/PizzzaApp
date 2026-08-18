@@ -14,5 +14,9 @@ data class OrderModel (
     val priceTotal : String,
     val state : String,
     val date : String,
-    val idOrder: String
+    val idOrder: String,
+    val address: String,
+    val reception: String,
+    val priceDelivery: String,
+    val priceChosse: String
 )

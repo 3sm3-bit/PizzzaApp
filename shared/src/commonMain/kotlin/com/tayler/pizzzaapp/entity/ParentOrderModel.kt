@@ -10,7 +10,10 @@ data class ParentOrderModel(
     val price: String,
     val phone: String,
     val date: String,
-    val state: String
+    val state: String,
+    val address: String,
+    val reception: String,
+    val orders: List<OrderModel>
 ) {
     fun toParentOrderRequest() =
         ParentOrderResponse(
@@ -20,7 +23,10 @@ data class ParentOrderModel(
             price = price,
             phone = phone,
             date = date,
-            state = state
+            state = state,
+            address = address,
+            reception = reception,
+            orders = emptyList() // Or map it back if needed, but usually for requests we might not need all orders
         )
 
 }
