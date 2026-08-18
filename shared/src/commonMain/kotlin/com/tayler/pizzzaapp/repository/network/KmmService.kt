@@ -6,7 +6,7 @@ import com.tayler.pizzzaapp.shared.BuildConfig
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
-import io.ktor.client.request.post
+import io.ktor.client.request.put
 import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
@@ -30,7 +30,7 @@ class KmmService(private val client: HttpClient) {
     }
 
     suspend fun updateParentOrder(request: ParentOrderResponse): String {
-        return client.post("${BASE_URL}/pizza/genralOrder") {
+        return client.put("${BASE_URL}/pizza/genralOrder") {
             contentType(ContentType.Application.Json)
             setBody(request)
         }.body()

@@ -13,7 +13,8 @@ data class OrderUiState(
     val filteredOrders: List<ParentOrderModel> = emptyList(),
     val selectedFilter: String = "TODOS",
     val countConfirmado: Int = 0,
-    val countListo: Int = 0
+    val countListo: Int = 0,
+    val selectedOrder: ParentOrderModel? = null
 )
 
 class AppViewModel(
@@ -84,9 +85,28 @@ class AppViewModel(
     fun updateOrderState(order: ParentOrderModel, newState: String) {
         if (order.state.trim().uppercase() == newState.uppercase()) return
 
-        execute {
-            dataUseCase.updateOrder(order.copy(state = newState))
-            getGeneralOrderList()
+        // 1. Guardar estado previo para Reversión (Rollback) en caso de error
+        val previousState = orderUiState
+
+        // 2. Actualización Optimista: Actualizamos la UI inmediatamente
+        Log.d("AppViewModel", "updateOrderState: Actualización optimista de ${order.uid} a $newState")
+        val updatedOrders = orderUiState.orders.map { 
+            if (it.uid == order.uid) it.copy(state = newState) else it 
+        }
+        updateStateWithOrders(updatedOrders)
+
+        // 3. Sincronización en segundo plano
+        // Usamos loading = false para que no aparezca el progreso global y la app se sienta "rápida"
+        execute(loading = false) {
+            try {
+                dataUseCase.updateOrder(order.copy(state = newState))
+                Log.d("AppViewModel", "updateOrderState: Sincronización exitosa con servidor")
+            } catch (e: Exception) {
+                // 4. Rollback: Si falla el servidor, devolvemos la UI a su estado anterior
+                Log.e("AppViewModel", "updateOrderState: Error al sincronizar. Revirtiendo UI.", e)
+                orderUiState = previousState
+                throw e // Permitimos que BaseViewModel muestre el diálogo de error
+            }
         }
     }
 
@@ -98,5 +118,9 @@ class AppViewModel(
             else -> "CONFIRMADO"
         }
         updateOrderState(order, nextState)
+    }
+
+    fun selectOrder(order: ParentOrderModel?) {
+        orderUiState = orderUiState.copy(selectedOrder = order)
     }
 }

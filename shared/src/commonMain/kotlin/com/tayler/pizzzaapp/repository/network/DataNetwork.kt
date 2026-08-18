@@ -8,6 +8,7 @@ import com.tayler.pizzzaapp.repository.model.loadParentOrder
 import com.tayler.pizzzaapp.usecases.network.IDataNetwork
 import com.tayler.pizzzaapp.utils.ConnectivityManager
 import com.tayler.pizzzaapp.manager.db.AppDataBase
+import com.tayler.pizzzaapp.manager.db.toEntity
 import com.tayler.pizzzaapp.manager.db.toEntityListFromResponse
 import com.tayler.pizzzaapp.manager.db.toModelList
 
@@ -26,9 +27,15 @@ class DataNetwork(
 
     override suspend fun updateOrder(data: ParentOrderModel): String = apiCall {
         if (!connectivityManager.isConnected()) throw ErrorNetwork()
+        println("DataNetwork: Actualizando pedido ${data.uid} a estado ${data.state}...")
         val response = apiService.updateParentOrder(data.toParentOrderRequest())
-        // Borramos la base de datos local para que la próxima carga traiga los datos actualizados
-        database.parentOrderDao().deleteAll()
+        
+        // En lugar de borrar todo, actualizamos o insertamos el pedido específico en la DB local
+        // Nota: Como la entidad no guarda los productos individuales, la próxima carga
+        // desde DB detectará que faltan productos y forzará un refresco completo de red.
+        // Esto es correcto para mantener la integridad de los datos.
+        database.parentOrderDao().insertAll(listOf(data.toEntity()))
+        println("DataNetwork: Pedido actualizado en servidor y DB local")
         response
     }
 
