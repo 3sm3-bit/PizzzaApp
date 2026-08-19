@@ -2,6 +2,7 @@ package com.tayler.pizzzaapp.repository.network
 
 import com.tayler.pizzzaapp.repository.model.OrderResponse
 import com.tayler.pizzzaapp.repository.model.ParentOrderResponse
+import com.tayler.pizzzaapp.repository.model.ProductResponse
 import com.tayler.pizzzaapp.shared.BuildConfig
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
@@ -27,6 +28,10 @@ class KmmService(private val client: HttpClient) {
 
     suspend fun getParentOrder(): List<ParentOrderResponse> {
         return client.get("${BASE_URL}/pizza/genralOrder").body()
+    }
+
+    suspend fun getProducts(): List<ProductResponse> {
+        return client.get("${BASE_URL}/pizza/products").body()
     }
 
     suspend fun updateParentOrder(request: ParentOrderResponse): String {

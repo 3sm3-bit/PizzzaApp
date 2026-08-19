@@ -44,3 +44,32 @@ fun List<ParentOrderResponse>.toEntityListFromResponse() = map {
         reception = it.reception ?: ""
     )
 }
+
+fun ProductEntity.toModel() = com.tayler.pizzzaapp.entity.ProductModel(
+    uid = uid,
+    nameProduct = nameProduct,
+    type = type,
+    price = price,
+    tamanio = tamanio,
+    description = description,
+    priceChosse = priceChosse,
+    currency = currency,
+    currencySymbol = currencySymbol,
+    state = state
+)
+
+fun com.tayler.pizzzaapp.entity.ProductModel.toEntity() = ProductEntity(
+    uid = uid,
+    nameProduct = nameProduct,
+    type = type,
+    price = price,
+    tamanio = tamanio,
+    description = description,
+    priceChosse = priceChosse,
+    currency = currency,
+    currencySymbol = currencySymbol,
+    state = state
+)
+
+fun List<ProductEntity>.toProductModelList() = map { it.toModel() }
+fun List<com.tayler.pizzzaapp.entity.ProductModel>.toProductEntityList() = map { it.toEntity() }

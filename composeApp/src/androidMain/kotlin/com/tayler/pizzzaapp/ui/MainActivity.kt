@@ -10,6 +10,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -20,6 +22,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import com.google.firebase.messaging.FirebaseMessaging
 import com.tayler.pizzzaapp.entity.ParentOrderModel
 import com.tayler.pizzzaapp.ui.base.BaseActivity
@@ -34,7 +39,21 @@ class MainActivity : BaseActivity() {
 
     @Composable
     override fun SetScreenConfig() {
-        App(viewModel)
+        val navController = rememberNavController()
+        NavHost(navController = navController, startDestination = "orders") {
+            composable("orders") {
+                OrderScreen(viewModel, onNavigateToProducts = {
+                    viewModel.getProductsList()
+                    navController.navigate("products")
+                })
+            }
+            composable("products") {
+                ProductScreen(
+                    products = viewModel.orderUiState.products,
+                    onBack = { navController.popBackStack() }
+                )
+            }
+        }
     }
 
     override fun setDataGlobal() {
@@ -58,10 +77,9 @@ class MainActivity : BaseActivity() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun App(viewModel: AppViewModel) {
+fun OrderScreen(viewModel: AppViewModel, onNavigateToProducts: () -> Unit) {
     val permissionManager = rememberUiTayPermissionManager()
     val uiState = viewModel.orderUiState
-    val sheetState = rememberModalBottomSheetState()
     var showSheet by remember { mutableStateOf(false) }
 
     LaunchedEffect(uiState.selectedOrder) {
@@ -76,16 +94,27 @@ fun App(viewModel: AppViewModel) {
         }
     }
 
-    MaterialTheme {
-        val lightBackground = Color(0xFFF0F2F5)
-        val cardBackground = Color.White
-        val darkText = Color(0xFF1C1E21)
-
-        Box(modifier = Modifier.fillMaxSize()) {
+    Scaffold(
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = onNavigateToProducts,
+                containerColor = Color(0xFF007BFF),
+                contentColor = Color.White,
+                modifier = Modifier.size(48.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.List,
+                    contentDescription = "Ver Productos",
+                    modifier = Modifier.size(24.dp)
+                )
+            }
+        },
+        containerColor = Color(0xFFF0F2F5)
+    ) { padding ->
+        Box(modifier = Modifier.fillMaxSize().padding(padding)) {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(lightBackground)
                     .padding(16.dp)
             ) {
                 Row(
@@ -97,7 +126,7 @@ fun App(viewModel: AppViewModel) {
                         text = "Gestión de Pedidos",
                         style = textB20,
                         fontSize = 18.sp,
-                        color = darkText
+                        color = Color(0xFF1C1E21)
                     )
                     
                     IconButton(
@@ -173,8 +202,8 @@ fun App(viewModel: AppViewModel) {
                         items(uiState.orders) { order ->
                             OrderCard(
                                 order = order,
-                                backgroundColor = cardBackground,
-                                textColor = darkText,
+                                backgroundColor = Color.White,
+                                textColor = Color(0xFF1C1E21),
                                 onDetailClick = { viewModel.selectOrder(order) },
                                 onStateChange = { action ->
                                     if (action == "AVANZAR") {
@@ -192,6 +221,103 @@ fun App(viewModel: AppViewModel) {
                     order = uiState.selectedOrder!!,
                     onDismiss = { viewModel.selectOrder(null) }
                 )
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ProductScreen(
+    products: List<com.tayler.pizzzaapp.entity.ProductModel>,
+    onBack: () -> Unit
+) {
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text("Nuestros Productos", style = textB20) },
+                navigationIcon = {
+                    IconButton(onClick = onBack) {
+                        Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Atrás")
+                    }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = Color.White,
+                    titleContentColor = Color(0xFF1C1E21)
+                )
+            )
+        },
+        containerColor = Color(0xFFF0F2F5)
+    ) { padding ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(padding)
+                .padding(16.dp)
+        ) {
+            LazyColumn(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                items(products) { product ->
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = CardDefaults.cardColors(containerColor = Color.White),
+                        shape = RoundedCornerShape(12.dp)
+                    ) {
+                        Column(modifier = Modifier.padding(16.dp)) {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(
+                                    text = product.nameProduct,
+                                    style = textB16,
+                                    color = Color(0xFF1C1E21),
+                                    modifier = Modifier.weight(1f)
+                                )
+                                Text(
+                                    text = "${product.currencySymbol}${product.price}",
+                                    style = textB18,
+                                    color = Color(0xFF10B981)
+                                )
+                            }
+
+                            Text(
+                                text = product.description,
+                                style = textS12,
+                                color = Color(0xFF65676B),
+                                modifier = Modifier.padding(top = 4.dp)
+                            )
+
+                            if (product.type == "1") {
+                                Row(
+                                    modifier = Modifier.padding(top = 8.dp),
+                                    horizontalArrangement = Arrangement.spacedBy(16.dp)
+                                ) {
+                                    Surface(
+                                        color = Color(0xFFF0F2F5),
+                                        shape = RoundedCornerShape(8.dp)
+                                    ) {
+                                        Text(
+                                            text = product.tamanio,
+                                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                                            style = textB10,
+                                            color = Color(0xFF65676B)
+                                        )
+                                    }
+
+                                    if (product.priceChosse.isNotBlank()) {
+                                        Text(
+                                            text = "🧀 Orilla: ${product.currencySymbol}${product.priceChosse}",
+                                            style = textB10,
+                                            color = Color(0xFF007BFF),
+                                            modifier = Modifier.padding(top = 4.dp)
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
     }

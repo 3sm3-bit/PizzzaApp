@@ -10,6 +10,8 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlin.time.Duration.Companion.milliseconds
 
+import kotlinx.coroutines.withContext
+
 open class BaseViewModel(): ViewModel() {
 
     var uiStateBase by mutableStateOf(BaseUiState())
@@ -17,12 +19,19 @@ open class BaseViewModel(): ViewModel() {
     fun execute(loading: Boolean = true, func: suspend () -> Unit) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                uiStateBase = uiStateBase.copy(loading = loading, error = false)
-                delay(1000.milliseconds)
+                withContext(Dispatchers.Main) {
+                    uiStateBase = uiStateBase.copy(loading = loading, error = false)
+                }
+                
                 func()
-                uiStateBase = uiStateBase.copy(loading = false)
+                
+                withContext(Dispatchers.Main) {
+                    uiStateBase = uiStateBase.copy(loading = false)
+                }
             } catch (ex: Exception) {
-                uiStateBase = uiStateBase.copy(error = true, errorType = ex, loading = false)
+                withContext(Dispatchers.Main) {
+                    uiStateBase = uiStateBase.copy(error = true, errorType = ex, loading = false)
+                }
             }
         }
     }

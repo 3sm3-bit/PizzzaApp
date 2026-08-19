@@ -25,6 +25,20 @@ data class ParentOrderEntity(
     val reception: String
 )
 
+@Entity(tableName = "products")
+data class ProductEntity(
+    @PrimaryKey val uid: String,
+    val nameProduct: String,
+    val type: String,
+    val price: String,
+    val tamanio: String,
+    val description: String,
+    val priceChosse: String,
+    val currency: String,
+    val currencySymbol: String,
+    val state: Boolean
+)
+
 @Dao
 interface ParentOrderDao {
     @Query("SELECT * FROM parent_orders")
@@ -37,10 +51,23 @@ interface ParentOrderDao {
     suspend fun deleteAll()
 }
 
-@Database(entities = [ParentOrderEntity::class], version = 1)
+@Dao
+interface ProductDao {
+    @Query("SELECT * FROM products")
+    suspend fun getAll(): List<ProductEntity>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertAll(products: List<ProductEntity>)
+
+    @Query("DELETE FROM products")
+    suspend fun deleteAll()
+}
+
+@Database(entities = [ParentOrderEntity::class, ProductEntity::class], version = 2)
 @ConstructedBy(AppDataBaseConstructor::class)
 abstract class AppDataBase : RoomDatabase() {
     abstract fun parentOrderDao(): ParentOrderDao
+    abstract fun productDao(): ProductDao
 }
 
 // Room KMP constructor

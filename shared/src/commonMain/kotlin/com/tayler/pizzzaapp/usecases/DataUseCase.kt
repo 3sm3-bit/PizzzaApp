@@ -12,4 +12,6 @@ class DataUseCase(private val iDataNetwork: IDataNetwork) {
 
     suspend fun updateOrder(data: ParentOrderModel) = iDataNetwork.updateOrder(data)
 
+    suspend fun getProducts() = iDataNetwork.getProducts()
+
 }

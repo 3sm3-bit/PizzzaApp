@@ -5,8 +5,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import com.tayler.pizzzaapp.entity.ParentOrderModel
+import com.tayler.pizzzaapp.entity.ProductModel
 import com.tayler.pizzzaapp.ui.base.BaseViewModel
 import com.tayler.pizzzaapp.usecases.DataUseCase
+
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 data class OrderUiState(
     val orders: List<ParentOrderModel> = emptyList(),
@@ -14,7 +18,8 @@ data class OrderUiState(
     val selectedFilter: String = "TODOS",
     val countConfirmado: Int = 0,
     val countListo: Int = 0,
-    val selectedOrder: ParentOrderModel? = null
+    val selectedOrder: ParentOrderModel? = null,
+    val products: List<ProductModel> = emptyList()
 )
 
 class AppViewModel(
@@ -118,6 +123,22 @@ class AppViewModel(
             else -> "CONFIRMADO"
         }
         updateOrderState(order, nextState)
+    }
+
+    fun getProductsList() {
+        val hasData = orderUiState.products.isNotEmpty()
+        // Si ya hay datos, cargamos en segundo plano para no bloquear
+        execute(loading = !hasData) {
+            try {
+                val response = dataUseCase.getProducts()
+                withContext(Dispatchers.Main) {
+                    orderUiState = orderUiState.copy(products = response)
+                }
+            } catch (e: Exception) {
+                Log.e("AppViewModel", "Error en getProductsList: ${e.message}", e)
+                throw e
+            }
+        }
     }
 
     fun selectOrder(order: ParentOrderModel?) {
