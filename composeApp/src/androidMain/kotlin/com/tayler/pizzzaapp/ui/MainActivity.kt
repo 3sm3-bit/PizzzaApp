@@ -30,6 +30,7 @@ import com.tayler.pizzzaapp.entity.ParentOrderModel
 import com.tayler.pizzzaapp.repository.network.WebSocketManager
 import com.tayler.pizzzaapp.ui.base.BaseActivity
 import com.tayler.pizzzaapp.ui.base.BaseViewModel
+import com.tayler.pizzzaapp.utils.AudioQueueManager
 import com.tayler.pizzzaapp.utils.NotificationHelper
 import com.valu.uitaycompose.utils.*
 import com.valu.uitaycompose.utils.permission.rememberUiTayPermissionManager
@@ -43,6 +44,7 @@ class MainActivity : BaseActivity() {
     private val viewModel : AppViewModel by viewModel()
     private val webSocketManager: WebSocketManager by inject()
     private lateinit var notificationHelper: NotificationHelper
+    private lateinit var audioQueueManager: AudioQueueManager
 
     @Composable
     override fun SetScreenConfig() {
@@ -70,17 +72,34 @@ class MainActivity : BaseActivity() {
 
     private fun setupWebSockets() {
         notificationHelper = NotificationHelper(this)
+        audioQueueManager = AudioQueueManager(this)
         
         // Usar branchId "1" que es el que aparece en tus pedidos de ejemplo
         webSocketManager.connect(branchId = "1")
 
         webSocketManager.notifications
             .onEach { notification ->
-                notificationHelper.showOrderNotification(
-                    title = notification.titulo,
-                    message = notification.mensaje
-                )
-                // Refrescar la lista de pedidos al recibir una notificación
+                println("🍕 MainActivity - Notificación recibida de WS: ${notification.titulo}")
+                
+                // 1. Intentar reproducir audio inmediatamente (más prioridad)
+                try {
+                    println("🍕 MainActivity - Llamando a enqueueAudio")
+                    audioQueueManager.enqueueAudio()
+                } catch (e: Exception) {
+                    println("⚠️ MainActivity - Error en audio: ${e.message}")
+                }
+
+                // 2. Mostrar notificación visual
+                try {
+                    notificationHelper.showOrderNotification(
+                        title = notification.titulo,
+                        message = notification.mensaje
+                    )
+                } catch (e: Exception) {
+                    println("⚠️ MainActivity - Error en notificación visual: ${e.message}")
+                }
+                
+                // 3. Refrescar lista
                 viewModel.getGeneralOrderList()
             }
             .launchIn(lifecycleScope)
