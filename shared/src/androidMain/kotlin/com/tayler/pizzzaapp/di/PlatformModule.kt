@@ -18,6 +18,7 @@ actual val platformModule = module {
             context = context,
             name = dbFile.absolutePath
         )
+            .fallbackToDestructiveMigration(true)
             .setDriver(BundledSQLiteDriver())
             .build()
     }

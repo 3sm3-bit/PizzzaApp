@@ -21,6 +21,7 @@ actual val platformModule = module {
             name = dbFilePath,
             factory = { AppDataBaseConstructor.initialize() }
         )
+            .fallbackToDestructiveMigration(true)
             .setDriver(BundledSQLiteDriver())
             .build()
     }
