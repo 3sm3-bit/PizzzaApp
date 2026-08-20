@@ -6,6 +6,7 @@ import com.tayler.pizzzaapp.repository.exception.UiTayApiException
 import com.tayler.pizzzaapp.repository.exception.UnAuthorizedException
 import com.tayler.pizzzaapp.repository.manager.InstantSerializer
 import com.tayler.pizzzaapp.repository.network.KmmService
+import com.tayler.pizzzaapp.repository.network.WebSocketManager
 import com.tayler.pizzzaapp.requestLogger
 import com.tayler.pizzzaapp.utils.parseJsonTo
 import io.ktor.client.HttpClient
@@ -14,16 +15,19 @@ import io.ktor.client.plugins.HttpTimeout
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.logging.LogLevel
 import io.ktor.client.plugins.logging.Logging
+import io.ktor.client.plugins.websocket.WebSockets
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.HttpStatusCode
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.datetime.Instant
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.modules.SerializersModule
+import org.koin.core.qualifier.named
 import org.koin.dsl.module
 
 val networkModule = module {
-    single {
+    // Cliente para peticiones REST (con ContentNegotiation y validación)
+    single(named("httpClient")) {
         HttpClient {
             install(ContentNegotiation) {
                 json(
@@ -41,7 +45,7 @@ val networkModule = module {
                 validateResponse { response ->
                     if (response.status != HttpStatusCode.OK) {
                         val statusCode = response.status.value
-                        val errorText = response.bodyAsText()
+                        val errorText = try { response.bodyAsText() } catch (e: Exception) { "" }
                         
                         when (statusCode) {
                             401 -> throw UnAuthorizedException()
@@ -74,7 +78,19 @@ val networkModule = module {
         }
     }
 
-    single { KmmService(get()) }
+    // Cliente dedicado para WebSockets (sin ContentNegotiation global para evitar conflictos)
+    single(named("wsClient")) {
+        HttpClient {
+            install(WebSockets)
+            install(Logging) {
+                logger = requestLogger
+                level = LogLevel.ALL
+            }
+        }
+    }
+
+    single { KmmService(get(named("httpClient"))) }
+    single { WebSocketManager(get(named("wsClient"))) }
 }
 
 fun getDatabaseBuilder(): androidx.room.RoomDatabase.Builder<AppDataBase> {

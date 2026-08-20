@@ -19,8 +19,8 @@ buildConfig {
     val isDebug = isAndroidDebug || isIosDebug || project.hasProperty("debug")
     
     buildConfigField("Boolean", "IS_DEBUG", isDebug.toString())
-    buildConfigField("String", "BASE_URL_SERVICE", "\"https://servertay.onrender.com/services\"")
-    buildConfigField("String", "BASE_URL_SERVICE_DEV", "\"https://servertay.onrender.com/services\"")
+    buildConfigField("String", "BASE_URL_SERVICE", "\"https://unexpired-culpable-eldercare.ngrok-free.dev/pizzzeria\"")
+    buildConfigField("String", "BASE_URL_SERVICE_DEV", "\"https://unexpired-culpable-eldercare.ngrok-free.dev/pizzzeria\"")
 }
 
 kotlin {
@@ -54,6 +54,7 @@ kotlin {
             implementation(libs.kotlinx.coroutines.core)
             implementation(libs.kotlinx.serialization.json)
             implementation(libs.ktor.client.core)
+            implementation(libs.ktor.client.websockets)
             implementation(libs.ktor.client.content.negotiation)
             implementation(libs.ktor.serialization.kotlinx.json)
             implementation(libs.ktor.client.logging)

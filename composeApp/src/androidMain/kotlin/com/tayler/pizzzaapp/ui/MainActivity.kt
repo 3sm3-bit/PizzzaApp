@@ -22,20 +22,27 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.google.firebase.messaging.FirebaseMessaging
 import com.tayler.pizzzaapp.entity.ParentOrderModel
+import com.tayler.pizzzaapp.repository.network.WebSocketManager
 import com.tayler.pizzzaapp.ui.base.BaseActivity
 import com.tayler.pizzzaapp.ui.base.BaseViewModel
+import com.tayler.pizzzaapp.utils.NotificationHelper
 import com.valu.uitaycompose.utils.*
 import com.valu.uitaycompose.utils.permission.rememberUiTayPermissionManager
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
+import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class MainActivity : BaseActivity() {
 
     private val viewModel : AppViewModel by viewModel()
+    private val webSocketManager: WebSocketManager by inject()
+    private lateinit var notificationHelper: NotificationHelper
 
     @Composable
     override fun SetScreenConfig() {
@@ -58,18 +65,25 @@ class MainActivity : BaseActivity() {
 
     override fun setDataGlobal() {
           viewModel.getGeneralOrderList()
-          printFirebaseToken()
+          setupWebSockets()
     }
 
-    private fun printFirebaseToken() {
-        FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
-            if (!task.isSuccessful) {
-                Log.w("FCM", "Fetching FCM registration token failed", task.exception)
-                return@addOnCompleteListener
+    private fun setupWebSockets() {
+        notificationHelper = NotificationHelper(this)
+        
+        // Usar branchId "1" que es el que aparece en tus pedidos de ejemplo
+        webSocketManager.connect(branchId = "1")
+
+        webSocketManager.notifications
+            .onEach { notification ->
+                notificationHelper.showOrderNotification(
+                    title = notification.titulo,
+                    message = notification.mensaje
+                )
+                // Refrescar la lista de pedidos al recibir una notificación
+                viewModel.getGeneralOrderList()
             }
-            val token = task.result
-            Log.d("FCM", "Current token: $token")
-        }
+            .launchIn(lifecycleScope)
     }
 
     override fun getViewModel(): BaseViewModel = viewModel

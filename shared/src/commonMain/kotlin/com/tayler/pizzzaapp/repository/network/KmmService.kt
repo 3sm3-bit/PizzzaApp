@@ -27,15 +27,15 @@ class KmmService(private val client: HttpClient) {
     }
 
     suspend fun getParentOrder(): List<ParentOrderResponse> {
-        return client.get("${BASE_URL}/pizza/genralOrder").body()
+        return client.get("${BASE_URL}/order/generalOrder").body()
     }
 
     suspend fun getProducts(): List<ProductResponse> {
-        return client.get("${BASE_URL}/pizza/products").body()
+        return client.get("${BASE_URL}/products").body()
     }
 
     suspend fun updateParentOrder(request: ParentOrderResponse): String {
-        return client.put("${BASE_URL}/pizza/genralOrder") {
+        return client.put("${BASE_URL}/order/generalOrder") {
             contentType(ContentType.Application.Json)
             setBody(request)
         }.body()

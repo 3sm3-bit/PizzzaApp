@@ -1,6 +1,4 @@
 import UIKit
-import FirebaseCore
-import FirebaseMessaging
 import UserNotifications
 import Shared
 
@@ -12,10 +10,7 @@ class AppDelegate: NSObject, UIApplicationDelegate {
         // Inicializar Koin desde el módulo compartido
         KoinInitKt.doInitKoin()
         
-        // Configurar Firebase
-        FirebaseApp.configure()
-        
-        // Configurar notificaciones push
+        // Configurar notificaciones locales
         UNUserNotificationCenter.current().delegate = self
         
         let authOptions: UNAuthorizationOptions = [.alert, .badge, .sound]
@@ -26,14 +21,7 @@ class AppDelegate: NSObject, UIApplicationDelegate {
         
         application.registerForRemoteNotifications()
         
-        // Configurar el delegado de mensajería
-        Messaging.messaging().delegate = self
-        
         return true
-    }
-    
-    func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
-        Messaging.messaging().apnsToken = deviceToken
     }
 }
 
@@ -69,12 +57,5 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
         print("Usuario tocó la notificación: \(userInfo)")
         
         completionHandler()
-    }
-}
-
-// MARK: - MessagingDelegate
-extension AppDelegate: MessagingDelegate {
-    func messaging(_ messaging: Messaging, didReceiveRegistrationToken fcmToken: String?) {
-        print("Firebase registration token: \(String(describing: fcmToken))")
     }
 }
