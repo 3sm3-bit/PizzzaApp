@@ -8,8 +8,8 @@ import com.tayler.pizzzaapp.entity.ParentOrderModel
 import com.tayler.pizzzaapp.entity.ProductModel
 import com.tayler.pizzzaapp.ui.base.BaseViewModel
 import com.tayler.pizzzaapp.usecases.DataUseCase
+import com.tayler.pizzzaapp.utils.DispatcherProvider
 
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 data class OrderUiState(
@@ -23,8 +23,9 @@ data class OrderUiState(
 )
 
 class AppViewModel(
-    private val dataUseCase: DataUseCase
-) : BaseViewModel() {
+    private val dataUseCase: DataUseCase,
+    private val dispatchers: DispatcherProvider
+) : BaseViewModel(dispatchers) {
 
     var orderUiState by mutableStateOf(OrderUiState())
         private set
@@ -131,7 +132,7 @@ class AppViewModel(
         execute(loading = !hasData) {
             try {
                 val response = dataUseCase.getProducts()
-                withContext(Dispatchers.Main) {
+                withContext(dispatchers.main) {
                     orderUiState = orderUiState.copy(products = response)
                 }
             } catch (e: Exception) {

@@ -14,6 +14,14 @@ class OrderViewModel: ObservableObject {
     
     init() {
         getGeneralOrderList()
+        setupNotificationObserver()
+    }
+    
+    private func setupNotificationObserver() {
+        NotificationCenter.default.addObserver(forName: NSNotification.Name("NewOrderReceived"), object: nil, queue: .main) { [weak self] _ in
+            print("🍕 OrderViewModel: Refrescando lista por nuevo pedido")
+            self?.refresh()
+        }
     }
     
     func getProductsList() {

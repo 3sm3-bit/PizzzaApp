@@ -1,5 +1,6 @@
 package com.tayler.pizzzaapp.ui
 
+import android.content.Intent
 import android.os.Build
 import android.util.Log
 import androidx.compose.foundation.BorderStroke
@@ -67,43 +68,31 @@ class MainActivity : BaseActivity() {
 
     override fun setDataGlobal() {
           viewModel.getGeneralOrderList()
-          setupWebSockets()
+          startWebSocketService()
+          observeSocketForRefresh()
     }
 
-    private fun setupWebSockets() {
-        notificationHelper = NotificationHelper(this)
-        audioQueueManager = AudioQueueManager(this)
-        
-        // Usar branchId "1" que es el que aparece en tus pedidos de ejemplo
-        webSocketManager.connect(branchId = "1")
+    private fun startWebSocketService() {
+        val intent = Intent(this, com.tayler.pizzzaapp.service.WebSocketService::class.java)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            startForegroundService(intent)
+        } else {
+            startService(intent)
+        }
+    }
 
+    private fun observeSocketForRefresh() {
+        // En la actividad solo observamos para refrescar la UI, 
+        // el audio y la notificación visual ya los maneja el servicio.
         webSocketManager.notifications
-            .onEach { notification ->
-                println("🍕 MainActivity - Notificación recibida de WS: ${notification.titulo}")
-                
-                // 1. Intentar reproducir audio inmediatamente (más prioridad)
-                try {
-                    println("🍕 MainActivity - Llamando a enqueueAudio")
-                    audioQueueManager.enqueueAudio()
-                } catch (e: Exception) {
-                    println("⚠️ MainActivity - Error en audio: ${e.message}")
-                }
-
-                // 2. Mostrar notificación visual
-                try {
-                    notificationHelper.showOrderNotification(
-                        title = notification.titulo,
-                        message = notification.mensaje
-                    )
-                } catch (e: Exception) {
-                    println("⚠️ MainActivity - Error en notificación visual: ${e.message}")
-                }
-                
-                // 3. Refrescar lista
+            .onEach {
+                println("🍕 MainActivity - Notificación recibida para refrescar lista")
                 viewModel.getGeneralOrderList()
             }
             .launchIn(lifecycleScope)
     }
+
+    // Ya no necesitamos setupWebSockets antiguo
 
     override fun getViewModel(): BaseViewModel = viewModel
 }
@@ -122,7 +111,7 @@ fun OrderScreen(viewModel: AppViewModel, onNavigateToProducts: () -> Unit) {
     LaunchedEffect(Unit) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             permissionManager.requestPermission(android.Manifest.permission.POST_NOTIFICATIONS) {
-                Log.d("FCM", "Notification permission granted")
+                Log.d("Notifications", "Permission granted for order alerts")
             }
         }
     }

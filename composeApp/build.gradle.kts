@@ -50,6 +50,11 @@ kotlin {
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
+            implementation(libs.kotlinx.coroutines.test)
+            implementation(libs.turbine)
+        }
+        androidUnitTest.dependencies {
+            implementation(libs.mockk)
         }
     }
 }
@@ -65,6 +70,16 @@ android {
         versionCode = 1
         versionName = "1.0"
     }
+
+    signingConfigs {
+        create("release") {
+            storeFile = file("../pizzza-app-key.jks")
+            storePassword = "pizzza123"
+            keyAlias = "pizzza-alias"
+            keyPassword = "pizzza123"
+        }
+    }
+
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
@@ -73,6 +88,7 @@ android {
     buildTypes {
         getByName("release") {
             isMinifyEnabled = false
+            signingConfig = signingConfigs.getByName("release")
         }
         getByName("debug") {
             isDebuggable = true
@@ -87,8 +103,22 @@ android {
         buildConfig = true
         compose = true
     }
+
+    applicationVariants.all {
+        outputs.all {
+            val output = this as com.android.build.gradle.internal.api.BaseVariantOutputImpl
+            output.outputFileName = "pizzeria.apk"
+        }
+    }
 }
 
 dependencies {
     debugImplementation(compose.uiTooling)
+    
+    // Testing Android
+    androidTestImplementation(libs.androidx.testExt.junit)
+    androidTestImplementation(libs.androidx.espresso.core)
+    androidTestImplementation(libs.androidx.compose.ui.test.junit4)
+    debugImplementation(libs.androidx.compose.ui.test.manifest)
+    androidTestImplementation(libs.androidx.test.runner)
 }

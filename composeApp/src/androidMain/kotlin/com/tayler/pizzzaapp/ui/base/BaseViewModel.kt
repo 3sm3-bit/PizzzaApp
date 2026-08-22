@@ -5,31 +5,31 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.Dispatchers
+import com.tayler.pizzzaapp.utils.DispatcherProvider
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlin.time.Duration.Companion.milliseconds
 
 import kotlinx.coroutines.withContext
 
-open class BaseViewModel(): ViewModel() {
+open class BaseViewModel(private val dispatchers: DispatcherProvider): ViewModel() {
 
     var uiStateBase by mutableStateOf(BaseUiState())
 
     fun execute(loading: Boolean = true, func: suspend () -> Unit) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(dispatchers.io) {
             try {
-                withContext(Dispatchers.Main) {
+                withContext(dispatchers.main) {
                     uiStateBase = uiStateBase.copy(loading = loading, error = false)
                 }
                 
                 func()
                 
-                withContext(Dispatchers.Main) {
+                withContext(dispatchers.main) {
                     uiStateBase = uiStateBase.copy(loading = false)
                 }
             } catch (ex: Exception) {
-                withContext(Dispatchers.Main) {
+                withContext(dispatchers.main) {
                     uiStateBase = uiStateBase.copy(error = true, errorType = ex, loading = false)
                 }
             }
@@ -37,7 +37,7 @@ open class BaseViewModel(): ViewModel() {
     }
 
     fun executeAlter(loading: Boolean = true,func:suspend ()->Unit){
-        viewModelScope.launch(Dispatchers.IO){
+        viewModelScope.launch(dispatchers.io){
             try {
                 uiStateBase = uiStateBase.copy(loading = loading)
                 delay(1000.milliseconds)

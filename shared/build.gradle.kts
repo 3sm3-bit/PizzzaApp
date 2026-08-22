@@ -66,6 +66,13 @@ kotlin {
         
         commonTest.dependencies {
             implementation(libs.kotlin.test)
+            implementation(libs.kotlinx.coroutines.test)
+            implementation(libs.turbine)
+            implementation(libs.koin.test)
+        }
+
+        androidUnitTest.dependencies {
+            implementation(libs.mockk)
         }
 
         iosMain.dependencies {
