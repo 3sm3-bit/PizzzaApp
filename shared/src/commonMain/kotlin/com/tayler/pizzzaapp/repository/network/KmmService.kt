@@ -1,8 +1,8 @@
 package com.tayler.pizzzaapp.repository.network
 
-import com.tayler.pizzzaapp.repository.model.OrderResponse
-import com.tayler.pizzzaapp.repository.model.ParentOrderResponse
-import com.tayler.pizzzaapp.repository.model.ProductResponse
+import com.tayler.pizzzaapp.repository.network.model.OrderResponse
+import com.tayler.pizzzaapp.repository.network.model.ParentOrderResponse
+import com.tayler.pizzzaapp.repository.network.model.ProductResponse
 import com.tayler.pizzzaapp.shared.BuildConfig
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body

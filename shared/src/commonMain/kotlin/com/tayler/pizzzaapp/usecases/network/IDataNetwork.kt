@@ -1,8 +1,8 @@
 package com.tayler.pizzzaapp.usecases.network
 
-import com.tayler.pizzzaapp.entity.OrderModel
-import com.tayler.pizzzaapp.entity.ParentOrderModel
-import com.tayler.pizzzaapp.entity.ProductModel
+import com.tayler.pizzzaapp.model.OrderModel
+import com.tayler.pizzzaapp.model.ParentOrderModel
+import com.tayler.pizzzaapp.model.ProductModel
 
 interface IDataNetwork {
 

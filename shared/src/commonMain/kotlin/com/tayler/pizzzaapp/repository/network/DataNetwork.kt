@@ -1,20 +1,20 @@
 package com.tayler.pizzzaapp.repository.network
 
-import com.tayler.pizzzaapp.entity.OrderModel
-import com.tayler.pizzzaapp.entity.ParentOrderModel
-import com.tayler.pizzzaapp.entity.ProductModel
-import com.tayler.pizzzaapp.repository.exception.ErrorNetwork
-import com.tayler.pizzzaapp.repository.model.loadOrder
-import com.tayler.pizzzaapp.repository.model.loadParentOrder
-import com.tayler.pizzzaapp.repository.model.toModelList
+import com.tayler.pizzzaapp.model.OrderModel
+import com.tayler.pizzzaapp.model.ParentOrderModel
+import com.tayler.pizzzaapp.model.ProductModel
+import com.tayler.pizzzaapp.repository.network.exception.ErrorNetwork
+import com.tayler.pizzzaapp.repository.network.model.loadOrder
+import com.tayler.pizzzaapp.repository.network.model.loadParentOrder
+import com.tayler.pizzzaapp.repository.network.model.toModelList
 import com.tayler.pizzzaapp.usecases.network.IDataNetwork
-import com.tayler.pizzzaapp.utils.ConnectivityManager
-import com.tayler.pizzzaapp.manager.db.AppDataBase
-import com.tayler.pizzzaapp.manager.db.toEntity
-import com.tayler.pizzzaapp.manager.db.toEntityListFromResponse
-import com.tayler.pizzzaapp.manager.db.toProductEntityList
-import com.tayler.pizzzaapp.manager.db.toProductModelList
-import com.tayler.pizzzaapp.manager.db.toModelList as toModelListFromDb
+import com.tayler.pizzzaapp.repository.utils.ConnectivityManager
+import com.tayler.pizzzaapp.repository.db.manager.AppDataBase
+import com.tayler.pizzzaapp.repository.db.toEntity
+import com.tayler.pizzzaapp.repository.db.toEntityListFromResponse
+import com.tayler.pizzzaapp.repository.db.toProductEntityList
+import com.tayler.pizzzaapp.repository.db.toProductModelList
+import com.tayler.pizzzaapp.repository.db.toModelList as toModelListFromDb
 
 class DataNetwork(
     private val apiService: KmmService,

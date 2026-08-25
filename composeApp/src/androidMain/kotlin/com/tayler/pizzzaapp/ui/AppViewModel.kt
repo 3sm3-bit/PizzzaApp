@@ -4,11 +4,11 @@ import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import com.tayler.pizzzaapp.entity.ParentOrderModel
-import com.tayler.pizzzaapp.entity.ProductModel
+import com.tayler.pizzzaapp.DispatcherProvider
+import com.tayler.pizzzaapp.model.ParentOrderModel
+import com.tayler.pizzzaapp.model.ProductModel
 import com.tayler.pizzzaapp.ui.base.BaseViewModel
 import com.tayler.pizzzaapp.usecases.DataUseCase
-import com.tayler.pizzzaapp.utils.DispatcherProvider
 
 import kotlinx.coroutines.withContext
 

@@ -3,7 +3,6 @@ package com.tayler.pizzzaapp.ui
 import android.content.Intent
 import android.os.Build
 import android.util.Log
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
@@ -18,7 +17,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -27,7 +25,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.tayler.pizzzaapp.entity.ParentOrderModel
+import com.tayler.pizzzaapp.model.ParentOrderModel
 import com.tayler.pizzzaapp.repository.network.WebSocketManager
 import com.tayler.pizzzaapp.ui.base.BaseActivity
 import com.tayler.pizzzaapp.ui.base.BaseViewModel
@@ -240,7 +238,7 @@ fun OrderScreen(viewModel: AppViewModel, onNavigateToProducts: () -> Unit) {
 
             if (showSheet && uiState.selectedOrder != null) {
                 OrderDetailSheet(
-                    order = uiState.selectedOrder!!,
+                    order = uiState.selectedOrder,
                     onDismiss = { viewModel.selectOrder(null) }
                 )
             }
@@ -251,7 +249,7 @@ fun OrderScreen(viewModel: AppViewModel, onNavigateToProducts: () -> Unit) {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProductScreen(
-    products: List<com.tayler.pizzzaapp.entity.ProductModel>,
+    products: List<com.tayler.pizzzaapp.model.ProductModel>,
     onBack: () -> Unit
 ) {
     Scaffold(

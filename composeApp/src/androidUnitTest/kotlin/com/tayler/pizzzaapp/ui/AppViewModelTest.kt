@@ -1,7 +1,7 @@
 package com.tayler.pizzzaapp.ui
 
 import android.util.Log
-import com.tayler.pizzzaapp.entity.ParentOrderModel
+import com.tayler.pizzzaapp.model.ParentOrderModel
 import com.tayler.pizzzaapp.usecases.DataUseCase
 import com.tayler.pizzzaapp.utils.DispatcherProvider
 import io.mockk.coEvery

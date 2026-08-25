@@ -1,6 +1,6 @@
 package com.tayler.pizzzaapp.usecases
 
-import com.tayler.pizzzaapp.entity.ParentOrderModel
+import com.tayler.pizzzaapp.model.ParentOrderModel
 import com.tayler.pizzzaapp.usecases.network.IDataNetwork
 
 

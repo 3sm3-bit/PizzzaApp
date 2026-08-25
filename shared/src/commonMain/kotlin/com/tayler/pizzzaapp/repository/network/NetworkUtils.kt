@@ -1,6 +1,6 @@
 package com.tayler.pizzzaapp.repository.network
 
-import com.tayler.pizzzaapp.repository.exception.toAppException
+import com.tayler.pizzzaapp.repository.network.exception.toAppException
 import kotlinx.coroutines.CancellationException
 
 suspend inline fun <T, R> apiCall(
