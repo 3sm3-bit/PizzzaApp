@@ -27,3 +27,8 @@ keystore.properties
 # --- IDE (Android Studio / IntelliJ) ---
 .idea/
 /uitaycompose/
+
+# --- Temp / AI artifacts ---
+.artifacts/
+.kotlin/
+.DS_Store
