@@ -35,6 +35,11 @@ kotlin {
             // Icons
             implementation("androidx.compose.material:material-icons-extended:1.7.8")
 
+            // Google Maps
+            implementation(libs.google.maps.compose)
+            implementation(libs.play.services.maps)
+            implementation(libs.play.services.location)
+
             // Custom Library
             implementation(libs.tay.compose.library)
         }
@@ -61,11 +66,11 @@ kotlin {
 }
 
 android {
-    namespace = "com.tayler.pizzzaapp"
+    namespace = "com.pizzza.pizzzaapp"
     compileSdk = libs.versions.android.compileSdk.get().toInt()
 
     defaultConfig {
-        applicationId = "com.tayler.pizzzaapp"
+        applicationId = "com.pizzza.pizzzaapp"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
         versionCode = 1
