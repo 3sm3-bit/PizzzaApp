@@ -7,20 +7,12 @@ import androidx.compose.runtime.setValue
 import com.tayler.pizzzaapp.DispatcherProvider
 import com.tayler.pizzzaapp.model.ParentOrderModel
 import com.tayler.pizzzaapp.model.ProductModel
+import com.tayler.pizzzaapp.model.BranchModel
 import com.tayler.pizzzaapp.ui.base.BaseViewModel
+import com.tayler.pizzzaapp.ui.orders.OrderItem
+import com.tayler.pizzzaapp.ui.orders.OrderUiState
 import com.tayler.pizzzaapp.usecases.DataUseCase
-
 import kotlinx.coroutines.withContext
-
-data class OrderUiState(
-    val orders: List<ParentOrderModel> = emptyList(),
-    val filteredOrders: List<ParentOrderModel> = emptyList(),
-    val selectedFilter: String = "TODOS",
-    val countConfirmado: Int = 0,
-    val countListo: Int = 0,
-    val selectedOrder: ParentOrderModel? = null,
-    val products: List<ProductModel> = emptyList()
-)
 
 class AppViewModel(
     private val dataUseCase: DataUseCase,
@@ -126,6 +118,32 @@ class AppViewModel(
         updateOrderState(order, nextState)
     }
 
+    fun syncProducts(onComplete: (Boolean) -> Unit = {}) {
+        execute(loading = false) {
+            try {
+                println("AppViewModel: Iniciando sincronización obligatoria...")
+                dataUseCase.syncProducts()
+                // Cargar lo que el servidor acaba de mandar (y que ya está en DB)
+                val updatedProducts = dataUseCase.getProducts()
+                withContext(dispatchers.main) {
+                    orderUiState = orderUiState.copy(
+                        products = updatedProducts,
+                        pizzaProducts = updatedProducts.filter { it.type == "1" },
+                        extraProducts = updatedProducts.filter { it.type == "2" || it.type == "3" },
+                        deliveryProducts = updatedProducts.filter { it.type == "4" }
+                    )
+                    println("AppViewModel: Sincronización exitosa. Total: ${updatedProducts.size}")
+                    onComplete(true)
+                }
+            } catch (e: Exception) {
+                Log.e("AppViewModel", "Error crítico en sincronización: ${e.message}")
+                withContext(dispatchers.main) {
+                    onComplete(false)
+                }
+            }
+        }
+    }
+
     fun getProductsList() {
         val hasData = orderUiState.products.isNotEmpty()
         // Si ya hay datos, cargamos en segundo plano para no bloquear
@@ -133,7 +151,12 @@ class AppViewModel(
             try {
                 val response = dataUseCase.getProducts()
                 withContext(dispatchers.main) {
-                    orderUiState = orderUiState.copy(products = response)
+                    orderUiState = orderUiState.copy(
+                        products = response,
+                        pizzaProducts = response.filter { it.type == "1" },
+                        extraProducts = response.filter { it.type == "2" || it.type == "3" },
+                        deliveryProducts = response.filter { it.type == "4" }
+                    )
                 }
             } catch (e: Exception) {
                 Log.e("AppViewModel", "Error en getProductsList: ${e.message}", e)
@@ -142,7 +165,124 @@ class AppViewModel(
         }
     }
 
+    fun getBranchesList() {
+        val hasData = orderUiState.branches.isNotEmpty()
+        execute(loading = !hasData) {
+            try {
+                val response = dataUseCase.getBranches()
+                withContext(dispatchers.main) {
+                    orderUiState = orderUiState.copy(branches = response)
+                }
+            } catch (e: Exception) {
+                Log.e("AppViewModel", "Error en getBranchesList: ${e.message}", e)
+                throw e
+            }
+        }
+    }
+
     fun selectOrder(order: ParentOrderModel?) {
         orderUiState = orderUiState.copy(selectedOrder = order)
+    }
+
+    fun selectBranch(branch: BranchModel?) {
+        orderUiState = orderUiState.copy(selectedBranch = branch)
+    }
+
+    fun selectProduct(product: ProductModel?) {
+        orderUiState = orderUiState.copy(selectedProduct = product)
+    }
+
+    fun setCategory(category: String) {
+        orderUiState = orderUiState.copy(selectedCategory = category)
+    }
+
+    fun addToCart(
+        product: ProductModel,
+        quantity: Int = 1,
+        typeDough: String = "TRADICIONAL",
+        cheeseFilledCrust: Boolean = false,
+        note: String = ""
+    ) {
+        val currentCart = orderUiState.cart.toMutableList()
+        val productType = product.type.trim()
+        
+        // Si es pizza (tipo 1), siempre agregamos como item nuevo para permitir personalización individual
+        if (productType == "1") {
+            currentCart.add(OrderItem(
+                product = product, 
+                quantity = quantity, 
+                typeDough = typeDough, 
+                cheeseFilledCrust = cheeseFilledCrust, 
+                note = note
+            ))
+        } else {
+            // Para otros productos (bebidas, etc.), podemos agrupar si son el mismo producto
+            val index = currentCart.indexOfFirst { it.product.uid == product.uid }
+            if (index != -1) {
+                val item = currentCart[index]
+                currentCart[index] = item.copy(quantity = item.quantity + quantity)
+            } else {
+                currentCart.add(OrderItem(product = product, quantity = quantity))
+            }
+        }
+        orderUiState = orderUiState.copy(cart = currentCart, selectedProduct = null)
+    }
+
+    fun removeCartItem(item: OrderItem) {
+        val currentCart = orderUiState.cart.toMutableList()
+        currentCart.removeAll { it.id == item.id }
+        orderUiState = orderUiState.copy(cart = currentCart)
+    }
+
+    fun updateCartItem(oldItem: OrderItem, newItem: OrderItem) {
+        val currentCart = orderUiState.cart.toMutableList()
+        val index = currentCart.indexOfFirst { it.id == oldItem.id }
+        if (index != -1) {
+            currentCart[index] = newItem
+            orderUiState = orderUiState.copy(cart = currentCart)
+        }
+    }
+
+    fun clearCart() {
+        orderUiState = orderUiState.copy(cart = emptyList())
+    }
+
+    fun toggleNotifications() {
+        orderUiState = orderUiState.copy(notificationsEnabled = !orderUiState.notificationsEnabled)
+    }
+
+    fun setNotificationsEnabled(enabled: Boolean) {
+        orderUiState = orderUiState.copy(notificationsEnabled = enabled)
+    }
+
+    fun updateProduct(product: ProductModel, onSuccess: () -> Unit) {
+        execute {
+            try {
+                dataUseCase.updateProduct(product)
+                getProductsList()
+                withContext(dispatchers.main) {
+                    onSuccess()
+                }
+            } catch (e: Exception) {
+                Log.e("AppViewModel", "Error al actualizar producto: ${e.message}", e)
+                throw e
+            }
+        }
+    }
+
+    fun updateBranch(branch: BranchModel, onSuccess: () -> Unit) {
+        execute {
+            try {
+                dataUseCase.updateBranch(branch)
+                // Refrescar la lista localmente o desde el servidor
+                getBranchesList()
+                withContext(dispatchers.main) {
+                    onSuccess()
+                }
+            } catch (e: Exception) {
+                Log.e("AppViewModel", "Error al actualizar sucursal: ${e.message}", e)
+                throw e
+            }
+        }
     }
 }

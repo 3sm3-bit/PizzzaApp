@@ -13,5 +13,12 @@ data class ParentOrderEntity(
     val date: String,
     val state: String,
     val address: String,
-    val reception: String
+    val reception: String,
+    val symbol: String,
+    val branchId: String,
+    val stage: String,
+    val latitude: String,
+    val longitude: String,
+    val userId: String,
+    val driverId: String
 )

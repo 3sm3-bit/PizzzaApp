@@ -12,14 +12,18 @@ class OrderResponse (
     val nameClient : String? = "",
     @SerialName("quantity")
     val quantity : String? = "",
+    @SerialName("type")
+    val type : String? = "1",
+    @SerialName("symbol")
+    val symbol : String? = "$",
     @SerialName("nameProduct")
     val nameProduct : String? = "",
     @SerialName("tamanio")
     val tamanio : String? = "",
     @SerialName("typeDough")
-    val typeDough : String? = "",
+    val typeDough : String? = "TRADICIONAL",
     @SerialName("cheeseFilledCrust")
-    val cheeseFilledCrust : String? = "",
+    val cheeseFilledCrust : String? = "NO",
     @SerialName("note")
     val note : String? = "",
     @SerialName("phone")
@@ -27,21 +31,29 @@ class OrderResponse (
     @SerialName("price")
     val price : String? = "",
     @SerialName("priceTotal")
-    val priceTotal : String? = "",
+    val priceTotal : String? = "0",
     @SerialName("state")
-    val state : String? = "",
+    val state : String? = "PENDIENTE",
     @SerialName("date")
     val date : String? = "",
-    @SerialName("idOrder")
-    val idOrder: String? = "",
     @SerialName("address")
     val address: String? = "",
     @SerialName("reception")
     val reception: String? = "",
     @SerialName("priceDelivery")
-    val priceDelivery: String? = "",
+    val priceDelivery: String? = "0",
     @SerialName("priceChosse")
-    val priceChosse: String? = ""
+    val priceChosse: String? = "0",
+    @SerialName("idOrden")
+    val idOrden: String? = "",
+    @SerialName("branchId")
+    val branchId: String? = "1",
+    @SerialName("stage")
+    val stage: String? = "1",
+    @SerialName("userId")
+    val userId: String? = "0",
+    @SerialName("driverId")
+    val driverId: String? = "0"
 )
 
 fun List<OrderResponse>.loadOrder() = this.map {
@@ -49,20 +61,26 @@ fun List<OrderResponse>.loadOrder() = this.map {
         ui = it.uid ?: "",
         nameClient = it.nameClient ?: "",
         quantity = it.quantity ?: "",
+        type = it.type ?: "1",
+        symbol = it.symbol ?: "$",
         nameProduct = it.nameProduct ?: "",
         tamanio = it.tamanio ?: "",
-        typeDough = it.typeDough ?: "",
-        cheeseFilledCrust = it.cheeseFilledCrust ?: "",
+        typeDough = it.typeDough ?: "TRADICIONAL",
+        cheeseFilledCrust = it.cheeseFilledCrust ?: "NO",
         note = it.note ?: "",
         phone = it.phone ?: "",
         price = it.price ?: "",
-        priceTotal = it.priceTotal ?: "",
-        state = it.state ?: "",
+        priceTotal = it.priceTotal ?: "0",
+        state = it.state ?: "PENDIENTE",
         date = it.date ?: "",
-        idOrder = it.idOrder ?: "",
         address = it.address ?: "",
         reception = it.reception ?: "",
-        priceDelivery = it.priceDelivery ?: "",
-        priceChosse = it.priceChosse ?: ""
+        priceDelivery = it.priceDelivery ?: "0",
+        priceChosse = it.priceChosse ?: "0",
+        idOrden = it.idOrden ?: "",
+        branchId = it.branchId ?: "1",
+        stage = it.stage ?: "1",
+        userId = it.userId ?: "0",
+        driverId = it.driverId ?: "0"
     )
 }

@@ -16,6 +16,13 @@ fun ParentOrderEntity.toModel() = ParentOrderModel(
     state = state,
     address = address,
     reception = reception,
+    symbol = symbol,
+    branchId = branchId,
+    stage = stage,
+    latitude = latitude,
+    longitude = longitude,
+    userId = userId,
+    driverId = driverId,
     orders = emptyList() // No orders stored in Entity for now
 )
 
@@ -28,7 +35,14 @@ fun ParentOrderModel.toEntity() = ParentOrderEntity(
     date = date,
     state = state,
     address = address,
-    reception = reception
+    reception = reception,
+    symbol = symbol,
+    branchId = branchId,
+    stage = stage,
+    latitude = latitude,
+    longitude = longitude,
+    userId = userId,
+    driverId = driverId
 )
 
 fun List<ParentOrderEntity>.toModelList() = map { it.toModel() }
@@ -43,7 +57,14 @@ fun List<ParentOrderResponse>.toEntityListFromResponse() = map {
         date = it.date ?: "",
         state = it.state ?: "",
         address = it.address ?: "",
-        reception = it.reception ?: ""
+        reception = it.reception ?: "",
+        symbol = it.symbol ?: "$",
+        branchId = it.branchId ?: "1",
+        stage = it.stage ?: "1",
+        latitude = it.latitude ?: "0",
+        longitude = it.longitude ?: "0",
+        userId = it.userId ?: "0",
+        driverId = it.driverId ?: "0"
     )
 }
 
@@ -57,7 +78,8 @@ fun ProductEntity.toModel() = ProductModel(
     priceChosse = priceChosse,
     currency = currency,
     currencySymbol = currencySymbol,
-    state = state
+    state = state,
+    urlImg = urlImg
 )
 
 fun ProductModel.toEntity() = ProductEntity(
@@ -70,7 +92,8 @@ fun ProductModel.toEntity() = ProductEntity(
     priceChosse = priceChosse,
     currency = currency,
     currencySymbol = currencySymbol,
-    state = state
+    state = state,
+    urlImg = urlImg
 )
 
 fun List<ProductEntity>.toProductModelList() = map { it.toModel() }

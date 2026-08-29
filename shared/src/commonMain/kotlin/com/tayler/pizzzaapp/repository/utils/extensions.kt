@@ -1,6 +1,8 @@
 package com.tayler.pizzzaapp.repository.utils
 
-import kotlinx.serialization.json.Json.Default.decodeFromString
+import kotlinx.serialization.json.Json
+
+private val json = Json { ignoreUnknownKeys = true }
 
 internal inline fun <reified R : Any> String.parseJsonTo() =
-    decodeFromString<R>(this)
+    json.decodeFromString<R>(this)

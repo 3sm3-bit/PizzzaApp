@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 2,
-    "identityHash": "641dc33df89c45e3c65bbf1f7eccbfb0",
+    "identityHash": "2a363db6467fd96ffe92cf92e2197f8e",
     "entities": [
       {
         "tableName": "parent_orders",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`uid` TEXT NOT NULL, `nameClient` TEXT NOT NULL, `description` TEXT NOT NULL, `price` TEXT NOT NULL, `phone` TEXT NOT NULL, `date` TEXT NOT NULL, `state` TEXT NOT NULL, `address` TEXT NOT NULL, `reception` TEXT NOT NULL, PRIMARY KEY(`uid`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`uid` TEXT NOT NULL, `nameClient` TEXT NOT NULL, `description` TEXT NOT NULL, `price` TEXT NOT NULL, `phone` TEXT NOT NULL, `date` TEXT NOT NULL, `state` TEXT NOT NULL, `address` TEXT NOT NULL, `reception` TEXT NOT NULL, `symbol` TEXT NOT NULL, `branchId` TEXT NOT NULL, `stage` TEXT NOT NULL, `latitude` TEXT NOT NULL, `longitude` TEXT NOT NULL, `userId` TEXT NOT NULL, `driverId` TEXT NOT NULL, PRIMARY KEY(`uid`))",
         "fields": [
           {
             "fieldPath": "uid",
@@ -61,6 +61,48 @@
             "columnName": "reception",
             "affinity": "TEXT",
             "notNull": true
+          },
+          {
+            "fieldPath": "symbol",
+            "columnName": "symbol",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "branchId",
+            "columnName": "branchId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "stage",
+            "columnName": "stage",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "latitude",
+            "columnName": "latitude",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "longitude",
+            "columnName": "longitude",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "userId",
+            "columnName": "userId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "driverId",
+            "columnName": "driverId",
+            "affinity": "TEXT",
+            "notNull": true
           }
         ],
         "primaryKey": {
@@ -72,7 +114,7 @@
       },
       {
         "tableName": "products",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`uid` TEXT NOT NULL, `nameProduct` TEXT NOT NULL, `type` TEXT NOT NULL, `price` TEXT NOT NULL, `tamanio` TEXT NOT NULL, `description` TEXT NOT NULL, `priceChosse` TEXT NOT NULL, `currency` TEXT NOT NULL, `currencySymbol` TEXT NOT NULL, `state` INTEGER NOT NULL, PRIMARY KEY(`uid`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`uid` TEXT NOT NULL, `nameProduct` TEXT NOT NULL, `type` TEXT NOT NULL, `price` TEXT NOT NULL, `tamanio` TEXT NOT NULL, `description` TEXT NOT NULL, `priceChosse` TEXT NOT NULL, `currency` TEXT NOT NULL, `currencySymbol` TEXT NOT NULL, `state` INTEGER NOT NULL, `urlImg` TEXT NOT NULL, PRIMARY KEY(`uid`))",
         "fields": [
           {
             "fieldPath": "uid",
@@ -133,6 +175,12 @@
             "columnName": "state",
             "affinity": "INTEGER",
             "notNull": true
+          },
+          {
+            "fieldPath": "urlImg",
+            "columnName": "urlImg",
+            "affinity": "TEXT",
+            "notNull": true
           }
         ],
         "primaryKey": {
@@ -145,7 +193,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '641dc33df89c45e3c65bbf1f7eccbfb0')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '2a363db6467fd96ffe92cf92e2197f8e')"
     ]
   }
 }

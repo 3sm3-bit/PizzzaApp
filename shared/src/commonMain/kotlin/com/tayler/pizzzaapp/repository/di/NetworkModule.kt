@@ -9,22 +9,25 @@ import com.tayler.pizzzaapp.repository.network.manager.InstantSerializer
 import com.tayler.pizzzaapp.repository.network.KmmService
 import com.tayler.pizzzaapp.repository.network.WebSocketManager
 import com.tayler.pizzzaapp.requestLogger
-import com.tayler.pizzzaapp.repository.utils.parseJsonTo
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.HttpResponseValidator
 import io.ktor.client.plugins.HttpTimeout
+import io.ktor.client.plugins.defaultRequest
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.logging.LogLevel
 import io.ktor.client.plugins.logging.Logging
 import io.ktor.client.plugins.websocket.WebSockets
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.HttpStatusCode
+import io.ktor.http.isSuccess
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.datetime.Instant
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.modules.SerializersModule
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
+
+val jsonLenient = Json { ignoreUnknownKeys = true }
 
 val networkModule = module {
     // Cliente para peticiones REST (con ContentNegotiation y validación)
@@ -34,7 +37,7 @@ val networkModule = module {
                 json(
                     Json {
                         ignoreUnknownKeys = true
-                        useAlternativeNames = false
+                        encodeDefaults = true
                         serializersModule = SerializersModule {
                             contextual(Instant::class, InstantSerializer)
                         }
@@ -42,24 +45,28 @@ val networkModule = module {
                 )
             }
 
+            defaultRequest {
+                headers.append("ngrok-skip-browser-warning", "true")
+            }
+
             HttpResponseValidator {
                 validateResponse { response ->
-                    if (response.status != HttpStatusCode.OK) {
+                    if (!response.status.isSuccess()) {
                         val statusCode = response.status.value
                         val errorText = try { response.bodyAsText() } catch (e: Exception) { "" }
                         
                         when (statusCode) {
-                            401 -> throw UnAuthorizedException()
+                            //401 -> throw UnAuthorizedException()
                             in 400..599 -> {
                                 val errorModel = try {
-                                    errorText.parseJsonTo<CompleteErrorModel>()
+                                    jsonLenient.decodeFromString<CompleteErrorModel>(errorText)
                                 } catch (e: Exception) {
                                     null
                                 }
                                 throw UiTayApiException(
                                     code = statusCode,
-                                    title = errorModel?.title ?: "Error de servidor",
-                                    messageApi = errorModel?.message ?: "Ocurrió un error inesperado"
+                                    title = errorModel?.title ?: "Error $statusCode",
+                                    messageApi = errorModel?.errorMessage ?: errorText.takeIf { it.isNotBlank() } ?: "Ocurrió un error inesperado"
                                 )
                             }
                         }

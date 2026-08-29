@@ -4,6 +4,8 @@ data class OrderModel (
     val ui : String,
     val nameClient : String,
     val quantity : String,
+    val type : String,
+    val symbol : String,
     val nameProduct : String,
     val tamanio : String,
     val typeDough : String,
@@ -14,9 +16,13 @@ data class OrderModel (
     val priceTotal : String,
     val state : String,
     val date : String,
-    val idOrder: String,
-    val address: String,
-    val reception: String,
-    val priceDelivery: String,
-    val priceChosse: String
+    val address : String,
+    val reception : String,
+    val priceDelivery : String,
+    val priceChosse : String,
+    val idOrden : String,
+    val branchId : String,
+    val stage : String,
+    val userId : String,
+    val driverId : String
 )

@@ -25,6 +25,20 @@ class ParentOrderResponse(
     val address: String? = "",
     @SerialName("reception")
     val reception: String? = "",
+    @SerialName("symbol")
+    val symbol: String? = "$",
+    @SerialName("branchId")
+    val branchId: String? = "1",
+    @SerialName("stage")
+    val stage: String? = "1",
+    @SerialName("latitude")
+    val latitude: String? = "0",
+    @SerialName("longitude")
+    val longitude: String? = "0",
+    @SerialName("userId")
+    val userId: String? = "0",
+    @SerialName("driverId")
+    val driverId: String? = "0",
     @SerialName("orders")
     val orders: List<OrderResponse>? = emptyList()
 )
@@ -40,6 +54,13 @@ fun List<ParentOrderResponse>.loadParentOrder() = this.map {
         state = it.state ?: "",
         address = it.address ?: "",
         reception = it.reception ?: "",
+        symbol = it.symbol ?: "$",
+        branchId = it.branchId ?: "1",
+        stage = it.stage ?: "1",
+        latitude = it.latitude ?: "0",
+        longitude = it.longitude ?: "0",
+        userId = it.userId ?: "0",
+        driverId = it.driverId ?: "0",
         orders = it.orders?.loadOrder() ?: emptyList()
     )
 }

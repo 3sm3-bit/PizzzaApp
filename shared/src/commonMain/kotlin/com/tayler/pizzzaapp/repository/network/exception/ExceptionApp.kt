@@ -6,7 +6,7 @@ import kotlinx.serialization.Serializable
 data class CompleteErrorModel(
     val code: Int? = null,
     val title: String? = null,
-    val message: String? = null
+    val errorMessage: String? = null
 )
 
 class UiTayApiException(

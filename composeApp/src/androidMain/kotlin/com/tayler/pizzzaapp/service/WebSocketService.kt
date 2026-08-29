@@ -107,6 +107,7 @@ class WebSocketService : Service() {
     override fun onBind(intent: Intent?): IBinder? = null
 
     override fun onDestroy() {
+        println("🍕 WebSocketService - Servicio detenido por el usuario")
         webSocketManager.close()
         audioQueueManager.release()
         super.onDestroy()

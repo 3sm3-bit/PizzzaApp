@@ -10,5 +10,6 @@ data class ProductModel(
     val currency: String,
     val currencySymbol: String,
     val state: Boolean,
-    val uid: String
+    val uid: String,
+    val urlImg: String
 )

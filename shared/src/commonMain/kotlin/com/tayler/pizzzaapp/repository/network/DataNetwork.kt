@@ -7,6 +7,8 @@ import com.tayler.pizzzaapp.repository.network.exception.ErrorNetwork
 import com.tayler.pizzzaapp.repository.network.model.loadOrder
 import com.tayler.pizzzaapp.repository.network.model.loadParentOrder
 import com.tayler.pizzzaapp.repository.network.model.toModelList
+import com.tayler.pizzzaapp.repository.network.model.toResponse
+import com.tayler.pizzzaapp.model.BranchModel
 import com.tayler.pizzzaapp.usecases.network.IDataNetwork
 import com.tayler.pizzzaapp.repository.utils.ConnectivityManager
 import com.tayler.pizzzaapp.repository.db.manager.AppDataBase
@@ -14,6 +16,7 @@ import com.tayler.pizzzaapp.repository.db.toEntity
 import com.tayler.pizzzaapp.repository.db.toEntityListFromResponse
 import com.tayler.pizzzaapp.repository.db.toProductEntityList
 import com.tayler.pizzzaapp.repository.db.toProductModelList
+import com.tayler.pizzzaapp.repository.network.model.UserResponse
 import com.tayler.pizzzaapp.repository.db.toModelList as toModelListFromDb
 
 class DataNetwork(
@@ -32,23 +35,41 @@ class DataNetwork(
     override suspend fun getProducts(): List<ProductModel> {
         val dao = database.productDao()
         val localProducts = dao.getAll()
-        
-        if (localProducts.isNotEmpty()) {
-            println("DataNetwork: Cargando productos desde DB Local")
-            return localProducts.toProductModelList()
-        }
+        println("DataNetwork: Obteniendo ${localProducts.size} productos desde DB Local")
+        return localProducts.toProductModelList()
+    }
 
-        return apiCall({
-            if (!connectivityManager.isConnected()) throw ErrorNetwork()
-            println("DataNetwork: Cargando productos desde el servicio...")
-            apiService.getProducts()
-        }) { response ->
-            val models = response.toModelList()
-            dao.deleteAll()
-            dao.insertAll(models.toProductEntityList())
-            println("DataNetwork: Productos guardados en DB local")
-            models
-        }
+    override suspend fun syncProducts(): List<ProductModel> = apiCall({
+        if (!connectivityManager.isConnected()) throw ErrorNetwork()
+        println("DataNetwork: Sincronizando productos desde el servicio...")
+        val response = apiService.getProducts()
+        val models = response.toModelList()
+        
+        val dao = database.productDao()
+        dao.deleteAll()
+        dao.insertAll(models.toProductEntityList())
+        println("DataNetwork: Sincronización completa. ${models.size} productos guardados.")
+        models
+    }) { it }
+
+    override suspend fun getBranches(): List<BranchModel> = apiCall({
+        if (!connectivityManager.isConnected()) throw ErrorNetwork()
+        println("DataNetwork: Cargando sucursales desde el servicio...")
+        apiService.getBranches()
+    }) { response ->
+        response.toModelList()
+    }
+
+    override suspend fun updateBranch(data: BranchModel): String = apiCall {
+        if (!connectivityManager.isConnected()) throw ErrorNetwork()
+        println("DataNetwork: Actualizando sucursal ${data.uid}...")
+        apiService.updateBranch(data.toResponse())
+    }
+
+    override suspend fun updateProduct(data: ProductModel): String = apiCall {
+        if (!connectivityManager.isConnected()) throw ErrorNetwork()
+        println("DataNetwork: Actualizando producto ${data.uid}...")
+        apiService.updateProduct(data.toResponse())
     }
 
     override suspend fun updateOrder(data: ParentOrderModel): String = apiCall {
@@ -104,5 +125,29 @@ class DataNetwork(
             println("DataNetwork: Datos guardados en DB local")
             response.loadParentOrder()
         }
+    }
+
+    override suspend fun registerUser(data: UserResponse): String = apiCall {
+        if (!connectivityManager.isConnected()) throw ErrorNetwork()
+        println("DataNetwork: Registrando usuario ${data.email}...")
+        apiService.registerUser(data)
+    }
+
+    override suspend fun login(data: com.tayler.pizzzaapp.repository.network.model.LoginRequest): com.tayler.pizzzaapp.repository.network.model.LoginResponse = apiCall {
+        if (!connectivityManager.isConnected()) throw ErrorNetwork()
+        apiService.login(data)
+    }
+
+    override suspend fun saveUserLocal(user: com.tayler.pizzzaapp.repository.db.entity.UserEntity) {
+        database.userDao().logout()
+        database.userDao().insertUser(user)
+    }
+
+    override suspend fun getUserLocal(): com.tayler.pizzzaapp.repository.db.entity.UserEntity? {
+        return database.userDao().getUser()
+    }
+
+    override suspend fun logout() {
+        database.userDao().logout()
     }
 }

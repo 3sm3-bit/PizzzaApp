@@ -14,5 +14,6 @@ data class ProductEntity(
     val priceChosse: String,
     val currency: String,
     val currencySymbol: String,
-    val state: Boolean
+    val state: Boolean,
+    val urlImg: String = ""
 )

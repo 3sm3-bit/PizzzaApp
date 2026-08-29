@@ -24,6 +24,8 @@ data class ProductResponse(
     val currencySymbol: String? = "",
     @SerialName("state")
     val state: Boolean? = true,
+    @SerialName("urlImg")
+    val urlImg: String? = "",
     @SerialName("uid")
     val uid: String? = ""
 )
@@ -39,6 +41,21 @@ fun List<ProductResponse>.toModelList() = map {
         currency = it.currency ?: "",
         currencySymbol = it.currencySymbol ?: "",
         state = it.state ?: true,
+        urlImg = it.urlImg ?: "",
         uid = it.uid ?: ""
     )
 }
+
+fun ProductModel.toResponse() = ProductResponse(
+    nameProduct = nameProduct,
+    type = type,
+    price = price,
+    tamanio = tamanio,
+    description = description,
+    priceChosse = priceChosse,
+    currency = currency,
+    currencySymbol = currencySymbol,
+    state = state,
+    urlImg = urlImg,
+    uid = uid
+)
