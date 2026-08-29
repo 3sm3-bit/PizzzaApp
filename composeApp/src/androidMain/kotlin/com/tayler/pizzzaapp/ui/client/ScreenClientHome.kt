@@ -1,4 +1,4 @@
-package com.tayler.pizzzaapp.ui.client // updated code
+package com.tayler.pizzzaapp.ui.client
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
