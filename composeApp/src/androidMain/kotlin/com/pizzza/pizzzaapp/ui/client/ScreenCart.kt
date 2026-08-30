@@ -3,7 +3,6 @@ package com.pizzza.pizzzaapp.ui.client
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -38,12 +37,12 @@ fun ScreenCart(
     } else {
         uiState.cart.isNotEmpty() && 
         uiState.deliveryAddress.isNotBlank() && 
-        uiState.deliveryAddress != "Selecciona dirección en el mapa" &&
-        uiState.selectedDeliveryProduct != null
+        uiState.deliveryAddress != "Selecciona dirección en el mapa"
     }
 
     LaunchedEffect(Unit) {
         storeViewModel.getProductsList()
+        cartViewModel.loadUserAddress()
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
@@ -93,45 +92,13 @@ fun ScreenCart(
 
                             if (uiState.receptionMode == "DELIVERY") {
                                 Spacer(Modifier.height(16.dp))
-                                Text("Zona de entrega", style = textB14, color = Color.Gray)
-                                Spacer(Modifier.height(8.dp))
-                                LazyRow(
-                                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                                    contentPadding = PaddingValues(vertical = 4.dp)
-                                ) {
-                                    items(storeState.deliveryProducts) { deliveryProd ->
-                                        val isSelected = uiState.selectedDeliveryProduct?.uid == deliveryProd.uid
-                                        Card(
-                                            onClick = { cartViewModel.setDeliveryProduct(deliveryProd) },
-                                            modifier = Modifier.widthIn(min = 100.dp),
-                                            shape = RoundedCornerShape(12.dp),
-                                            colors = CardDefaults.cardColors(
-                                                containerColor = if (isSelected) tay_red_600 else Color.White
-                                            ),
-                                            border = if (!isSelected) BorderStroke(1.dp, tay_red_600) else null
-                                        ) {
-                                            Box(modifier =
-                                                Modifier.fillMaxWidth().padding(horizontal = 4.dp,
-                                                vertical = 10.dp), contentAlignment = Alignment.Center) {
-                                                Text(
-                                                    text = deliveryProd.description, 
-                                                    style = textB12, 
-                                                    color = if (isSelected) Color.White else Color.Black,
-                                                    textAlign = TextAlign.Center,
-                                                    modifier = Modifier.fillMaxWidth()
-                                                )
-                                            }
-                                        }
-                                    }
-                                }
-
-                                Spacer(Modifier.height(12.dp))
-                                
+                                Text("Cambiar dirección de entrega", style = textS12, color = tay_red_600)
+                                Spacer(Modifier.height(4.dp))
                                 Surface(
                                     onClick = onNavigateToAddressSelection,
                                     modifier = Modifier.fillMaxWidth().height(48.dp),
                                     shape = RoundedCornerShape(12.dp),
-                                    border = BorderStroke(1.dp, tay_red_600),
+                                    border = BorderStroke(1.dp, tay_green_600),
                                     color = Color.White
                                 ) {
                                     Row(
@@ -142,7 +109,7 @@ fun ScreenCart(
                                         Text(
                                             text = if (uiState.deliveryAddress.isBlank()) "Selecciona dirección en el mapa" else uiState.deliveryAddress,
                                             style = textM12,
-                                            color = if (uiState.deliveryAddress.isBlank()) Color.Gray else tay_red_600,
+                                            color = if (uiState.deliveryAddress.isBlank()) Color.Gray else tay_green_600,
                                             maxLines = 1,
                                             overflow = TextOverflow.Ellipsis,
                                             modifier = Modifier.weight(1f)
@@ -150,7 +117,7 @@ fun ScreenCart(
                                         Icon(
                                             imageVector = Icons.Default.LocationOn,
                                             contentDescription = null,
-                                            tint = tay_red_600
+                                            tint = tay_green_600
                                         )
                                     }
                                 }
@@ -193,7 +160,7 @@ fun ScreenCart(
                             imageVector = Icons.AutoMirrored.Filled.ArrowForward,
                             contentDescription = "Continuar",
                             tint = Color.White,
-                            modifier = Modifier.size(32.dp)
+                            modifier = Modifier.size(24.dp)
                         )
                     }
                 }

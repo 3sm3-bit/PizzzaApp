@@ -26,5 +26,6 @@ data class OrderUiState(
     val deliveryAddress: String = "",
     val latitude: String = "",
     val longitude: String = "",
-    val initialTab: Int = 0
+    val initialTab: Int = 0,
+    val ordersLoaded: Boolean = false
 )

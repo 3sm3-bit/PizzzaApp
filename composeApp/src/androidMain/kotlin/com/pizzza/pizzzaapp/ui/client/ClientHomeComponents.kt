@@ -7,6 +7,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -54,7 +55,9 @@ fun ProductCard(product: ProductModel, onClick: () -> Unit) {
         shape = RoundedCornerShape(24.dp),
         colors = CardDefaults.cardColors(containerColor = Color.White),
         elevation = CardDefaults.cardElevation(defaultElevation = 12.dp),
-        modifier = Modifier.fillMaxWidth().height(130.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(130.dp),
         onClick = onClick
     ) {
         Row(
@@ -72,9 +75,11 @@ fun ProductCard(product: ProductModel, onClick: () -> Unit) {
                 )
             }
 
-            Column(modifier = Modifier
-                .weight(1f)
-                .padding(16.dp)) {
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(16.dp)
+            ) {
                 Text(
                     text = product.nameProduct,
                     style = textB18,
@@ -82,8 +87,9 @@ fun ProductCard(product: ProductModel, onClick: () -> Unit) {
                 )
 
 
-                Text(modifier = Modifier
-                    .padding(end = 24.dp, top = 4.dp),
+                Text(
+                    modifier = Modifier
+                        .padding(end = 24.dp, top = 4.dp),
                     text = product.description,
                     style = textM10,
                     color = Color.Gray,
@@ -162,28 +168,34 @@ fun CartItemCard(
                     )
                 }
                 IconButton(onClick = onRemove, modifier = Modifier.size(28.dp)) {
-                    Icon(Icons.Default.Close,
-                        contentDescription = null, tint = tay_red_600, modifier = Modifier.size(20.dp))
+                    Icon(
+                        Icons.Default.Delete,
+                        contentDescription = null,
+                        tint = tay_red_600, modifier = Modifier.size(20.dp)
+                    )
                 }
             }
 
             // Resumen de personalización (Solo si aplica)
             if (item.product.type == "1" || item.note.isNotBlank()) {
-                Spacer(Modifier.height(8.dp))
-                Column(modifier = Modifier.padding(start = 44.dp)) {
+                Column {
                     if (item.product.type == "1") {
-                        Text(
-                            text = "Masa: ${item.typeDough}",
-                            style = textM12,
-                            color = Color.Gray
-                        )
-                        if (item.cheeseFilledCrust) {
+                        Row {
                             Text(
-                                text = "Con Orilla de Queso",
+                                text = "Masa: ${item.typeDough}, ",
                                 style = textM12,
-                                color = tay_green_600
+                                color = Color.Gray
                             )
+                            if (item.cheeseFilledCrust) {
+                                Text(
+                                    text = "Con Orilla de Queso",
+                                    style = textM12,
+                                    color = tay_green_600
+                                )
+                            }
                         }
+
+
                     }
                     if (item.note.isNotBlank()) {
                         Text(
@@ -197,10 +209,11 @@ fun CartItemCard(
             }
 
             Spacer(Modifier.height(12.dp))
-            
+
             val unitPrice = (item.product.price.toDoubleOrNull() ?: 0.0) +
-                    (if (item.cheeseFilledCrust) item.product.priceChosse.toDoubleOrNull() ?: 0.0 else 0.0)
-            
+                    (if (item.cheeseFilledCrust) item.product.priceChosse.toDoubleOrNull()
+                        ?: 0.0 else 0.0)
+
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.End,
@@ -223,7 +236,9 @@ fun ExtraProductCard(product: ProductModel, onClick: () -> Unit) {
         shape = RoundedCornerShape(20.dp),
         colors = CardDefaults.cardColors(containerColor = Color.White),
         elevation = CardDefaults.cardElevation(defaultElevation = 20.dp),
-        modifier = Modifier.fillMaxWidth().height(190.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(190.dp),
         onClick = onClick
     ) {
         Column(

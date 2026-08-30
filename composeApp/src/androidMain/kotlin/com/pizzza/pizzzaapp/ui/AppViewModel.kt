@@ -23,12 +23,23 @@ class AppViewModel(
     var orderUiState by mutableStateOf(OrderUiState())
         private set
 
-    fun getGeneralOrderList() {
-        Log.d(TAG_PIZZZA, "getGeneralOrderList: Iniciando ejecución")
-        execute {
+    fun getGeneralOrderList(forceLoading: Boolean = false) {
+        if (orderUiState.ordersLoaded && !forceLoading) {
+            Log.d(TAG_PIZZZA, "getGeneralOrderList: Datos ya cargados, omitiendo llamada")
+            return
+        }
+        
+        Log.d(TAG_PIZZZA, "getGeneralOrderList: Iniciando ejecución (force=$forceLoading)")
+        execute(loading = forceLoading) {
             try {
+                val user = dataUseCase.getUserLocal()
                 val response = dataUseCase.loadParentOrder()
-                updateStateWithOrders(response)
+                val filteredOrders = if (user != null) {
+                    response.filter { it.userId == user.uid }
+                } else {
+                    response
+                }
+                updateStateWithOrders(filteredOrders)
             } catch (e: Exception) {
                 Log.e(TAG_PIZZZA, "Error en getGeneralOrderList: ${e.message}", e)
                 throw e
@@ -40,8 +51,14 @@ class AppViewModel(
         Log.d(TAG_PIZZZA, "refresh: Forzando refresco")
         execute {
             try {
+                val user = dataUseCase.getUserLocal()
                 val response = dataUseCase.loadParentOrder(forceRefresh = true)
-                updateStateWithOrders(response)
+                val filteredOrders = if (user != null) {
+                    response.filter { it.userId == user.uid }
+                } else {
+                    response
+                }
+                updateStateWithOrders(filteredOrders)
             } catch (e: Exception) {
                 Log.e(TAG_PIZZZA, "Error en refresh: ${e.message}", e)
                 throw e
@@ -65,7 +82,8 @@ class AppViewModel(
             orders = sortedOrders,
             filteredOrders = sortedOrders, // Mostramos todos por defecto ya que no hay filtros
             countConfirmado = countConfirmado,
-            countListo = countListo
+            countListo = countListo,
+            ordersLoaded = true
         )
     }
 
@@ -108,9 +126,8 @@ class AppViewModel(
     }
 
     fun getProductsList() {
-        val hasData = orderUiState.products.isNotEmpty()
-        // Si ya hay datos, cargamos en segundo plano para no bloquear
-        execute(loading = !hasData) {
+        // Cargamos en segundo plano para no bloquear, ya que usualmente viene de DB local
+        execute(loading = false) {
             try {
                 val response = dataUseCase.getProducts()
                 withContext(dispatchers.main) {
@@ -216,5 +233,9 @@ class AppViewModel(
 
     fun setNotificationsEnabled(enabled: Boolean) {
         orderUiState = orderUiState.copy(notificationsEnabled = enabled)
+    }
+
+    fun resetOrderState() {
+        orderUiState = OrderUiState()
     }
 }

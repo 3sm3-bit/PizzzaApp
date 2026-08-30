@@ -22,8 +22,7 @@ class StoreViewModel(
         private set
 
     fun getProductsList() {
-        val hasData = storeUiState.products.isNotEmpty()
-        execute(loading = !hasData) {
+        execute(loading = false) {
             try {
                 val response = dataUseCase.getProducts()
                 withContext(dispatchers.main) {

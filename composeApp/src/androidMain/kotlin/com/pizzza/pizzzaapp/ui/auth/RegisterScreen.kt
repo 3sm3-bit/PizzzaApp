@@ -16,6 +16,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import android.widget.Toast
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextOverflow
 import com.valu.uitaycompose.button.UiTayButton
 import com.valu.uitaycompose.extra.UiTayCToolBar
@@ -23,6 +24,8 @@ import com.valu.uitaycompose.label.UiTayEditLayout
 import com.valu.uitaycompose.model.UiEditLayoutModel
 import com.valu.uitaycompose.model.UiTayButtonModel
 import com.valu.uitaycompose.model.UiToolBarModel
+import com.valu.uitaycompose.utils.tay_green_600
+import com.valu.uitaycompose.utils.tay_grey_800
 import com.valu.uitaycompose.utils.tay_red_50
 import com.valu.uitaycompose.utils.tay_red_600
 import com.valu.uitaycompose.utils.textB12
@@ -48,7 +51,6 @@ fun RegisterScreen(
     val isButtonEnabled = uiState.nameUser.isNotBlank() &&
             uiState.names.isNotBlank() &&
             uiState.lastName.isNotBlank() &&
-            uiState.document.isNotBlank() &&
             isEmailValid &&
             uiState.pass.isNotBlank() &&
             isPhoneValid &&
@@ -60,7 +62,7 @@ fun RegisterScreen(
             Surface(color = tay_red_50) {
                 Box(modifier = Modifier.statusBarsPadding()) {
                     UiTayCToolBar(
-                        uiTayText = "Registro de Usuario",
+                        uiTayText = "Pizzzeria 3 Z",
                         uiTayModifier = UiToolBarModel()
                             .backgroundColor(tay_red_50)
                             .textColor(tay_red_600)
@@ -71,11 +73,39 @@ fun RegisterScreen(
                 }
             }
         },
+        bottomBar = {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .navigationBarsPadding()
+                    .padding(horizontal = 16.dp)
+                    .padding(bottom = 32.dp)
+            ) {
+                val context = LocalContext.current
+                UiTayButton(
+                    uiTayText = "Registrarse",
+                    uiTayEnable = isButtonEnabled,
+                    uiTayClick = {
+                        viewModel.register { _ ->
+                            Toast.makeText(context, "Registro exitoso", Toast.LENGTH_LONG).show()
+                            onRegisterSuccess()
+                        }
+                    },
+                    uiTayBtnModifier = UiTayButtonModel(
+                        uTBgColor = tay_red_600,
+                        uTStrokeColor = tay_red_600,
+                        uTBgSelectedColor = tay_red_600,
+                        uTStrokeSelectedColor = tay_red_600,
+                    )
+                )
+            }
+        },
         containerColor = Color(0xFFF0F2F5)
     ) { padding ->
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
+                .imePadding()
                 .consumeWindowInsets(padding),
             contentPadding = PaddingValues(
                 top = padding.calculateTopPadding() + 8.dp,
@@ -87,10 +117,16 @@ fun RegisterScreen(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             item {
+                Text("Registrate ahora",
+                    style = textB20,
+                    color = tay_red_600)
+            }
+            item {
                 UiTayEditLayout(
                     value = uiState.nameUser,
                     onValueChange = { viewModel.onRegisterFieldChange(nameUser = it) },
                     hint = "Nombre de usuario",
+                    imeAction = ImeAction.Next,
                     model = UiEditLayoutModel(
                         uiStrokeActiveColor = tay_red_600,
                         uiTextColor = tay_red_600,
@@ -106,6 +142,7 @@ fun RegisterScreen(
                     value = uiState.names,
                     onValueChange = { viewModel.onRegisterFieldChange(names = it) },
                     hint = "Nombres",
+                    imeAction = ImeAction.Next,
                     model = UiEditLayoutModel(
                         uiStrokeActiveColor = tay_red_600,
                         uiTextColor = tay_red_600,
@@ -121,22 +158,7 @@ fun RegisterScreen(
                     value = uiState.lastName,
                     onValueChange = { viewModel.onRegisterFieldChange(lastName = it) },
                     hint = "Apellidos",
-                    model = UiEditLayoutModel(
-                        uiStrokeActiveColor = tay_red_600,
-                        uiTextColor = tay_red_600,
-                        uiTextActiveColor = tay_red_600,
-                        uiTitleActiveColor= tay_red_600,
-                        uiTextFont = textM14,
-                        uiTitleFont = textM14
-                    )
-                )
-            }
-            item {
-                UiTayEditLayout(
-                    value = uiState.document,
-                    onValueChange = { viewModel.onRegisterFieldChange(document = it) },
-                    hint = "Documento",
-                    maxLength = 18,
+                    imeAction = ImeAction.Next,
                     model = UiEditLayoutModel(
                         uiStrokeActiveColor = tay_red_600,
                         uiTextColor = tay_red_600,
@@ -155,6 +177,7 @@ fun RegisterScreen(
                     keyboardType = KeyboardType.Email,
                     isError = uiState.email.isNotBlank() && !isEmailValid,
                     errorMessage = "Formato de correo inválido",
+                    imeAction = ImeAction.Next,
                     model = UiEditLayoutModel(
                         uiStrokeActiveColor = tay_red_600,
                         uiTextColor = tay_red_600,
@@ -171,11 +194,14 @@ fun RegisterScreen(
                     onValueChange = { viewModel.onRegisterFieldChange(pass = it) },
                     hint = "Contraseña",
                     isPassword = true,
+                    imeAction = ImeAction.Next,
                     model = UiEditLayoutModel(
                         uiStrokeActiveColor = tay_red_600,
                         uiTextColor = tay_red_600,
                         uiTextActiveColor = tay_red_600,
                         uiTitleActiveColor= tay_red_600,
+                        uiIconColor = tay_grey_800,
+                        uiIconActiveColor=  tay_red_600,
                         uiTextFont = textM14,
                         uiTitleFont = textM14
                     )
@@ -185,11 +211,12 @@ fun RegisterScreen(
                 UiTayEditLayout(
                     value = uiState.phone,
                     onValueChange = { viewModel.onRegisterFieldChange(phone = it) },
-                    hint = "Teléfono",
+                    hint = "Celular",
                     keyboardType = KeyboardType.Number,
                     maxLength = 10,
                     isError = uiState.phone.isNotBlank() && !isPhoneValid,
                     errorMessage = "Debe ser de 10 dígitos",
+                    imeAction = ImeAction.Done,
                     model = UiEditLayoutModel(
                         uiStrokeActiveColor = tay_red_600,
                         uiTextColor = tay_red_600,
@@ -205,7 +232,7 @@ fun RegisterScreen(
                     onClick = onNavigateToAddressSelection,
                     modifier = Modifier.fillMaxWidth().height(42.dp),
                     shape = RoundedCornerShape(12.dp),
-                    border = BorderStroke(1.dp, tay_red_600),
+                    border = BorderStroke(1.dp, tay_green_600),
                     color = Color.White
                 ) {
                     Row(
@@ -224,56 +251,10 @@ fun RegisterScreen(
                         Icon(
                             imageVector = Icons.Default.LocationOn,
                             contentDescription = null,
-                            tint = tay_red_600
+                            tint = tay_green_600
                         )
                     }
                 }
-            }
-            item {
-                Column(modifier = Modifier.fillMaxWidth()) {
-                    Text("Selecciona Área", style = textB14, color = Color.Black)
-                    Spacer(Modifier.height(8.dp))
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(12.dp)
-                    ) {
-                        val areas = listOf("1" to "zona 1", "2" to "zona 2", "3" to "zona 3")
-                        areas.forEach { (value, label) ->
-                            val isSelected = uiState.area == value
-                            Surface(
-                                onClick = { viewModel.onRegisterFieldChange(area = value) },
-                                modifier = Modifier.weight(1f).height(32.dp),
-                                shape = RoundedCornerShape(12.dp),
-                                color = if (isSelected) tay_red_600 else Color.White,
-                                border = if (!isSelected) BorderStroke(1.dp, tay_red_600) else null
-                            ) {
-                                Box(contentAlignment = Alignment.Center) {
-                                    Text(text = label, style = textB12, color = if (isSelected) Color.White else tay_red_600)
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            item {
-                val context = LocalContext.current
-                Spacer(modifier = Modifier.height(16.dp))
-                UiTayButton(
-                    uiTayText = "Registrarse",
-                    uiTayEnable = isButtonEnabled,
-                    uiTayClick = {
-                        viewModel.register { _ ->
-                            Toast.makeText(context, "Registro exitoso", Toast.LENGTH_LONG).show()
-                            onRegisterSuccess()
-                        }
-                    },
-                    uiTayBtnModifier = UiTayButtonModel(
-                        uTBgColor = tay_red_600,
-                        uTStrokeColor = tay_red_600,
-                        uTBgSelectedColor = tay_red_600,
-                        uTStrokeSelectedColor = tay_red_600,
-                    )
-                )
             }
         }
     }

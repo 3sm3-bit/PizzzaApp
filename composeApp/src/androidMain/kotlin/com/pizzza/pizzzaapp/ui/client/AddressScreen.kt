@@ -48,24 +48,39 @@ fun AddressScreen(
         position = CameraPosition.fromLatLngZoom(defaultLocation, 15f)
     }
 
-    var currentAddress by remember { mutableStateOf("Mueve el mapa para seleccionar") }
+    var currentAddress by remember { mutableStateOf("Obteniendo dirección...") }
     var currentLatLng by remember { mutableStateOf(defaultLocation) }
 
     val fusedLocationClient = remember { LocationServices.getFusedLocationProviderClient(context) }
+
+    fun updateAddress(latLng: LatLng) {
+        currentLatLng = latLng
+        scope.launch {
+            try {
+                val geocoder = Geocoder(context, Locale.getDefault())
+                @Suppress("DEPRECATION")
+                val addresses = geocoder.getFromLocation(latLng.latitude, latLng.longitude, 1)
+                if (addresses?.isNotEmpty() == true) {
+                    currentAddress = addresses[0].getAddressLine(0)
+                }
+            } catch (e: Exception) {
+                currentAddress = "Ubicación seleccionada"
+            }
+        }
+    }
 
     val locationPermissionLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
     ) { permissions ->
         if (permissions[Manifest.permission.ACCESS_FINE_LOCATION] == true) {
-            scope.launch {
-                fusedLocationClient.lastLocation.addOnSuccessListener { location ->
-                    location?.let {
-                        val userLatLng = LatLng(it.latitude, it.longitude)
-                        scope.launch {
-                            cameraPositionState.animate(
-                                update = CameraUpdateFactory.newLatLngZoom(userLatLng, 15f)
-                            )
-                        }
+            fusedLocationClient.lastLocation.addOnSuccessListener { location ->
+                location?.let {
+                    val userLatLng = LatLng(it.latitude, it.longitude)
+                    updateAddress(userLatLng)
+                    scope.launch {
+                        cameraPositionState.animate(
+                            update = CameraUpdateFactory.newLatLngZoom(userLatLng, 15f)
+                        )
                     }
                 }
             }
@@ -77,6 +92,7 @@ fun AddressScreen(
             fusedLocationClient.lastLocation.addOnSuccessListener { location ->
                 location?.let {
                     val userLatLng = LatLng(it.latitude, it.longitude)
+                    updateAddress(userLatLng)
                     scope.launch {
                         cameraPositionState.animate(
                             update = CameraUpdateFactory.newLatLngZoom(userLatLng, 15f)
@@ -96,20 +112,7 @@ fun AddressScreen(
 
     LaunchedEffect(cameraPositionState.isMoving) {
         if (!cameraPositionState.isMoving) {
-            val center = cameraPositionState.position.target
-            currentLatLng = center
-            scope.launch {
-                try {
-                    val geocoder = Geocoder(context, Locale.getDefault())
-                    @Suppress("DEPRECATION")
-                    val addresses = geocoder.getFromLocation(center.latitude, center.longitude, 1)
-                    if (addresses?.isNotEmpty() == true) {
-                        currentAddress = addresses[0].getAddressLine(0)
-                    }
-                } catch (e: Exception) {
-                    currentAddress = "Ubicación seleccionada"
-                }
-            }
+            updateAddress(cameraPositionState.position.target)
         }
     }
 

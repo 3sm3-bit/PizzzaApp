@@ -18,7 +18,7 @@ fun ScreenPizza(
     var selectedSize by remember { mutableStateOf("CHICO") }
     val sizes = listOf("CHICO", "MEDIANO", "GRANDE")
 
-    Column(modifier = Modifier.fillMaxSize()) {
+    Column(modifier = Modifier.fillMaxSize().padding(top = 12.dp)) {
         LazyRow(
             modifier = Modifier
                 .fillMaxWidth()

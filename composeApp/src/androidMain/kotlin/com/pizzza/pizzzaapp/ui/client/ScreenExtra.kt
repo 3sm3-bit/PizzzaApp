@@ -20,7 +20,7 @@ fun ScreenExtra(
     var selectedCategory by remember { mutableStateOf("TODOS") }
     val categories = listOf("TODOS", "EXTRAS", "BEBIDAS")
 
-    Column(modifier = Modifier.fillMaxSize()) {
+    Column(modifier = Modifier.fillMaxSize().padding(top = 12.dp)) {
         LazyRow(
             modifier = Modifier
                 .fillMaxWidth()

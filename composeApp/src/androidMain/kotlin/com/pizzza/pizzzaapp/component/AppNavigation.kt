@@ -120,6 +120,7 @@ fun AppNavigation(
                 onConfirm = { tabIndex ->
                     cartViewModel.setInitialTab(tabIndex)
                     cartViewModel.clearCart()
+                    viewModel.getGeneralOrderList(forceLoading = true)
                     navController.navigate(ClientHome) {
                         popUpTo(ClientHome) { inclusive = true }
                     }

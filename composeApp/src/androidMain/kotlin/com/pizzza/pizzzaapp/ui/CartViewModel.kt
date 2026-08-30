@@ -105,10 +105,33 @@ class CartViewModel(
         )
     }
 
+    fun loadUserAddress() {
+        execute(loading = false) {
+            val user = dataUseCase.getUserLocal()
+            user?.let {
+                if (cartUiState.deliveryAddress.isBlank()) {
+                    withContext(dispatchers.main) {
+                        cartUiState = cartUiState.copy(
+                            deliveryAddress = it.address,
+                            latitude = it.latitude,
+                            longitude = it.longitude
+                        )
+                    }
+                }
+            }
+        }
+    }
+
     fun confirmOrder(onSuccess: () -> Unit) {
         execute {
             try {
                 val user = dataUseCase.getUserLocal() ?: return@execute
+                
+                // Asegurar que tenemos un producto de delivery si es necesario
+                val deliveryProduct = if (cartUiState.receptionMode == "DELIVERY") {
+                    cartUiState.selectedDeliveryProduct ?: dataUseCase.getProducts().firstOrNull { it.type == "4" }
+                } else null
+
                 val orders = cartUiState.cart.map { item ->
                     OrderResponse(
                         userId = user.uid,
@@ -129,7 +152,7 @@ class CartViewModel(
                         date = "",
                         address = if (cartUiState.receptionMode == "DELIVERY") cartUiState.deliveryAddress else "",
                         reception = cartUiState.receptionMode,
-                        priceDelivery = if (cartUiState.receptionMode == "DELIVERY") cartUiState.selectedDeliveryProduct?.price ?: "0" else "0",
+                        priceDelivery = if (cartUiState.receptionMode == "DELIVERY") deliveryProduct?.price ?: "0" else "0",
                         priceChosse = item.product.priceChosse,
                         idOrden = "",
                         branchId = "1",

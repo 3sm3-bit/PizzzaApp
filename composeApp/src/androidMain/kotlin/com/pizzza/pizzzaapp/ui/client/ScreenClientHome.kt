@@ -1,19 +1,28 @@
 package com.pizzza.pizzzaapp.ui.client
 
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Assignment
 import androidx.compose.material.icons.automirrored.filled.Logout
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Fastfood
 import androidx.compose.material.icons.filled.LocalPizza
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.ShoppingCart
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -23,6 +32,7 @@ import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -38,29 +48,18 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.pizzza.pizzzaapp.R
-import com.pizzza.pizzzaapp.model.ProductModel
 import com.pizzza.pizzzaapp.ui.AppViewModel
 import com.pizzza.pizzzaapp.ui.CartViewModel
 import com.pizzza.pizzzaapp.ui.StoreViewModel
 import com.pizzza.pizzzaapp.ui.auth.AuthViewModel
-import com.valu.uitaycompose.button.UiTayButton
-import com.valu.uitaycompose.model.UiTayButtonModel
-import com.valu.uitaycompose.swipe.UiTayUrlImage
 import com.valu.uitaycompose.utils.tay_green_600
 import com.valu.uitaycompose.utils.tay_red_400
 import com.valu.uitaycompose.utils.tay_red_600
 import com.valu.uitaycompose.utils.textB12
-import com.valu.uitaycompose.utils.textB14
-import com.valu.uitaycompose.utils.textB16
-import com.valu.uitaycompose.utils.textB18
 import com.valu.uitaycompose.utils.textB20
-import com.valu.uitaycompose.utils.textM10
 import com.valu.uitaycompose.utils.textM12
 import com.valu.uitaycompose.utils.textM14
-import com.valu.uitaycompose.utils.textS12
 
 data class NavItemData(
     val index: Int,
@@ -82,6 +81,7 @@ fun ScreenClientHome(
 ) {
     val cartState = cartViewModel.cartUiState
     var selectedTab by rememberSaveable { mutableIntStateOf(cartState.initialTab) } // Dinámico basado en el estado
+    var showLogoutDialog by remember { mutableStateOf(false) }
 
     LaunchedEffect(cartState.initialTab) {
         if (cartState.initialTab != 0) {
@@ -180,20 +180,20 @@ fun ScreenClientHome(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(16.dp),
+                    .padding(start=16.dp, top = 16.dp, end = 8.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.Top
             ) {
-                // Textos de Bienvenida (Siempre visibles)
+                // Textos de Cabecera Dinámicos
                 Column {
                     Text(
-                        text = "Bienvenido a la pizzeria",
+                        text = if (selectedTab == 3) "Monitorea tus pedidos aquí" else "Bienvenido a la pizzeria",
                         style = textM14,
                         color = tay_red_600
                     )
                     Text(
                         modifier = Modifier.padding(top = 4.dp),
-                        text = "Has tu pedido ya!",
+                        text = if (selectedTab == 3) "Tus pedidos de hoy" else "Has tu pedido ya!",
                         style = textB20,
                         color = Color.Black
                     )
@@ -226,19 +226,58 @@ fun ScreenClientHome(
                         }
                     }
 
-                    IconButton(onClick = {
-                        authViewModel.logout {
-                            onLogout()
+                    if (selectedTab == 3) {
+                        // Botón de Refrescar Pedidos
+                        IconButton(onClick = { viewModel.getGeneralOrderList(forceLoading = true) }) {
+                            Icon(
+                                imageVector = Icons.Default.Refresh,
+                                contentDescription = "Refrescar",
+                                tint = tay_red_400,
+                                modifier = Modifier.size(28.dp)
+                            )
                         }
-                    }) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.Logout,
-                            contentDescription = "Cerrar Sesión",
-                            tint = tay_red_400,
-                            modifier = Modifier.size(28.dp)
-                        )
+                    } else {
+                        // Botón de Cerrar Sesión (En las otras pestañas)
+                        IconButton(onClick = { showLogoutDialog = true }) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.Logout,
+                                contentDescription = "Cerrar Sesión",
+                                tint = tay_red_400,
+                                modifier = Modifier.size(28.dp)
+                            )
+                        }
                     }
                 }
+            }
+
+            if (showLogoutDialog) {
+                AlertDialog(
+                    onDismissRequest = { showLogoutDialog = false },
+                    title = { Text(text = "Cerrar Sesión", style = textB20, color = tay_red_600) },
+                    text = { Text(text = "¿Estás seguro de que deseas cerrar sesión?",
+                        style = textM14,color = Color.Gray) },
+                    confirmButton = {
+                        Button(
+                            onClick = {
+                                showLogoutDialog = false
+                                viewModel.resetOrderState()
+                                authViewModel.logout {
+                                    onLogout()
+                                }
+                            },
+                            colors = ButtonDefaults.buttonColors(containerColor = tay_red_600)
+                        ) {
+                            Text("Sí, salir", color = Color.White)
+                        }
+                    },
+                    dismissButton = {
+                        TextButton(onClick = { showLogoutDialog = false }) {
+                            Text("No", color = Color.Gray)
+                        }
+                    },
+                    containerColor = Color.White,
+                    shape = RoundedCornerShape(16.dp)
+                )
             }
 
             when (selectedTab) {
