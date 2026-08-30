@@ -21,7 +21,8 @@
 
         <activity
             android:exported="true"
-            android:name=".ui.MainActivity">
+            android:name=".ui.MainActivity"
+            android:windowSoftInputMode="adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -31,7 +32,7 @@
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyA1gylqBLlia0Q9FElkhMcc9HL0xrr8toU" />
+            android:value="${MAPS_API_KEY}" />
 
         <service
             android:name=".service.WebSocketService"
