@@ -1,11 +1,15 @@
 package com.pizzza.pizzzaapp.repository.network.exception
 
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
 data class CompleteErrorModel(
+    @SerialName("code")
     val code: Int? = null,
+    @SerialName("title")
     val title: String? = null,
+    @SerialName("errorMessage")
     val errorMessage: String? = null
 )
 

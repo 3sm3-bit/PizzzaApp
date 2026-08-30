@@ -65,7 +65,7 @@ fun OrderItemCard(order: ParentOrderModel) {
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(text = "Pedido #${order.uid.takeLast(6)}", style = textB16, color = Color.Black)
+                Text(text = "Pedido #${order.nameClient}", style = textB16, color = Color.Black)
                 Surface(
                     color = when (order.state.uppercase()) {
                         "CONFIRMADO" -> Color(0xFFFFF3E0)

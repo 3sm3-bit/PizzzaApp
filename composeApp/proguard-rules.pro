@@ -12,10 +12,22 @@
 #   public *;
 #}
 
-# Uncomment this to preserve the line number information for
-# debugging stack traces.
-#-keepattributes SourceFile,LineNumberTable
+# --- Kotlinx Serialization ---
+-keepattributes *Annotation*, InnerClasses, EnclosingMethod, Signature, Exceptions
+-keepclassmembers class * {
+    @kotlinx.serialization.SerialName <fields>;
+}
+-keep,allowobfuscation,allowoptimization class com.pizzza.pizzzaapp.repository.network.model.** { *; }
+-keep,allowobfuscation,allowoptimization class com.pizzza.pizzzaapp.repository.network.exception.CompleteErrorModel { *; }
 
-# If you keep the line number information, uncomment this to
-# hide the original source file name.
-#-renamesourcefileattribute SourceFile
+# --- Ktor ---
+-keep class io.ktor.** { *; }
+
+# --- Room ---
+-keep class * extends androidx.room.RoomDatabase
+-keep class * extends androidx.room.Entity
+-keep class * extends androidx.room.Dao
+-keep class * extends androidx.room.TypeConverter
+
+# --- Koin ---
+-keep class org.koin.** { *; }
