@@ -13,7 +13,9 @@ import com.pizzza.pizzzaapp.R
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
+import com.valu.uitaycompose.loading.UiProgress
 import com.valu.uitaycompose.loading.UiTayAnimationProgress
+import com.valu.uitaycompose.utils.tay_red_600
 
 abstract class BaseActivity : ComponentActivity() {
 
@@ -45,7 +47,9 @@ abstract class BaseActivity : ComponentActivity() {
                 SetScreenConfig()
 
                 if (isLoading) {
-                    UiTayAnimationProgress(idGif = R.drawable.ui_ani_logo)
+                    UiProgress(
+                        colorProgress = tay_red_600
+                    )
                 }
                 
                 errorState?.let { uiState ->
