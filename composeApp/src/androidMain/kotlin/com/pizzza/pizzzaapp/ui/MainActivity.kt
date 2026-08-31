@@ -25,7 +25,7 @@ class MainActivity : BaseActivity() {
     private val cartViewModel : CartViewModel by viewModel()
     private val storeViewModel : StoreViewModel by viewModel()
     private val authViewModel : com.pizzza.pizzzaapp.ui.auth.AuthViewModel by viewModel()
-    private val webSocketManager: WebSocketManager by inject()
+    // private val webSocketManager: WebSocketManager by inject()
 
     private val prefs by lazy { getSharedPreferences("pizza_prefs", Context.MODE_PRIVATE) }
 
@@ -44,7 +44,7 @@ class MainActivity : BaseActivity() {
         val isEnabled = prefs.getBoolean("notifications_enabled", false)
         viewModel.setNotificationsEnabled(isEnabled)
 
-        observeSocketForRefresh()
+        // observeSocketForRefresh()
         
         // El sync se maneja ahora en la SplashScreen
         
@@ -63,10 +63,10 @@ class MainActivity : BaseActivity() {
                         
                         if (enabled) {
                             println("$TAG_PIZZZA: MainActivity - Switch ACTIVADO: Iniciando servicio")
-                            startWebSocketService()
+                            // startWebSocketService()
                         } else {
                             println("$TAG_PIZZZA: MainActivity - Switch DESACTIVADO: Deteniendo servicio")
-                            stopWebSocketService()
+                            // stopWebSocketService()
                         }
                     }
             }
@@ -74,26 +74,26 @@ class MainActivity : BaseActivity() {
     }
 
     private fun startWebSocketService() {
-        val intent = Intent(this, com.pizzza.pizzzaapp.service.WebSocketService::class.java)
+        /*val intent = Intent(this, com.pizzza.pizzzaapp.service.WebSocketService::class.java)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             startForegroundService(intent)
         } else {
             startService(intent)
-        }
+        }*/
     }
 
     private fun stopWebSocketService() {
-        val intent = Intent(this, com.pizzza.pizzzaapp.service.WebSocketService::class.java)
-        stopService(intent)
+        /*val intent = Intent(this, com.pizzza.pizzzaapp.service.WebSocketService::class.java)
+        stopService(intent)*/
     }
 
     private fun observeSocketForRefresh() {
-        webSocketManager.notifications
+        /*webSocketManager.notifications
             .onEach {
                 println("$TAG_PIZZZA: MainActivity - Notificación recibida para refrescar lista")
                 viewModel.getGeneralOrderList()
             }
-            .launchIn(lifecycleScope)
+            .launchIn(lifecycleScope)*/
     }
 
     override fun getViewModel(): BaseViewModel = viewModel

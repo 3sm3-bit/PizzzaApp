@@ -68,7 +68,7 @@ fun ScreenCart(
                                 modifier = Modifier.fillMaxWidth(),
                                 horizontalArrangement = Arrangement.spacedBy(12.dp)
                             ) {
-                                val modes = listOf("RECOJO" to "LOCAL", "DELIVERY" to "DOMICILIO")
+                                val modes = listOf("DELIVERY" to "DOMICILIO", "RECOJO" to "LOCAL")
                                 modes.forEach { (value, label) ->
                                     val isSelected = uiState.receptionMode == value
                                     Surface(
@@ -92,13 +92,13 @@ fun ScreenCart(
 
                             if (uiState.receptionMode == "DELIVERY") {
                                 Spacer(Modifier.height(16.dp))
-                                Text("Cambiar dirección de entrega", style = textS12, color = tay_red_600)
+                                Text("Cambiar dirección de entrega", style = textS16, color = Color.Black)
                                 Spacer(Modifier.height(4.dp))
                                 Surface(
                                     onClick = onNavigateToAddressSelection,
                                     modifier = Modifier.fillMaxWidth().height(48.dp),
                                     shape = RoundedCornerShape(12.dp),
-                                    border = BorderStroke(1.dp, tay_green_600),
+                                    border = BorderStroke(1.dp, Color.Black),
                                     color = Color.White
                                 ) {
                                     Row(
@@ -117,7 +117,7 @@ fun ScreenCart(
                                         Icon(
                                             imageVector = Icons.Default.LocationOn,
                                             contentDescription = null,
-                                            tint = tay_green_600
+                                            tint = Color.Black
                                         )
                                     }
                                 }

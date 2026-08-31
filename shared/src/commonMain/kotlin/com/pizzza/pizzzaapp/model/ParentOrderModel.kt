@@ -18,6 +18,9 @@ data class ParentOrderModel(
     val stage: String,
     val latitude: String,
     val longitude: String,
+    val currentLatitude: String,
+    val currentLongitude: String,
+    val statePay: String,
     val userId: String,
     val driverId: String,
     val orders: List<OrderModel>
@@ -38,6 +41,9 @@ data class ParentOrderModel(
             stage = stage,
             latitude = latitude,
             longitude = longitude,
+            currentLatitude = currentLatitude,
+            currentLongitude = currentLongitude,
+            statePay = statePay,
             userId = userId,
             driverId = driverId,
             orders = emptyList() // Or map it back if needed, but usually for requests we might not need all orders

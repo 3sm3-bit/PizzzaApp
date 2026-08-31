@@ -157,7 +157,7 @@ fun ScreenOrderSummary(
                                 horizontalArrangement = Arrangement.SpaceBetween
                             ) {
                                 Text(
-                                    text = "Envío (${uiState.selectedDeliveryProduct.description})",
+                                    text = "Envío:",
                                     style = textM14,
                                     color = tay_green_600
                                 )

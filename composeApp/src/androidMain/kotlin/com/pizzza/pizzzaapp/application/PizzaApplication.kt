@@ -11,7 +11,7 @@ class PizzaApplication: Application()  {
 
     override fun onCreate() {
         super.onCreate()
-        NotificationHelper.createNotificationChannel(this)
+       // NotificationHelper.createNotificationChannel(this)
         initKoin {
             androidContext(this@PizzaApplication)
             androidLogger()

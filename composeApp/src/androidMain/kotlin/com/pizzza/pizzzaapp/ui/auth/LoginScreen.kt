@@ -7,6 +7,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -18,6 +19,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -30,11 +32,14 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import com.pizzza.pizzzaapp.R
 import com.valu.uitaycompose.button.UiTayButton
+import com.valu.uitaycompose.extra.UiTayCToolBar
 import com.valu.uitaycompose.label.UiTayEditLayout
 import com.valu.uitaycompose.model.UiEditLayoutModel
 import com.valu.uitaycompose.model.UiTayButtonModel
+import com.valu.uitaycompose.model.UiToolBarModel
 import com.valu.uitaycompose.utils.tay_green_600
 import com.valu.uitaycompose.utils.tay_grey_800
+import com.valu.uitaycompose.utils.tay_red_50
 import com.valu.uitaycompose.utils.tay_red_600
 import com.valu.uitaycompose.utils.textB14
 import com.valu.uitaycompose.utils.textB20
@@ -61,21 +66,34 @@ fun LoginScreen(
         }
     }
 
-    Surface(
-        modifier = Modifier.fillMaxSize(),
-        color = Color(0xFFF0F2F5)
-    ) {
+    Scaffold(
+        topBar = {
+            Surface(color = tay_red_50) {
+                Box(modifier = Modifier.statusBarsPadding()) {
+                    UiTayCToolBar(
+                        uiTayText = "Pizzzeria 3 Z",
+                        uiTayModifier = UiToolBarModel()
+                            .backgroundColor(tay_red_50)
+                            .textColor(tay_red_600)
+                            .iconColor(Color.Transparent) // Sin icono atrás en Login
+                    ) { }
+                }
+            }
+        },
+        containerColor = Color(0xFFF0F2F5)
+    ) { padding ->
         val scrollState = rememberScrollState()
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .statusBarsPadding()
+                .padding(padding)
                 .imePadding()
-                .padding(24.dp)
+                .padding(horizontal = 24.dp)
                 .verticalScroll(scrollState),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+            verticalArrangement = Arrangement.Top
         ) {
+            Spacer(modifier = Modifier.weight(1f))
 
             Image(painter = painterResource(R.drawable.ic_pizzza),
                 contentDescription = "logo_ic",
@@ -140,6 +158,8 @@ fun LoginScreen(
                 color = tay_green_600,
                 modifier = Modifier.clickable { onNavigateToRegister() }
             )
+
+            Spacer(modifier = Modifier.weight(1f))
         }
     }
 }

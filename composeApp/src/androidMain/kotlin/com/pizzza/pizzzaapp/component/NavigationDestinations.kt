@@ -25,3 +25,6 @@ object OrderDetail
 
 @Serializable
 object AddressSelection
+
+@Serializable
+object Monitor

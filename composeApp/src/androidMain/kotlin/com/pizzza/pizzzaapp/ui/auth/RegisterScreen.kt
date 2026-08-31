@@ -1,6 +1,7 @@
 package com.pizzza.pizzzaapp.ui.auth
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -59,7 +60,10 @@ fun RegisterScreen(
 
     Scaffold(
         topBar = {
-            Surface(color = tay_red_50) {
+            Surface(
+                color = tay_red_50,
+                shadowElevation = 4.dp // Darle un poco de sombra para que no sea traslúcido
+            ) {
                 Box(modifier = Modifier.statusBarsPadding()) {
                     UiTayCToolBar(
                         uiTayText = "Pizzzeria 3 Z",
@@ -77,7 +81,9 @@ fun RegisterScreen(
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
+                    .background(Color(0xFFF0F2F5)) // Asegurar fondo sólido
                     .navigationBarsPadding()
+                    .imePadding() // Importante: el botón debe subir con el teclado si es necesario
                     .padding(horizontal = 16.dp)
                     .padding(bottom = 32.dp)
             ) {
@@ -105,14 +111,9 @@ fun RegisterScreen(
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
-                .imePadding()
-                .consumeWindowInsets(padding),
-            contentPadding = PaddingValues(
-                top = padding.calculateTopPadding() + 8.dp,
-                bottom = padding.calculateBottomPadding() + 8.dp,
-                start = 16.dp,
-                end = 16.dp
-            ),
+                .padding(padding) // Scaffold padding maneja topBar y bottomBar
+                .imePadding(), // Solo el contenido de la lista se ajusta al teclado
+            contentPadding = PaddingValues(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {

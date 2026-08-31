@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 4,
-    "identityHash": "dc39270e16ee82e5ded292524c1cab9e",
+    "identityHash": "af5f80f837465e0c868cfc4ecafcb93a",
     "entities": [
       {
         "tableName": "parent_orders",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`uid` TEXT NOT NULL, `nameClient` TEXT NOT NULL, `description` TEXT NOT NULL, `price` TEXT NOT NULL, `phone` TEXT NOT NULL, `date` TEXT NOT NULL, `state` TEXT NOT NULL, `address` TEXT NOT NULL, `reception` TEXT NOT NULL, `symbol` TEXT NOT NULL, `branchId` TEXT NOT NULL, `stage` TEXT NOT NULL, `latitude` TEXT NOT NULL, `longitude` TEXT NOT NULL, `userId` TEXT NOT NULL, `driverId` TEXT NOT NULL, PRIMARY KEY(`uid`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`uid` TEXT NOT NULL, `nameClient` TEXT NOT NULL, `description` TEXT NOT NULL, `price` TEXT NOT NULL, `phone` TEXT NOT NULL, `date` TEXT NOT NULL, `state` TEXT NOT NULL, `address` TEXT NOT NULL, `reception` TEXT NOT NULL, `symbol` TEXT NOT NULL, `branchId` TEXT NOT NULL, `stage` TEXT NOT NULL, `latitude` TEXT NOT NULL, `longitude` TEXT NOT NULL, `currentLatitude` TEXT NOT NULL, `currentLongitude` TEXT NOT NULL, `statePay` TEXT NOT NULL, `userId` TEXT NOT NULL, `driverId` TEXT NOT NULL, PRIMARY KEY(`uid`))",
         "fields": [
           {
             "fieldPath": "uid",
@@ -89,6 +89,24 @@
           {
             "fieldPath": "longitude",
             "columnName": "longitude",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "currentLatitude",
+            "columnName": "currentLatitude",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "currentLongitude",
+            "columnName": "currentLongitude",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "statePay",
+            "columnName": "statePay",
             "affinity": "TEXT",
             "notNull": true
           },
@@ -283,7 +301,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'dc39270e16ee82e5ded292524c1cab9e')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'af5f80f837465e0c868cfc4ecafcb93a')"
     ]
   }
 }

@@ -57,7 +57,13 @@ class OrderResponse (
     @SerialName("latitude")
     val latitude: String? = "0",
     @SerialName("longitude")
-    val longitude: String? = "0"
+    val longitude: String? = "0",
+    @SerialName("currentLatitude")
+    val currentLatitude: String? = "0",
+    @SerialName("currentLongitude")
+    val currentLongitude: String? = "0",
+    @SerialName("statePay")
+    val statePay: String? = "PENDIENTE"
 )
 
 fun List<OrderResponse>.loadOrder() = this.map {
@@ -87,6 +93,9 @@ fun List<OrderResponse>.loadOrder() = this.map {
         userId = it.userId ?: "0",
         driverId = it.driverId ?: "0",
         latitude = it.latitude ?: "0",
-        longitude = it.longitude ?: "0"
+        longitude = it.longitude ?: "0",
+        currentLatitude = it.currentLatitude ?: "0",
+        currentLongitude = it.currentLongitude ?: "0",
+        statePay = it.statePay ?: "PENDIENTE"
     )
 }

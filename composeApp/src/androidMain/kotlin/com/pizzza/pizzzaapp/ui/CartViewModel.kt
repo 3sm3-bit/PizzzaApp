@@ -58,19 +58,11 @@ class CartViewModel(
         cartUiState = cartUiState.copy(cart = currentCart)
     }
 
-    fun updateCartItem(oldItem: OrderItem, newItem: OrderItem) {
-        val currentCart = cartUiState.cart.toMutableList()
-        val index = currentCart.indexOfFirst { it.id == oldItem.id }
-        if (index != -1) {
-            currentCart[index] = newItem
-            cartUiState = cartUiState.copy(cart = currentCart)
-        }
-    }
 
     fun clearCart() {
         cartUiState = cartUiState.copy(
             cart = emptyList(),
-            receptionMode = "RECOJO",
+            receptionMode = "DELIVERY",
             selectedDeliveryProduct = null,
             deliveryAddress = ""
         )
@@ -83,18 +75,9 @@ class CartViewModel(
     fun setReceptionMode(mode: String, defaultDeliveryProduct: ProductModel? = null) {
         cartUiState = cartUiState.copy(
             receptionMode = mode,
-            // Reset delivery data if switching to pickup, or set default if switching to delivery
             selectedDeliveryProduct = if (mode == "RECOJO") null else (cartUiState.selectedDeliveryProduct ?: defaultDeliveryProduct),
             deliveryAddress = if (mode == "RECOJO") "" else cartUiState.deliveryAddress
         )
-    }
-
-    fun setDeliveryProduct(product: ProductModel?) {
-        cartUiState = cartUiState.copy(selectedDeliveryProduct = product)
-    }
-
-    fun setDeliveryAddress(address: String) {
-        cartUiState = cartUiState.copy(deliveryAddress = address)
     }
 
     fun setAddressSelection(address: String, lat: String, lng: String) {
@@ -157,8 +140,8 @@ class CartViewModel(
                         idOrden = "",
                         branchId = "1",
                         stage = "1",
-                        latitude = cartUiState.latitude,
-                        longitude = cartUiState.longitude
+                        latitude = "21.852697463621574",//cartUiState.latitude,
+                        longitude = "-102.33635533601046",//cartUiState.longitude
                     )
                 }
                 

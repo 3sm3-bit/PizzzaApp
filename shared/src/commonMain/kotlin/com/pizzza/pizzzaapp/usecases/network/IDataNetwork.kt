@@ -8,13 +8,13 @@ import com.pizzza.pizzzaapp.repository.network.model.UserResponse
 
 interface IDataNetwork {
 
-    suspend fun loadParentOrder(forceRefresh: Boolean = false): List<ParentOrderModel>
+    suspend fun loadParentOrder(userId: String): List<ParentOrderModel>
+
+    suspend fun getOrderById(orderId: String): ParentOrderModel
 
     suspend fun syncProducts(): List<ProductModel>
 
     suspend fun getProducts(): List<ProductModel>
-
-    suspend fun getBranches(): List<BranchModel>
 
     suspend fun createOrder(data: List<OrderResponse>): String
 

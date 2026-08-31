@@ -77,6 +77,7 @@ fun ScreenClientHome(
     onNavigateToSummary: () -> Unit,
     onNavigateToAddressSelection: () -> Unit,
     onNavigateToDetail: () -> Unit,
+    onNavigateToMonitor: () -> Unit,
     onLogout: () -> Unit
 ) {
     val cartState = cartViewModel.cartUiState
@@ -289,7 +290,10 @@ fun ScreenClientHome(
                     onNavigateToAddressSelection = onNavigateToAddressSelection,
                     onNavigateToSummary = onNavigateToSummary
                 )
-                3 -> ScreenOrder(viewModel)
+                3 -> ScreenOrder(
+                    viewModel = viewModel,
+                    onNavigateToMonitor = onNavigateToMonitor
+                )
             }
         }
     }

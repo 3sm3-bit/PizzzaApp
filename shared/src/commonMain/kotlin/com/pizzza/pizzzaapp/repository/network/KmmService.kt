@@ -29,16 +29,16 @@ class KmmService(private val client: HttpClient) {
         }
     }
 
-    suspend fun getParentOrder(): List<ParentOrderResponse> {
-        return client.get("${BASE_URL}/pizzzeria/order/generalOrder").body()
+    suspend fun getParentOrder(userId: String): List<ParentOrderResponse> {
+        return client.get("${BASE_URL}/pizzzeria/order/generalOrder/user/hoy/$userId").body()
+    }
+
+    suspend fun getOrderById(orderId: String): ParentOrderResponse {
+        return client.get("${BASE_URL}/pizzzeria/order/generalOrder/$orderId").body()
     }
 
     suspend fun getProducts(): List<ProductResponse> {
         return client.get("${BASE_URL}/pizzzeria/products").body()
-    }
-
-    suspend fun getBranches(): List<BranchResponse> {
-        return client.get("${BASE_URL}/pizzzeria/branch").body()
     }
 
     suspend fun createOrder(request: List<OrderResponse>): String {

@@ -39,31 +39,4 @@ class StoreViewModel(
             }
         }
     }
-
-    fun getBranchesList() {
-        val hasData = storeUiState.branches.isNotEmpty()
-        execute(loading = !hasData) {
-            try {
-                val response = dataUseCase.getBranches()
-                withContext(dispatchers.main) {
-                    storeUiState = storeUiState.copy(branches = response)
-                }
-            } catch (e: Exception) {
-                Log.e(TAG_PIZZZA, "Error en getBranchesList: ${e.message}", e)
-                throw e
-            }
-        }
-    }
-
-    fun selectBranch(branch: BranchModel?) {
-        storeUiState = storeUiState.copy(selectedBranch = branch)
-    }
-
-    fun selectProduct(product: ProductModel?) {
-        storeUiState = storeUiState.copy(selectedProduct = product)
-    }
-
-    fun setCategory(category: String) {
-        storeUiState = storeUiState.copy(selectedCategory = category)
-    }
 }

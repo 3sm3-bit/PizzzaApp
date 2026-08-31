@@ -21,6 +21,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import org.koin.android.ext.android.inject
 
+/*
 class WebSocketService : Service() {
 
     private val webSocketManager: WebSocketManager by inject()
@@ -114,3 +115,4 @@ class WebSocketService : Service() {
         super.onDestroy()
     }
 }
+*/

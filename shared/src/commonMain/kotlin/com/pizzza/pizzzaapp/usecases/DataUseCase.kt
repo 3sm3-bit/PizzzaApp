@@ -1,6 +1,5 @@
 package com.pizzza.pizzzaapp.usecases
 
-import com.pizzza.pizzzaapp.model.BranchModel
 import com.pizzza.pizzzaapp.model.ProductModel
 import com.pizzza.pizzzaapp.repository.network.model.OrderResponse
 import com.pizzza.pizzzaapp.repository.network.model.UserResponse
@@ -9,13 +8,13 @@ import com.pizzza.pizzzaapp.usecases.network.IDataNetwork
 
 class DataUseCase(private val iDataNetwork: IDataNetwork) {
 
-    suspend fun loadParentOrder(forceRefresh: Boolean = false) = iDataNetwork.loadParentOrder(forceRefresh)
+    suspend fun loadParentOrder(userId: String) = iDataNetwork.loadParentOrder(userId)
+
+    suspend fun getOrderById(orderId: String) = iDataNetwork.getOrderById(orderId)
 
     suspend fun syncProducts() = iDataNetwork.syncProducts()
 
     suspend fun getProducts() = iDataNetwork.getProducts()
-
-    suspend fun getBranches() = iDataNetwork.getBranches()
 
     suspend fun createOrder(data: List<OrderResponse>) = iDataNetwork.createOrder(data)
 

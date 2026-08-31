@@ -15,8 +15,8 @@ fun ScreenPizza(
     onNavigateToDetail: () -> Unit
 ) {
     val uiState = viewModel.orderUiState
-    var selectedSize by remember { mutableStateOf("CHICO") }
-    val sizes = listOf("CHICO", "MEDIANO", "GRANDE")
+    var selectedSize by remember { mutableStateOf("GRANDE") }
+    val sizes = listOf("GRANDE", "MEDIANO", "CHICO")
 
     Column(modifier = Modifier.fillMaxSize().padding(top = 12.dp)) {
         LazyRow(

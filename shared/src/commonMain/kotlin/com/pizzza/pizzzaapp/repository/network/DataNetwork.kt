@@ -9,16 +9,12 @@ import com.pizzza.pizzzaapp.repository.network.model.loadParentOrder
 import com.pizzza.pizzzaapp.repository.network.model.toModelList
 import com.pizzza.pizzzaapp.repository.network.model.OrderResponse
 import com.pizzza.pizzzaapp.repository.network.model.toResponse
-import com.pizzza.pizzzaapp.model.BranchModel
 import com.pizzza.pizzzaapp.usecases.network.IDataNetwork
 import com.pizzza.pizzzaapp.repository.utils.ConnectivityManager
 import com.pizzza.pizzzaapp.repository.db.manager.AppDataBase
-import com.pizzza.pizzzaapp.repository.db.toEntity
-import com.pizzza.pizzzaapp.repository.db.toEntityListFromResponse
 import com.pizzza.pizzzaapp.repository.db.toProductEntityList
 import com.pizzza.pizzzaapp.repository.db.toProductModelList
 import com.pizzza.pizzzaapp.repository.network.model.UserResponse
-import com.pizzza.pizzzaapp.repository.db.toModelList as toModelListFromDb
 
 class DataNetwork(
     private val apiService: KmmService,
@@ -46,59 +42,34 @@ class DataNetwork(
         models
     }) { it }
 
-    override suspend fun getBranches(): List<BranchModel> = apiCall({
-        if (!connectivityManager.isConnected()) throw ErrorNetwork()
-        println("$TAG_PIZZZA: DataNetwork: Cargando sucursales desde el servicio...")
-        apiService.getBranches()
-    }) { response ->
-        response.toModelList()
-    }
-
     override suspend fun createOrder(data: List<OrderResponse>): String = apiCall {
         if (!connectivityManager.isConnected()) throw ErrorNetwork()
         println("$TAG_PIZZZA: DataNetwork: Enviando lista de pedidos (${data.size} items)...")
         apiService.createOrder(data)
     }
 
-    override suspend fun loadParentOrder(forceRefresh: Boolean): List<ParentOrderModel> {
-        val dao = database.parentOrderDao()
-        val localOrders = dao.getAll()
-        
-        println("$TAG_PIZZZA: DataNetwork: Iniciando loadParentOrder. forceRefresh=$forceRefresh, localCount=${localOrders.size}")
+    override suspend fun loadParentOrder(userId: String): List<ParentOrderModel> {
+        if (!connectivityManager.isConnected()) throw ErrorNetwork()
 
-        if (localOrders.isNotEmpty() && !forceRefresh) {
-            val models = localOrders.toModelListFromDb()
-            // Si por alguna razón no tienen productos asociados, forzamos refresco para obtener data completa
-            if (models.any { it.orders.isEmpty() }) {
-                println("$TAG_PIZZZA: DataNetwork: Datos locales incompletos (sin productos). Forzando refresco de red.")
-            } else {
-                println("$TAG_PIZZZA: DataNetwork: Cargando desde DB Local con datos completos")
-                return models
-            }
-        }
-
-        if (!connectivityManager.isConnected()) {
-            if (localOrders.isNotEmpty()) {
-                println("$TAG_PIZZZA: DataNetwork: Sin conexión, usando DB Local (aunque falten productos)")
-                return localOrders.toModelListFromDb()
-            } else {
-                println("$TAG_PIZZZA: DataNetwork: Sin conexión y sin datos locales. Lanzando error.")
-                throw ErrorNetwork()
-            }
-        }
+        println("$TAG_PIZZZA: DataNetwork: Iniciando loadParentOrder para usuario $userId desde red")
 
         return apiCall({
-            println("$TAG_PIZZZA: DataNetwork: Llamando al servicio getParentOrder...")
-            val response = apiService.getParentOrder()
+            println("$TAG_PIZZZA: DataNetwork: Llamando al servicio getParentOrder($userId)...")
+            val response = apiService.getParentOrder(userId)
             println("$TAG_PIZZZA: DataNetwork: Servicio respondió con ${response.size} pedidos")
             response
         }) { response ->
-            // Guardar en DB para la próxima vez
-            dao.deleteAll()
-            dao.insertAll(response.toEntityListFromResponse())
-            println("$TAG_PIZZZA: DataNetwork: Datos guardados en DB local")
             response.loadParentOrder()
         }
+    }
+
+    override suspend fun getOrderById(orderId: String): ParentOrderModel = apiCall({
+        if (!connectivityManager.isConnected()) throw ErrorNetwork()
+        println("$TAG_PIZZZA: DataNetwork: Obteniendo pedido $orderId...")
+        apiService.getOrderById(orderId)
+    }) { response ->
+        // Solo hay uno
+        listOf(response).loadParentOrder().first()
     }
 
     override suspend fun registerUser(data: UserResponse): String = apiCall {

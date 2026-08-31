@@ -13,6 +13,7 @@ import com.pizzza.pizzzaapp.ui.client.ScreenClientHome
 import com.pizzza.pizzzaapp.ui.client.ScreenOrderSummary
 import com.pizzza.pizzzaapp.ui.client.ScreenDetailOrder
 import com.pizzza.pizzzaapp.ui.client.AddressScreen
+import com.pizzza.pizzzaapp.ui.monitoring.ScreenMonitor
 import com.pizzza.pizzzaapp.ui.auth.LoginScreen
 import com.pizzza.pizzzaapp.ui.auth.RegisterScreen
 
@@ -104,13 +105,20 @@ fun AppNavigation(
                     navController.navigate(Login) {
                         popUpTo<ClientHome> { inclusive = true }
                     }
-                }
+                },
+                onNavigateToMonitor = { navController.navigate(Monitor) }
             )
         }
         composable<OrderDetail> {
             ScreenDetailOrder(
                 viewModel = viewModel,
                 cartViewModel = cartViewModel,
+                onBack = { navController.popBackStack() }
+            )
+        }
+        composable<Monitor> {
+            ScreenMonitor(
+                viewModel = viewModel,
                 onBack = { navController.popBackStack() }
             )
         }

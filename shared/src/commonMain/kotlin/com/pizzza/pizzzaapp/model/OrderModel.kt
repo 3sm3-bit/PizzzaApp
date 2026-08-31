@@ -26,5 +26,8 @@ data class OrderModel (
     val userId : String,
     val driverId : String,
     val latitude : String,
-    val longitude : String
+    val longitude : String,
+    val currentLatitude : String,
+    val currentLongitude : String,
+    val statePay : String
 )

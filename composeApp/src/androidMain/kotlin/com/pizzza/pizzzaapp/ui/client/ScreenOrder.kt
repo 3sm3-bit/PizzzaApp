@@ -20,7 +20,10 @@ import com.valu.uitaycompose.utils.textB16
 import com.valu.uitaycompose.utils.textM12
 
 @Composable
-fun ScreenOrder(viewModel: AppViewModel) {
+fun ScreenOrder(
+    viewModel: AppViewModel,
+    onNavigateToMonitor: () -> Unit
+) {
     val uiState = viewModel.orderUiState
 
     LaunchedEffect(Unit) {
@@ -43,7 +46,11 @@ fun ScreenOrder(viewModel: AppViewModel) {
                 contentPadding = PaddingValues(bottom = 16.dp)
             ) {
                 items(uiState.orders) { order ->
-                    OrderItemCard(order = order)
+                    OrderItemCard(
+                        order = order,
+                        viewModel = viewModel,
+                        onNavigateToMonitor = onNavigateToMonitor
+                    )
                 }
             }
         }
@@ -51,7 +58,20 @@ fun ScreenOrder(viewModel: AppViewModel) {
 }
 
 @Composable
-fun OrderItemCard(order: ParentOrderModel) {
+fun OrderItemCard(
+    order: ParentOrderModel,
+    viewModel: AppViewModel,
+    onNavigateToMonitor: () -> Unit
+) {
+    val displayState = when (order.state.uppercase()) {
+        "CONFIRMADO" -> "PREPARANDO"
+        "LISTO" -> "LISTO"
+        "ENVIADO" -> "LISTO"
+        "INICIADO" -> "EN CAMINO"
+        "ENTREGADO" -> "ENTREGADO"
+        else -> order.state.uppercase()
+    }
+
     Card(
         colors = CardDefaults.cardColors(containerColor = Color.White),
         shape = RoundedCornerShape(16.dp),
@@ -69,20 +89,22 @@ fun OrderItemCard(order: ParentOrderModel) {
                 Surface(
                     color = when (order.state.uppercase()) {
                         "CONFIRMADO" -> Color(0xFFFFF3E0)
-                        "LISTO" -> Color(0xFFE8F5E9)
-                        "ENTREGADO" -> Color(0xFFE3F2FD)
+                        "LISTO", "ENVIADO" -> Color(0xFFE8F5E9)
+                        "INICIADO" -> Color(0xFFE3F2FD)
+                        "ENTREGADO" -> Color(0xFFE8F5E9)
                         else -> Color(0xFFF5F5F5)
                     },
                     shape = RoundedCornerShape(8.dp)
                 ) {
                     Text(
-                        text = order.state.uppercase(),
+                        text = displayState,
                         modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
                         style = textB12,
                         color = when (order.state.uppercase()) {
                             "CONFIRMADO" -> Color(0xFFE65100)
-                            "LISTO" -> Color(0xFF2E7D32)
-                            "ENTREGADO" -> Color(0xFF1565C0)
+                            "LISTO", "ENVIADO" -> Color(0xFF2E7D32)
+                            "INICIADO" -> Color(0xFF1565C0)
+                            "ENTREGADO" -> Color(0xFF2E7D32)
                             else -> Color.Gray
                         }
                     )
@@ -100,8 +122,25 @@ fun OrderItemCard(order: ParentOrderModel) {
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(text = order.date, style = textM12, color = Color.LightGray)
-                Text(text = "${order.symbol}${order.price}", style = textB14, color = tay_red_600)
+                Column {
+                    Text(text = order.date, style = textM12, color = Color.LightGray)
+                    Text(text = "${order.symbol}${order.price}", style = textB14, color = tay_red_600)
+                }
+
+                if (order.state.uppercase() == "INICIADO" && order.reception.uppercase() == "DELIVERY") {
+                    Button(
+                        onClick = {
+                            viewModel.selectOrder(order)
+                            onNavigateToMonitor()
+                        },
+                        colors = ButtonDefaults.buttonColors(containerColor = tay_red_600),
+                        shape = RoundedCornerShape(8.dp),
+                        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 4.dp),
+                        modifier = Modifier.height(32.dp)
+                    ) {
+                        Text("VER", style = textB12, color = Color.White)
+                    }
+                }
             }
         }
     }

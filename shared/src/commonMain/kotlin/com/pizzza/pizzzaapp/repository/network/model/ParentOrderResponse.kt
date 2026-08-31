@@ -35,6 +35,12 @@ class ParentOrderResponse(
     val latitude: String? = "0",
     @SerialName("longitude")
     val longitude: String? = "0",
+    @SerialName("currentLatitude")
+    val currentLatitude: String? = "0",
+    @SerialName("currentLongitude")
+    val currentLongitude: String? = "0",
+    @SerialName("statePay")
+    val statePay: String? = "PENDIENTE",
     @SerialName("userId")
     val userId: String? = "0",
     @SerialName("driverId")
@@ -59,6 +65,9 @@ fun List<ParentOrderResponse>.loadParentOrder() = this.map {
         stage = it.stage ?: "1",
         latitude = it.latitude ?: "0",
         longitude = it.longitude ?: "0",
+        currentLatitude = it.currentLatitude ?: "0",
+        currentLongitude = it.currentLongitude ?: "0",
+        statePay = it.statePay ?: "PENDIENTE",
         userId = it.userId ?: "0",
         driverId = it.driverId ?: "0",
         orders = it.orders?.loadOrder() ?: emptyList()
