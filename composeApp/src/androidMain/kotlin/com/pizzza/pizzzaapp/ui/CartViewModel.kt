@@ -140,8 +140,8 @@ class CartViewModel(
                         idOrden = "",
                         branchId = "1",
                         stage = "1",
-                        latitude = "21.852697463621574",//cartUiState.latitude,
-                        longitude = "-102.33635533601046",//cartUiState.longitude
+                        latitude = cartUiState.latitude,
+                        longitude = cartUiState.longitude
                     )
                 }
                 

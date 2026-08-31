@@ -95,7 +95,7 @@ fun ScreenClientHome(
         NavItemData(0, "Pizza", Icons.Default.LocalPizza),
         NavItemData(1, "Extra", Icons.Default.Fastfood),
         NavItemData(2, "Cart", Icons.Default.ShoppingCart),
-        NavItemData(3, "Order", Icons.AutoMirrored.Filled.Assignment)
+        NavItemData(3, "Orden", Icons.AutoMirrored.Filled.Assignment)
     )
 
     LaunchedEffect(Unit) {
