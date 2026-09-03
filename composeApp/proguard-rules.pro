@@ -17,8 +17,16 @@
 -keepclassmembers class * {
     @kotlinx.serialization.SerialName <fields>;
 }
--keep,allowobfuscation,allowoptimization class com.pizzza.pizzzaapp.repository.network.model.** { *; }
--keep,allowobfuscation,allowoptimization class com.pizzza.pizzzaapp.repository.network.exception.CompleteErrorModel { *; }
+# Quitamos allowobfuscation para asegurar que los modelos se mantengan íntegros
+-keep class com.pizzza.pizzzaapp.repository.network.model.** { *; }
+-keep class com.pizzza.pizzzaapp.repository.network.exception.CompleteErrorModel { *; }
+-keep class com.pizzza.pizzzaapp.repository.network.KmmService { *; }
+
+# Mantener los serializadores generados
+-keep class **$$serializer { *; }
+-keepclassmembers class * {
+    *** Companion;
+}
 
 # --- Ktor ---
 -keep class io.ktor.** { *; }

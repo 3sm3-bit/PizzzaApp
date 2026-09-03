@@ -11,7 +11,6 @@ class AndroidConnectivityManager(private val context: Context) : ConnectivityMan
         val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as android.net.ConnectivityManager?
         val capabilities = connectivityManager?.getNetworkCapabilities(connectivityManager.activeNetwork)
         return capabilities != null &&
-                capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) &&
-                capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED)
+                capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
     }
 }

@@ -14,7 +14,7 @@ class PizzaApplication: Application()  {
        // NotificationHelper.createNotificationChannel(this)
         initKoin {
             androidContext(this@PizzaApplication)
-            androidLogger()
+            androidLogger(org.koin.core.logger.Level.ERROR)
             modules(viewModelModule)
         }
     }

@@ -17,7 +17,8 @@
         android:name=".application.PizzaApplication"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.PizzzaApp">
+        android:theme="@style/Theme.PizzzaApp"
+        android:usesCleartextTraffic="true">
 
         <activity
             android:exported="true"
