@@ -100,7 +100,7 @@ play-services-maps = { module = "com.google.android.gms:play-services-maps", ver
 play-services-location = { module = "com.google.android.gms:play-services-location", version.ref = "play-services-location" }
 
 # Custom Libraries
-tay-compose-library = { module = "com.github.montes8:UITayCompose", version = "1.0.1" }
+tay-compose-library = { module = "com.github.montes8:UITayCompose", version = "1.0.0" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }

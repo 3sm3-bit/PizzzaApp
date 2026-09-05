@@ -38,11 +38,17 @@ class OrderViewModel: ObservableObject {
     
     func getGeneralOrderList() {
         isLoading = true
-        dataUseCase.loadParentOrder(forceRefresh: false) { response, error in
-            DispatchQueue.main.async {
-                self.isLoading = false
-                if let orders = response {
-                    self.updateStateWithOrders(orders: orders)
+        dataUseCase.getUserLocal { [weak self] user, error in
+            guard let uid = user?.uid else {
+                DispatchQueue.main.async { self?.isLoading = false }
+                return
+            }
+            self?.dataUseCase.loadParentOrder(userId: uid) { response, error in
+                DispatchQueue.main.async {
+                    self?.isLoading = false
+                    if let orders = response {
+                        self?.updateStateWithOrders(orders: orders)
+                    }
                 }
             }
         }
@@ -50,11 +56,17 @@ class OrderViewModel: ObservableObject {
     
     func refresh() {
         isLoading = true
-        dataUseCase.loadParentOrder(forceRefresh: true) { response, error in
-            DispatchQueue.main.async {
-                self.isLoading = false
-                if let orders = response {
-                    self.updateStateWithOrders(orders: orders)
+        dataUseCase.getUserLocal { [weak self] user, error in
+            guard let uid = user?.uid else {
+                DispatchQueue.main.async { self?.isLoading = false }
+                return
+            }
+            self?.dataUseCase.loadParentOrder(userId: uid) { response, error in
+                DispatchQueue.main.async {
+                    self?.isLoading = false
+                    if let orders = response {
+                        self?.updateStateWithOrders(orders: orders)
+                    }
                 }
             }
         }
@@ -100,6 +112,16 @@ class OrderViewModel: ObservableObject {
                     state: newState,
                     address: $0.address,
                     reception: $0.reception,
+                    symbol: $0.symbol,
+                    branchId: $0.branchId,
+                    stage: $0.stage,
+                    latitude: $0.latitude,
+                    longitude: $0.longitude,
+                    currentLatitude: $0.currentLatitude,
+                    currentLongitude: $0.currentLongitude,
+                    statePay: $0.statePay,
+                    userId: $0.userId,
+                    driverId: $0.driverId,
                     orders: $0.orders
                 )
             }
@@ -108,31 +130,24 @@ class OrderViewModel: ObservableObject {
         
         self.updateStateWithOrders(orders: updatedOrders)
         
-        // 3. Sync in background
-        dataUseCase.updateOrder(data: order.doCopy(
-            uid: order.uid,
-            nameClient: order.nameClient,
-            description: order.description,
-            price: order.price,
-            phone: order.phone,
-            date: order.date,
-            state: newState,
-            address: order.address,
-            reception: order.reception,
-            orders: order.orders
-        )) { response, error in
+        /* 
+         TODO: updateOrder is not implemented in DataUseCase yet.
+         This would require a PUT endpoint in the backend and a new method in the shared module.
+        */
+        print("⚠️ updateOrder not implemented in shared module")
+        /*
+        dataUseCase.updateOrder(...) { response, error in
             if error != nil {
                 DispatchQueue.main.async {
                     self.orders = previousOrders
                     self.countConfirmado = previousConfirmado
                     self.countListo = previousListo
-                    // En una app real mostraríamos un Toast o Alert aquí
                 }
             } else {
-                // Éxito: recargamos para asegurar sincronización total
                 self.getGeneralOrderList()
             }
         }
+        */
     }
     
     func avanzarEstado(order: ParentOrderModel) {
@@ -149,7 +164,49 @@ class OrderViewModel: ObservableObject {
 
 // Extensión para facilitar la copia del modelo (KMP models don't have direct copy in Swift usually)
 extension ParentOrderModel {
-    func doCopy(uid: String, nameClient: String, description: String, price: String, phone: String, date: String, state: String, address: String, reception: String, orders: [OrderModel]) -> ParentOrderModel {
-        return ParentOrderModel(uid: uid, nameClient: nameClient, description: description, price: price, phone: phone, date: date, state: state, address: address, reception: reception, orders: orders)
+    func doCopy(
+        uid: String,
+        nameClient: String,
+        description: String,
+        price: String,
+        phone: String,
+        date: String,
+        state: String,
+        address: String,
+        reception: String,
+        symbol: String,
+        branchId: String,
+        stage: String,
+        latitude: String,
+        longitude: String,
+        currentLatitude: String,
+        currentLongitude: String,
+        statePay: String,
+        userId: String,
+        driverId: String,
+        orders: [OrderModel]
+    ) -> ParentOrderModel {
+        return ParentOrderModel(
+            uid: uid,
+            nameClient: nameClient,
+            description: description,
+            price: price,
+            phone: phone,
+            date: date,
+            state: state,
+            address: address,
+            reception: reception,
+            symbol: symbol,
+            branchId: branchId,
+            stage: stage,
+            latitude: latitude,
+            longitude: longitude,
+            currentLatitude: currentLatitude,
+            currentLongitude: currentLongitude,
+            statePay: statePay,
+            userId: userId,
+            driverId: driverId,
+            orders: orders
+        )
     }
 }
