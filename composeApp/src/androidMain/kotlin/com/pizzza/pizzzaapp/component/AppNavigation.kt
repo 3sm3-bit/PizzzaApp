@@ -1,139 +1,123 @@
 package com.pizzza.pizzzaapp.component
 
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.getValue
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.pizzza.pizzzaapp.core.navigation.*
+import com.pizzza.pizzzaapp.core.ui.*
+import com.pizzza.pizzzaapp.feature.auth.AuthViewModel
+import com.pizzza.pizzzaapp.feature.auth.login.LoginScreen
+import com.pizzza.pizzzaapp.feature.auth.register.RegisterScreen
+import com.pizzza.pizzzaapp.feature.cart.AddressScreen
+import com.pizzza.pizzzaapp.feature.cart.CartViewModel
+import com.pizzza.pizzzaapp.feature.cart.ScreenOrderSummary
+import com.pizzza.pizzzaapp.feature.home.HomeViewModel
+import com.pizzza.pizzzaapp.feature.home.ScreenClientHome
+import com.pizzza.pizzzaapp.feature.monitoring.ScreenMonitor
+import com.pizzza.pizzzaapp.feature.orders.OrdersViewModel
+import com.pizzza.pizzzaapp.feature.orders.ScreenDetailOrder
 import com.pizzza.pizzzaapp.ui.AppViewModel
-import com.pizzza.pizzzaapp.ui.CartViewModel
-import com.pizzza.pizzzaapp.ui.StoreViewModel
-import com.pizzza.pizzzaapp.ui.auth.AuthViewModel
 import com.pizzza.pizzzaapp.ui.splash.SplashScreen
-import com.pizzza.pizzzaapp.ui.client.ScreenClientHome
-import com.pizzza.pizzzaapp.ui.client.ScreenOrderSummary
-import com.pizzza.pizzzaapp.ui.client.ScreenDetailOrder
-import com.pizzza.pizzzaapp.ui.client.AddressScreen
-import com.pizzza.pizzzaapp.ui.monitoring.ScreenMonitor
-import com.pizzza.pizzzaapp.ui.auth.LoginScreen
-import com.pizzza.pizzzaapp.ui.auth.RegisterScreen
+import org.koin.compose.koinInject
+import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
-fun AppNavigation(
-    viewModel: AppViewModel,
-    cartViewModel: CartViewModel,
-    storeViewModel: StoreViewModel,
-    authViewModel: AuthViewModel
-) {
-    val navController = rememberNavController()
-    NavHost(navController = navController, startDestination = Splash) {
+fun AppNavigation() {
+    val navController: NavHostController = rememberNavController()
+    val onBack: () -> Unit = { navController.popBackStack() }
+
+    NavHost(
+        navController = navController,
+        startDestination = Splash,
+        enterTransition = { EnterTransition.None },
+        exitTransition = { ExitTransition.None }
+    ) {
         composable<Splash> {
             SplashScreen(
-                viewModel = viewModel,
-                authViewModel = authViewModel,
                 onFinished = { isLoggedIn ->
                     if (isLoggedIn) {
-                        navController.navigate(ClientHome) {
+                        navController.navigateSafe(ClientHome) {
                             popUpTo<Splash> { inclusive = true }
                         }
                     } else {
-                        navController.navigate(Login) {
+                        navController.navigateSafe(Login) {
                             popUpTo<Splash> { inclusive = true }
                         }
                     }
                 }
             )
         }
+
         composable<Login> {
             LoginScreen(
-                viewModel = authViewModel,
                 onNavigateToClientHome = {
-                    navController.navigate(ClientHome) {
+                    navController.navigateSafe(ClientHome) {
                         popUpTo(Login) { inclusive = true }
                     }
                 },
                 onNavigateToRegister = {
-                    navController.navigate(Register) 
+                    navController.navigateSafe(Register)
                 }
             )
         }
+
         composable<Register> {
             RegisterScreen(
-                viewModel = authViewModel,
                 onNavigateToAddressSelection = {
-                    navController.navigate(AddressSelection)
+                    navController.navigateSafe(AddressSelection)
                 },
                 onRegisterSuccess = {
-                    navController.navigate(Login) {
+                    navController.navigateSafe(Login) {
                         popUpTo(Register) { inclusive = true }
                     }
                 },
-                onBack = { navController.popBackStack() }
+                onBack = onBack
             )
         }
+
         composable<AddressSelection> {
-            AddressScreen(
-                onConfirm = { address, lat, lng ->
-                    // Detect if we came from Register or Cart (ClientHome/Cart tab)
-                    val previousRoute = navController.previousBackStackEntry?.destination?.route
-                    if (previousRoute?.contains("Register") == true) {
-                        authViewModel.onRegisterFieldChange(
-                            address = address,
-                            latitude = lat,
-                            longitude = lng
-                        )
-                    } else {
-                        cartViewModel.setAddressSelection(
-                            address = address,
-                            lat = lat,
-                            lng = lng
-                        )
-                    }
-                },
-                onBack = { navController.popBackStack() }
-            )
+            AddressScreen(onBack = onBack)
         }
+
         composable<ClientHome> {
             ScreenClientHome(
-                viewModel = viewModel,
-                cartViewModel = cartViewModel,
-                storeViewModel = storeViewModel,
-                authViewModel = authViewModel,
-                onNavigateToSummary = { navController.navigate(OrderSummary) },
-                onNavigateToAddressSelection = { navController.navigate(AddressSelection) },
-                onNavigateToDetail = { navController.navigate(OrderDetail) },
+                onNavigateToSummary = { navController.navigateSafe(OrderSummary) },
+                onNavigateToAddressSelection = { navController.navigateSafe(AddressSelection) },
+                onNavigateToDetail = {
+                    navController.navigateSafe(OrderDetail)
+                },
                 onLogout = {
-                    navController.navigate(Login) {
+                    navController.navigateSafe(Login) {
                         popUpTo<ClientHome> { inclusive = true }
                     }
                 },
-                onNavigateToMonitor = { navController.navigate(Monitor) }
+                onNavigateToMonitor = { navController.navigateSafe(Monitor) }
             )
         }
+
         composable<OrderDetail> {
-            ScreenDetailOrder(
-                viewModel = viewModel,
-                cartViewModel = cartViewModel,
-                onBack = { navController.popBackStack() }
-            )
+            ScreenDetailOrder(onBack = onBack)
         }
+
         composable<Monitor> {
-            ScreenMonitor(
-                viewModel = viewModel,
-                onBack = { navController.popBackStack() }
-            )
+            ScreenMonitor(onBack = onBack)
         }
+
         composable<OrderSummary> {
             ScreenOrderSummary(
-                cartViewModel = cartViewModel,
-                onConfirm = { tabIndex ->
-                    cartViewModel.setInitialTab(tabIndex)
-                    cartViewModel.clearCart()
-                    viewModel.getGeneralOrderList(forceLoading = true)
-                    navController.navigate(ClientHome) {
+                onConfirm = {
+                    navController.navigateSafe(ClientHome) {
                         popUpTo(ClientHome) { inclusive = true }
                     }
                 },
-                onBack = { navController.popBackStack() }
+                onBack = onBack
             )
         }
     }

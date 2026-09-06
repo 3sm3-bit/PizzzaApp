@@ -30,3 +30,14 @@ dependencyResolutionManagement {
 
 include(":composeApp")
 include(":shared")
+
+// Core Modules
+include(":core:ui")
+include(":core:navigation")
+
+// Feature Modules
+include(":feature:auth")
+include(":feature:home")
+include(":feature:cart")
+include(":feature:orders")
+include(":feature:monitoring")

@@ -1,0 +1,160 @@
+package com.pizzza.pizzzaapp.feature.auth.login
+
+import android.Manifest
+import android.os.Build
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.unit.dp
+import com.pizzza.pizzzaapp.core.ui.R
+import com.pizzza.pizzzaapp.feature.auth.AuthViewModel
+import com.valu.uitaycompose.button.UiTayButton
+import org.koin.compose.viewmodel.koinViewModel
+import com.valu.uitaycompose.extra.UiTayCToolBar
+import com.valu.uitaycompose.label.UiTayEditLayout
+import com.valu.uitaycompose.model.*
+import com.valu.uitaycompose.utils.*
+
+@Composable
+fun LoginScreen(
+    viewModel: AuthViewModel = koinViewModel(),
+    onNavigateToClientHome: () -> Unit,
+    onNavigateToRegister: () -> Unit
+) {
+    val uiState by viewModel.authUiState.collectAsStateWithLifecycle()
+    val isButtonEnabled = uiState.user.length > 2 && uiState.pass.length > 2
+
+    val permissionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { _ -> }
+
+    LaunchedEffect(Unit) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+        }
+    }
+
+    Scaffold(
+        topBar = {
+            Surface(color = tay_red_50) {
+                Box(modifier = Modifier.statusBarsPadding()) {
+                    UiTayCToolBar(
+                        uiTayText = stringResource(R.string.app_name_principal),
+                        uiTayModifier = UiToolBarModel()
+                            .backgroundColor(tay_red_50)
+                            .textColor(tay_red_600)
+                            .iconColor(Color.Transparent) // Sin icono atrás en Login
+                    ) { _ -> }
+                }
+            }
+        },
+        containerColor = Color(0xFFF0F2F5)
+    ) { padding ->
+        val scrollState = rememberScrollState()
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(padding)
+                .imePadding()
+                .padding(horizontal = 24.dp)
+                .verticalScroll(scrollState),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Top
+        ) {
+            Spacer(modifier = Modifier.weight(1f))
+
+            Image(painter = painterResource(R.drawable.ic_logo_pizzzeria),
+                contentDescription = "logo_ic",
+                modifier = Modifier.width(350.dp).height(100.dp))
+
+            UiTayEditLayout(
+                value = uiState.user,
+                onValueChange = { viewModel.onUserChange(it) },
+                hint = "Usuario o email",
+                model = UiEditLayoutModel(
+                    uiStrokeActiveColor = tay_red_600,
+                    uiTextColor = tay_red_600,
+                    uiTextActiveColor = tay_red_600,
+                    uiTitleActiveColor= tay_red_600,
+                    uiTextFont = textM14,
+                    uiTitleFont = textM14
+                )
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            UiTayEditLayout(
+                value = uiState.pass,
+                onValueChange = { viewModel.onPassChange(it) },
+                hint = "Contraseña",
+                isPassword = true,
+                model = UiEditLayoutModel(
+                    uiStrokeActiveColor = tay_red_600,
+                    uiTextColor = tay_red_600,
+                    uiTextActiveColor = tay_red_600,
+                    uiTitleActiveColor= tay_red_600,
+                    uiIconColor = tay_grey_800,
+                    uiIconActiveColor=  tay_red_600,
+                    uiTextFont = textM14,
+                    uiTitleFont = textM14
+                )
+            )
+
+            Spacer(modifier = Modifier.height(32.dp))
+
+            UiTayButton(
+                uiTayText = "Iniciar Sesión",
+                uiTayEnable = isButtonEnabled,
+                uiTayClick = {
+                    viewModel.login {
+                        onNavigateToClientHome()
+                    }
+                },
+                uiTayBtnModifier = UiTayButtonModel(
+                    uTBgColor = tay_red_600,
+                    uTStrokeColor = tay_red_600,
+                    uTBgSelectedColor = tay_red_600,
+                    uTStrokeSelectedColor = tay_red_600,
+                )
+            )
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            Text(
+                text = "registrate ahora",
+                style = textB14.copy(textDecoration = TextDecoration.Underline),
+                color = tay_green_600,
+                modifier = Modifier.clickable { onNavigateToRegister() }
+            )
+
+            Spacer(modifier = Modifier.weight(1f))
+        }
+    }
+}

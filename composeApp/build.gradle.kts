@@ -62,6 +62,15 @@ kotlin {
             implementation(libs.androidx.lifecycle.viewmodelCompose)
             implementation(libs.androidx.lifecycle.runtimeCompose)
             implementation(project(":shared"))
+
+            // New Modules
+            implementation(project(":core:ui"))
+            implementation(project(":core:navigation"))
+            implementation(project(":feature:auth"))
+            implementation(project(":feature:home"))
+            implementation(project(":feature:cart"))
+            implementation(project(":feature:orders"))
+            implementation(project(":feature:monitoring"))
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)

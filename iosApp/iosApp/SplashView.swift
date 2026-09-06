@@ -1,5 +1,6 @@
 import SwiftUI
 import Shared
+import TaySwitfUILibrary
 
 struct SplashView: View {
     @State private var isActive = false
@@ -14,10 +15,7 @@ struct SplashView: View {
             PizzaColors.red600.edgesIgnoringSafeArea(.all)
             
             VStack(spacing: 24) {
-                Image("ic_pizzza")
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 200, height: 200)
+                UITayAniGif(nameGif: "ui_ani_logo")  .frame(width: 200, height: 200)
                 
                 Text("PIZZZA APP")
                     .font(.system(size: 42, weight: .bold))

@@ -7,10 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		948B7441304C7D6500CD0D05 /* TaySwitfUILibrary in Frameworks */ = {isa = PBXBuildFile; productRef = 948B7440304C7D6500CD0D05 /* TaySwitfUILibrary */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		2D6ABD917252E436B12AF9ED /* PizzzaApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PizzzaApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		948B743F304C7D3F00CD0D05 /* TaySwitfUILibrary */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = TaySwitfUILibrary; path = ../../../ios/TaySwitfUILibrary; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -44,6 +46,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				948B7441304C7D6500CD0D05 /* TaySwitfUILibrary in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -61,6 +64,7 @@
 		9417CA433033E7B70028AC3E /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				948B743F304C7D3F00CD0D05 /* TaySwitfUILibrary */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -96,6 +100,7 @@
 			);
 			name = iosApp;
 			packageProductDependencies = (
+				948B7440304C7D6500CD0D05 /* TaySwitfUILibrary */,
 			);
 			productName = iosApp;
 			productReference = 2D6ABD917252E436B12AF9ED /* PizzzaApp.app */;
@@ -382,10 +387,11 @@
 		};
 /* End XCConfigurationList section */
 
-/* Begin XCRemoteSwiftPackageReference section */
-/* End XCRemoteSwiftPackageReference section */
-
 /* Begin XCSwiftPackageProductDependency section */
+		948B7440304C7D6500CD0D05 /* TaySwitfUILibrary */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = TaySwitfUILibrary;
+		};
 /* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = F6987F2DC7EA2779BD830108 /* Project object */;

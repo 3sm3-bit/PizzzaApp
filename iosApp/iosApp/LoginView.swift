@@ -1,4 +1,5 @@
 import SwiftUI
+import TaySwitfUILibrary
 
 struct LoginView: View {
     @StateObject private var viewModel = LoginViewModel()
@@ -7,7 +8,6 @@ struct LoginView: View {
     
     var body: some View {
         ZStack {
-            PizzaColors.background.edgesIgnoringSafeArea(.all)
             
             VStack {
                 PizzaToolbar(title: "Pizzzeria 3 Z", showBackButton: false)
@@ -22,9 +22,20 @@ struct LoginView: View {
                             .frame(width: 150, height: 150)
                             .padding(.bottom, 32)
                         
-                        PizzaTextField(hint: "Usuario o email", text: $viewModel.user)
+                        UITayTextField(
+                                        label: "Usuario o email",
+                                        placeholder: "Usuario o email",
+                                        text: $viewModel.user
+                        )
                         
-                        PizzaTextField(hint: "Contraseña", text: $viewModel.pass, isPassword: true)
+                   
+                        UITayTextField(
+                                        label: "Contraseña",
+                                        placeholder: "Contraseña",
+                                        text: $viewModel.pass,
+                                        model: EditModel(typeSecret: true, stylePresent: .endIcon)
+                        )
+                        
                         
                         if let error = viewModel.errorMessage {
                             Text(error)
@@ -34,14 +45,11 @@ struct LoginView: View {
                         
                         Spacer().frame(height: 8)
                         
-                        PizzaButton(
-                            title: "Iniciar Sesión",
-                            isEnabled: viewModel.isButtonEnabled && !viewModel.isLoading
-                        ) {
+                        UITayButton(text: "Iniciar Sesión") {
                             viewModel.login {
                                 onNavigateToHome()
                             }
-                        }
+                         }
                         
                         if viewModel.isLoading {
                             ProgressView()
