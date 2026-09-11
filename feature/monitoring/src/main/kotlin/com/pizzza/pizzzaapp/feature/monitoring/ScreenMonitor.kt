@@ -21,12 +21,9 @@ import com.google.android.gms.maps.MapsInitializer
 import com.google.android.gms.maps.model.*
 import com.google.maps.android.compose.*
 import com.pizzza.pizzzaapp.core.ui.R
-import com.pizzza.pizzzaapp.core.ui.BaseViewModel
 import com.pizzza.pizzzaapp.feature.orders.OrdersViewModel
-import com.pizzza.pizzzaapp.core.ui.OrderUiState
-import com.pizzza.pizzzaapp.core.ui.LocalAppDataOrder
+import com.pizzza.pizzzaapp.core.ui.singleton.LocalAppDataOrder
 import org.koin.compose.viewmodel.koinViewModel
-import com.valu.uitaycompose.utils.tay_green_600
 import com.valu.uitaycompose.utils.tay_green_800
 import com.valu.uitaycompose.utils.tay_red_600
 import com.valu.uitaycompose.utils.textB16
@@ -54,7 +51,7 @@ fun ScreenMonitor(
         bitmapDescriptorFromVector(context, R.drawable.ic_map_house)
     }
     val driverIcon = remember(context) {
-        bitmapDescriptorFromVector(context, R.drawable.ic_map_boy)
+        bitmapDescriptorFromVector(context, R.drawable.ic_map_boy, sizeDp = 32)
     }
 
     // Polling cada 1 minuto
@@ -206,19 +203,26 @@ private fun generateCurvedPath(start: LatLng, end: LatLng): List<LatLng> {
 
 fun bitmapDescriptorFromVector(
     context: Context,
-    vectorResId: Int
+    vectorResId: Int,
+    sizeDp: Int? = null
 ): BitmapDescriptor? {
-    // Inicializar el SDK de mapas para evitar el error de IBitmapDescriptorFactory
     MapsInitializer.initialize(context)
     
     val drawable = ContextCompat.getDrawable(context, vectorResId) ?: return null
-    drawable.setBounds(0, 0, drawable.intrinsicWidth, drawable.intrinsicHeight)
+    
+    val density = context.resources.displayMetrics.density
+    // Si pasamos sizeDp, lo usamos. Si no, usamos el tamaño intrínseco del archivo.
+    val width = sizeDp?.let { (it * density).toInt() } ?: drawable.intrinsicWidth
+    val height = sizeDp?.let { (it * density).toInt() } ?: drawable.intrinsicHeight
+
     val bitmap = Bitmap.createBitmap(
-        drawable.intrinsicWidth,
-        drawable.intrinsicHeight,
+        width,
+        height,
         Bitmap.Config.ARGB_8888
     )
     val canvas = Canvas(bitmap)
+    drawable.setBounds(0, 0, width, height)
     drawable.draw(canvas)
+    
     return BitmapDescriptorFactory.fromBitmap(bitmap)
 }

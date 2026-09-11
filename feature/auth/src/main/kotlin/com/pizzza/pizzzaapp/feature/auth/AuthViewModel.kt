@@ -3,9 +3,9 @@ package com.pizzza.pizzzaapp.feature.auth
 import com.pizzza.pizzzaapp.repository.network.model.UserResponse
 import com.pizzza.pizzzaapp.repository.network.model.LoginRequest
 import com.pizzza.pizzzaapp.repository.db.entity.UserEntity
-import com.pizzza.pizzzaapp.core.ui.BaseViewModel
-import com.pizzza.pizzzaapp.core.ui.GlobalUiStateManager
-import com.pizzza.pizzzaapp.core.ui.AppDataOrder
+import com.pizzza.pizzzaapp.core.ui.base.BaseViewModel
+import com.pizzza.pizzzaapp.core.ui.singleton.GlobalUiStateManager
+import com.pizzza.pizzzaapp.core.ui.singleton.AppDataOrder
 import com.pizzza.pizzzaapp.usecases.DataUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

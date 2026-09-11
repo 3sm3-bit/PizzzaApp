@@ -1,10 +1,9 @@
 package com.pizzza.pizzzaapp.feature.home
 
-import com.pizzza.pizzzaapp.TAG_PIZZZA
-import com.pizzza.pizzzaapp.core.ui.BaseViewModel
-import com.pizzza.pizzzaapp.core.ui.GlobalUiStateManager
-import com.pizzza.pizzzaapp.core.ui.OrderUiState
-import com.pizzza.pizzzaapp.core.ui.AppDataOrder
+import com.pizzza.pizzzaapp.core.ui.base.BaseViewModel
+import com.pizzza.pizzzaapp.core.ui.singleton.GlobalUiStateManager
+import com.pizzza.pizzzaapp.core.ui.model.OrderUiState
+import com.pizzza.pizzzaapp.core.ui.singleton.AppDataOrder
 import com.pizzza.pizzzaapp.model.ProductModel
 import com.pizzza.pizzzaapp.usecases.DataUseCase
 import kotlinx.coroutines.flow.StateFlow

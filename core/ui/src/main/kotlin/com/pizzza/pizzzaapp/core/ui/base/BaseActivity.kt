@@ -1,4 +1,4 @@
-package com.pizzza.pizzzaapp.core.ui
+package com.pizzza.pizzzaapp.core.ui.base
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -7,17 +7,20 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.pizzza.pizzzaapp.core.ui.PizzzaTheme
+import com.pizzza.pizzzaapp.core.ui.singleton.GlobalUiStateManager
+import com.pizzza.pizzzaapp.core.ui.singleton.LocalGlobalUiStateManager
 import com.valu.uitaycompose.modal.UiTayDialog
 import com.valu.uitaycompose.loading.UiProgress
 import com.valu.uitaycompose.model.UiTayDialogModel
 import com.valu.uitaycompose.utils.tay_red_600
 import org.koin.android.ext.android.inject
+import com.pizzza.pizzzaapp.core.ui.R
 
 abstract class BaseActivity : ComponentActivity() {
 
@@ -67,7 +70,7 @@ abstract class BaseActivity : ComponentActivity() {
                         if (uiState.loading) {
                             UiProgress(colorProgress = tay_red_600)
                         }
-                        
+
                         if (uiState.error) {
                             val errorInfo = uiState.errorType.mapperError()
                             RenderGenericDialog(

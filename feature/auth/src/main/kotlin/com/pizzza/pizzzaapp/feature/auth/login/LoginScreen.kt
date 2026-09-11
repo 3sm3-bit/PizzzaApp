@@ -1,9 +1,5 @@
 package com.pizzza.pizzzaapp.feature.auth.login
 
-import android.Manifest
-import android.os.Build
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -14,7 +10,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
@@ -23,9 +18,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -33,14 +26,22 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.pizzza.pizzzaapp.core.ui.R
 import com.pizzza.pizzzaapp.feature.auth.AuthViewModel
 import com.valu.uitaycompose.button.UiTayButton
-import org.koin.compose.viewmodel.koinViewModel
 import com.valu.uitaycompose.extra.UiTayCToolBar
 import com.valu.uitaycompose.label.UiTayEditLayout
-import com.valu.uitaycompose.model.*
-import com.valu.uitaycompose.utils.*
+import com.valu.uitaycompose.model.UiEditLayoutModel
+import com.valu.uitaycompose.model.UiTayButtonModel
+import com.valu.uitaycompose.model.UiToolBarModel
+import com.valu.uitaycompose.utils.tay_green_600
+import com.valu.uitaycompose.utils.tay_grey_800
+import com.valu.uitaycompose.utils.tay_red_50
+import com.valu.uitaycompose.utils.tay_red_600
+import com.valu.uitaycompose.utils.textB14
+import com.valu.uitaycompose.utils.textM14
+import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun LoginScreen(
@@ -51,30 +52,7 @@ fun LoginScreen(
     val uiState by viewModel.authUiState.collectAsStateWithLifecycle()
     val isButtonEnabled = uiState.user.length > 2 && uiState.pass.length > 2
 
-    val permissionLauncher = rememberLauncherForActivityResult(
-        ActivityResultContracts.RequestPermission()
-    ) { _ -> }
-
-    LaunchedEffect(Unit) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
-        }
-    }
-
     Scaffold(
-        topBar = {
-            Surface(color = tay_red_50) {
-                Box(modifier = Modifier.statusBarsPadding()) {
-                    UiTayCToolBar(
-                        uiTayText = stringResource(R.string.app_name_principal),
-                        uiTayModifier = UiToolBarModel()
-                            .backgroundColor(tay_red_50)
-                            .textColor(tay_red_600)
-                            .iconColor(Color.Transparent) // Sin icono atrás en Login
-                    ) { _ -> }
-                }
-            }
-        },
         containerColor = Color(0xFFF0F2F5)
     ) { padding ->
         val scrollState = rememberScrollState()

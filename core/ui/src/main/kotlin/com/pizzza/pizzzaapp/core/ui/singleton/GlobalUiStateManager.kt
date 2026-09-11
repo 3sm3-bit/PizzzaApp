@@ -1,6 +1,7 @@
-package com.pizzza.pizzzaapp.core.ui
+package com.pizzza.pizzzaapp.core.ui.singleton
 
 import androidx.compose.runtime.staticCompositionLocalOf
+import com.pizzza.pizzzaapp.core.ui.base.BaseUiState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow

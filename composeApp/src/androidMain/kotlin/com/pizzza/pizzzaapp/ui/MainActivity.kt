@@ -3,9 +3,9 @@ package com.pizzza.pizzzaapp.ui
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import com.pizzza.pizzzaapp.component.AppNavigation
-import com.pizzza.pizzzaapp.core.ui.BaseActivity
-import com.pizzza.pizzzaapp.core.ui.LocalAppDataOrder
-import com.pizzza.pizzzaapp.core.ui.AppDataOrder
+import com.pizzza.pizzzaapp.core.ui.base.BaseActivity
+import com.pizzza.pizzzaapp.core.ui.singleton.LocalAppDataOrder
+import com.pizzza.pizzzaapp.core.ui.singleton.AppDataOrder
 import org.koin.compose.koinInject
 
 class MainActivity : BaseActivity() {

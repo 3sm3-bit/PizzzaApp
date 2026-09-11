@@ -11,7 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.unit.dp
-import com.pizzza.pizzzaapp.core.ui.OrderItem
+import com.pizzza.pizzzaapp.core.ui.model.OrderItem
 import com.valu.uitaycompose.utils.*
 import java.util.Locale
 

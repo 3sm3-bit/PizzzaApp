@@ -31,7 +31,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.pizzza.pizzzaapp.feature.orders.OrdersViewModel
 import com.pizzza.pizzzaapp.model.ParentOrderModel
-import com.pizzza.pizzzaapp.core.ui.LocalAppDataOrder
+import com.pizzza.pizzzaapp.core.ui.singleton.LocalAppDataOrder
 import com.valu.uitaycompose.utils.tay_green_600
 import com.valu.uitaycompose.utils.tay_red_600
 import com.valu.uitaycompose.utils.textB12

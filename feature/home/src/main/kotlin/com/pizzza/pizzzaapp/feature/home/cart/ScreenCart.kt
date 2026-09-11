@@ -22,7 +22,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.pizzza.pizzzaapp.feature.cart.CartViewModel
 import com.pizzza.pizzzaapp.feature.home.HomeViewModel
 import com.pizzza.pizzzaapp.feature.cart.CartItemCard
-import com.pizzza.pizzzaapp.core.ui.LocalAppDataOrder
+import com.pizzza.pizzzaapp.core.ui.singleton.LocalAppDataOrder
 import com.valu.uitaycompose.utils.*
 
 @OptIn(ExperimentalMaterial3Api::class)

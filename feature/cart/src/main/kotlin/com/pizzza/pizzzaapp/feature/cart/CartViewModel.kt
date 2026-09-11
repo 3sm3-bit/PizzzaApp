@@ -1,11 +1,11 @@
 package com.pizzza.pizzzaapp.feature.cart
 
 import com.pizzza.pizzzaapp.model.ProductModel
-import com.pizzza.pizzzaapp.core.ui.BaseViewModel
-import com.pizzza.pizzzaapp.core.ui.GlobalUiStateManager
-import com.pizzza.pizzzaapp.core.ui.OrderItem
-import com.pizzza.pizzzaapp.core.ui.OrderUiState
-import com.pizzza.pizzzaapp.core.ui.AppDataOrder
+import com.pizzza.pizzzaapp.core.ui.base.BaseViewModel
+import com.pizzza.pizzzaapp.core.ui.singleton.GlobalUiStateManager
+import com.pizzza.pizzzaapp.core.ui.model.OrderItem
+import com.pizzza.pizzzaapp.core.ui.model.OrderUiState
+import com.pizzza.pizzzaapp.core.ui.singleton.AppDataOrder
 import com.pizzza.pizzzaapp.usecases.DataUseCase
 import com.pizzza.pizzzaapp.repository.network.model.OrderResponse
 import kotlinx.coroutines.flow.StateFlow

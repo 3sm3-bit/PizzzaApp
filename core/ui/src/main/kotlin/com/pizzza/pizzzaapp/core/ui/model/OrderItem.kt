@@ -1,4 +1,4 @@
-package com.pizzza.pizzzaapp.core.ui
+package com.pizzza.pizzzaapp.core.ui.model
 
 import com.pizzza.pizzzaapp.model.ProductModel
 import java.util.UUID

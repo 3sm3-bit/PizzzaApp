@@ -11,8 +11,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.pizzza.pizzzaapp.feature.home.FilterChipSurface
 import com.pizzza.pizzzaapp.feature.home.ProductCard
 import com.pizzza.pizzzaapp.feature.home.HomeViewModel
-import com.pizzza.pizzzaapp.core.ui.OrderUiState
-import com.pizzza.pizzzaapp.core.ui.LocalAppDataOrder
+import com.pizzza.pizzzaapp.core.ui.singleton.LocalAppDataOrder
 
 @Composable
 fun ScreenPizza(

@@ -1,4 +1,4 @@
-package com.pizzza.pizzzaapp.core.ui
+package com.pizzza.pizzzaapp.core.ui.base
 
 import androidx.compose.ui.graphics.Color
 import com.valu.uitaycompose.utils.tay_red_600

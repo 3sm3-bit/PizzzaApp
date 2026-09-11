@@ -1,8 +1,8 @@
-package com.pizzza.pizzzaapp.core.ui
+package com.pizzza.pizzzaapp.core.ui.model
 
-import com.pizzza.pizzzaapp.model.ProductModel
-import com.pizzza.pizzzaapp.model.ParentOrderModel
 import com.pizzza.pizzzaapp.model.BranchModel
+import com.pizzza.pizzzaapp.model.ParentOrderModel
+import com.pizzza.pizzzaapp.model.ProductModel
 
 data class OrderUiState(
     val orders: List<ParentOrderModel> = emptyList(),

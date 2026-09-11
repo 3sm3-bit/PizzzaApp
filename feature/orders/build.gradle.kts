@@ -38,6 +38,11 @@ kotlin {
                 implementation(libs.play.services.location)
             }
         }
+        commonTest.dependencies {
+            implementation(libs.kotlin.test)
+            implementation(libs.kotlinx.coroutines.test)
+            implementation(libs.mockk)
+        }
     }
 }
 
