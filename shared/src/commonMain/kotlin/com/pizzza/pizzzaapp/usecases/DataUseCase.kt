@@ -2,6 +2,7 @@ package com.pizzza.pizzzaapp.usecases
 
 import com.pizzza.pizzzaapp.model.ProductModel
 import com.pizzza.pizzzaapp.repository.network.model.LoginRequest
+import com.pizzza.pizzzaapp.repository.network.model.LoginResponse
 import com.pizzza.pizzzaapp.repository.network.model.OrderResponse
 import com.pizzza.pizzzaapp.repository.network.model.UserResponse
 import com.pizzza.pizzzaapp.usecases.network.IDataNetwork
@@ -22,6 +23,12 @@ class DataUseCase(private val iDataNetwork: IDataNetwork) {
     suspend fun registerUser(data: UserResponse) = iDataNetwork.registerUser(data)
 
     suspend fun login(data: LoginRequest) = iDataNetwork.login(data)
+
+    suspend fun loginAndSave(data: LoginRequest):LoginResponse{
+        val response = iDataNetwork.login(data)
+        saveUserLocal(response.toUserEntity())
+        return response
+    }
 
     suspend fun saveUserLocal(user: com.pizzza.pizzzaapp.repository.db.entity.UserEntity) = iDataNetwork.saveUserLocal(user)
 

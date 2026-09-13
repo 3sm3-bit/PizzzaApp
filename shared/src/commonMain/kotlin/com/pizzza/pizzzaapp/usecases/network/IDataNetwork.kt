@@ -3,6 +3,9 @@ package com.pizzza.pizzzaapp.usecases.network
 import com.pizzza.pizzzaapp.model.ParentOrderModel
 import com.pizzza.pizzzaapp.model.ProductModel
 import com.pizzza.pizzzaapp.model.BranchModel
+import com.pizzza.pizzzaapp.repository.db.entity.UserEntity
+import com.pizzza.pizzzaapp.repository.network.model.LoginRequest
+import com.pizzza.pizzzaapp.repository.network.model.LoginResponse
 import com.pizzza.pizzzaapp.repository.network.model.OrderResponse
 import com.pizzza.pizzzaapp.repository.network.model.UserResponse
 
@@ -20,11 +23,11 @@ interface IDataNetwork {
 
     suspend fun registerUser(data: UserResponse): String
 
-    suspend fun login(data: com.pizzza.pizzzaapp.repository.network.model.LoginRequest): com.pizzza.pizzzaapp.repository.network.model.LoginResponse
+    suspend fun login(data: LoginRequest): LoginResponse
 
-    suspend fun saveUserLocal(user: com.pizzza.pizzzaapp.repository.db.entity.UserEntity)
+    suspend fun saveUserLocal(user: UserEntity)
 
-    suspend fun getUserLocal(): com.pizzza.pizzzaapp.repository.db.entity.UserEntity?
+    suspend fun getUserLocal(): UserEntity?
 
     suspend fun logout()
 

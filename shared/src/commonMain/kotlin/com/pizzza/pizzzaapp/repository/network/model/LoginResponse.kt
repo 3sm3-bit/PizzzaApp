@@ -1,5 +1,6 @@
 package com.pizzza.pizzzaapp.repository.network.model
 
+import com.pizzza.pizzzaapp.repository.db.entity.UserEntity
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -9,4 +10,20 @@ data class LoginResponse(
     val userValid: UserResponse,
     @SerialName("token")
     val token: String
-)
+){
+    fun toUserEntity() = UserEntity(
+        uid = userValid.uid ?: "",
+        nameUser = userValid.nameUser ?: "",
+        names = userValid.names ?: "",
+        lastName = userValid.lastName ?: "",
+        document = userValid.document ?: "",
+        email = userValid.email ?: "",
+        phone = userValid.phone ?: "",
+        address = userValid.address ?: "",
+        rol = userValid.rol ?: "CLIENTE",
+        area = userValid.area ?: "1",
+        longitude = userValid.longitude ?: "",
+        latitude = userValid.latitude ?: "",
+        token = token
+    )
+}
