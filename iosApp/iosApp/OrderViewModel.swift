@@ -1,6 +1,6 @@
 import Foundation
 import Shared
-import Combine
+internal import Combine
 
 class OrderViewModel: ObservableObject {
     private let dataUseCase = KoinHelper.shared.getDataUseCase()

@@ -16,7 +16,7 @@ struct OrderSummaryView: View {
                 VStack(spacing: 16) {
                     VStack(alignment: .leading, spacing: 20) {
                         Text("Detalles de tu Orden")
-                            .font(PizzaFonts.bold18)
+                            .font(Font.uiMontB8)
                             .padding(.bottom, 8)
                         
                         ForEach(cartManager.cart) { item in

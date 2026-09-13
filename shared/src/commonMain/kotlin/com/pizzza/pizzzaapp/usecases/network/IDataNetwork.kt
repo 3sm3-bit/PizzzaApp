@@ -28,4 +28,6 @@ interface IDataNetwork {
 
     suspend fun logout()
 
+    suspend fun createPaymentSession(amount: Double, email: String, orderId: String): String
+
 }

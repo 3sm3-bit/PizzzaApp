@@ -28,3 +28,6 @@ object AddressSelection
 
 @Serializable
 object Monitor
+
+@Serializable
+data class PaymentWebView(val url: String)

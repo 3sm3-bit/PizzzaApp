@@ -267,16 +267,24 @@ fun ScreenDetailOrder(
                                 Row(
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .clickable { typeDough = dough }
+                                        .clickable {
+                                            typeDough = dough
+                                            if (dough == "CRUJIENTE") cheeseFilledCrust = false
+                                        }
                                         .padding(vertical = 8.dp),
                                     verticalAlignment = Alignment.CenterVertically,
                                     horizontalArrangement = Arrangement.SpaceBetween
                                 ) {
-                                    Text(text = dough, style = textM12,
-                                        color = Color.DarkGray)
+                                    Text(
+                                        text = dough, style = textM12,
+                                        color = Color.DarkGray
+                                    )
                                     RadioButton(
                                         selected = typeDough == dough,
-                                        onClick = { typeDough = dough },
+                                        onClick = {
+                                            typeDough = dough
+                                            if (dough == "CRUJIENTE") cheeseFilledCrust = false
+                                        },
                                         colors = RadioButtonDefaults.colors(
                                             selectedColor = tay_red_600,
                                             unselectedColor = Color.Gray
@@ -286,34 +294,36 @@ fun ScreenDetailOrder(
                                 }
                             }
 
-                            Spacer(Modifier.height(12.dp))
+                            if (typeDough != "CRUJIENTE") {
+                                Spacer(Modifier.height(12.dp))
 
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceBetween,
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Column(modifier = Modifier.weight(1f)) {
-                                    Text("Orilla / Queso", style = textB14, color = tay_red_600)
-                                    Text(
-                                        modifier = Modifier.padding(top=4.dp),
-                                        text = "+ ${product.currencySymbol}${product.priceChosse}",
-                                        style = textM10,
-                                        color = tay_green_600
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Column(modifier = Modifier.weight(1f)) {
+                                        Text("Orilla / Queso", style = textB14, color = tay_red_600)
+                                        Text(
+                                            modifier = Modifier.padding(top = 4.dp),
+                                            text = "+ ${product.currencySymbol}${product.priceChosse}",
+                                            style = textM10,
+                                            color = tay_green_600
+                                        )
+                                    }
+                                    Switch(
+                                        checked = cheeseFilledCrust,
+                                        onCheckedChange = { cheeseFilledCrust = it },
+                                        colors = SwitchDefaults.colors(
+                                            checkedThumbColor = Color.White,
+                                            checkedTrackColor = tay_red_600,
+                                            uncheckedThumbColor = Color.White,
+                                            uncheckedTrackColor = Color(0xFFDDDFE2),
+                                            uncheckedBorderColor = Color.Transparent
+                                        ),
+                                        modifier = Modifier.scale(0.7f)
                                     )
                                 }
-                                Switch(
-                                    checked = cheeseFilledCrust,
-                                    onCheckedChange = { cheeseFilledCrust = it },
-                                    colors = SwitchDefaults.colors(
-                                        checkedThumbColor = Color.White,
-                                        checkedTrackColor = tay_red_600,
-                                        uncheckedThumbColor = Color.White,
-                                        uncheckedTrackColor = Color(0xFFDDDFE2),
-                                        uncheckedBorderColor = Color.Transparent
-                                    ),
-                                    modifier = Modifier.scale(0.7f)
-                                )
                             }
                         }
                     }

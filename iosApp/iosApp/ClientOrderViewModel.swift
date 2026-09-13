@@ -1,6 +1,6 @@
 import Foundation
 import Shared
-import Combine
+internal import Combine
 
 class ClientOrderViewModel: ObservableObject {
     @Published var orders: [ParentOrderModel] = []

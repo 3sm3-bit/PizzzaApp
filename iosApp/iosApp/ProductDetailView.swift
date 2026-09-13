@@ -1,7 +1,9 @@
 import SwiftUI
 import Shared
+import  TaySwitfUILibrary
 
 struct ProductDetailView: View {
+    
     let product: ProductModel
     @Environment(\.presentationMode) var presentationMode
     
@@ -18,28 +20,13 @@ struct ProductDetailView: View {
     
     var body: some View {
         VStack(spacing: 0) {
-            // Header Image with Back Button
             ZStack(alignment: .topLeading) {
-                // Placeholder for URL Image (AsyncImage would be ideal)
-                Rectangle()
-                    .fill(PizzaColors.red50)
-                    .frame(height: 250)
-                    .overlay(
-                        Image(systemName: "pizza")
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 150)
-                            .foregroundColor(PizzaColors.red600)
-                    )
+                UiTayUrlImage(url: product.urlImg)
+                    .frame(height: 200)
                 
-                Button(action: { presentationMode.wrappedValue.dismiss() }) {
-                    Image(systemName: "arrow.left")
-                        .font(.system(size: 20, weight: .bold))
-                        .foregroundColor(.white)
-                        .padding(10)
-                        .background(PizzaColors.red600)
-                        .clipShape(Circle())
-                }
+                Image(uiName:"")
+                .resizable()
+                .frame(width: 32,height: 32)
                 .padding(.top, 44)
                 .padding(.leading, 16)
             }
@@ -68,7 +55,7 @@ struct ProductDetailView: View {
                                     .frame(width: 32, height: 32)
                             }
                             Text("\(quantity)")
-                                .font(PizzaFonts.bold18)
+                                .font(Font.uiMontB8)
                             Button(action: { quantity += 1 }) {
                                 Image(systemName: "plus")
                                     .foregroundColor(PizzaColors.green600)
@@ -99,7 +86,7 @@ struct ProductDetailView: View {
                         VStack(alignment: .leading, spacing: 16) {
                             Text("Descripción")
                                 .font(PizzaFonts.bold16)
-                                .foregroundColor(PizzaColors.red600)
+                                .foregroundColor(Color.uiTayRed600)
                             Text(product.description)
                                 .font(PizzaFonts.medium12)
                                 .foregroundColor(.gray)
@@ -124,7 +111,7 @@ struct ProductDetailView: View {
                             VStack(alignment: .leading, spacing: 16) {
                                 Text("Masa")
                                     .font(PizzaFonts.bold14)
-                                    .foregroundColor(PizzaColors.red600)
+                                    .foregroundColor(Color.uiTayRed600)
                                 
                                 ForEach(["TRADICIONAL", "CRUJIENTE"], id: \.self) { dough in
                                     HStack {

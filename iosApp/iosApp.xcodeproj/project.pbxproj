@@ -7,12 +7,14 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		948B7441304C7D6500CD0D05 /* TaySwitfUILibrary in Frameworks */ = {isa = PBXBuildFile; productRef = 948B7440304C7D6500CD0D05 /* TaySwitfUILibrary */; };
+		94917D5E3055B33F008BF3E5 /* Swinject in Frameworks */ = {isa = PBXBuildFile; productRef = 94917D5D3055B33F008BF3E5 /* Swinject */; };
+		94E309463054CAB70003CD3E /* TaySwitfUILibrary in Frameworks */ = {isa = PBXBuildFile; productRef = 94E309453054CAB70003CD3E /* TaySwitfUILibrary */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		2D6ABD917252E436B12AF9ED /* PizzzaApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PizzzaApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		948B743F304C7D3F00CD0D05 /* TaySwitfUILibrary */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = TaySwitfUILibrary; path = ../../../ios/TaySwitfUILibrary; sourceTree = "<group>"; };
+		94E309443054CAAB0003CD3E /* TaySwitfUILibrary */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = TaySwitfUILibrary; path = ../../../project/ios/TaySwitfUILibrary; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -46,7 +48,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				948B7441304C7D6500CD0D05 /* TaySwitfUILibrary in Frameworks */,
+				94E309463054CAB70003CD3E /* TaySwitfUILibrary in Frameworks */,
+				94917D5E3055B33F008BF3E5 /* Swinject in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -64,6 +67,7 @@
 		9417CA433033E7B70028AC3E /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				94E309443054CAAB0003CD3E /* TaySwitfUILibrary */,
 				948B743F304C7D3F00CD0D05 /* TaySwitfUILibrary */,
 			);
 			name = Frameworks;
@@ -100,7 +104,8 @@
 			);
 			name = iosApp;
 			packageProductDependencies = (
-				948B7440304C7D6500CD0D05 /* TaySwitfUILibrary */,
+				94E309453054CAB70003CD3E /* TaySwitfUILibrary */,
+				94917D5D3055B33F008BF3E5 /* Swinject */,
 			);
 			productName = iosApp;
 			productReference = 2D6ABD917252E436B12AF9ED /* PizzzaApp.app */;
@@ -131,6 +136,7 @@
 			mainGroup = D7EFCE668611EAFA6AAEFFCF;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
+				94917D5C3055B33F008BF3E5 /* XCRemoteSwiftPackageReference "Swinject" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 0B8D89148A7E485216F2CBD2 /* Products */;
@@ -387,8 +393,24 @@
 		};
 /* End XCConfigurationList section */
 
+/* Begin XCRemoteSwiftPackageReference section */
+		94917D5C3055B33F008BF3E5 /* XCRemoteSwiftPackageReference "Swinject" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/Swinject/Swinject.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.10.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
 /* Begin XCSwiftPackageProductDependency section */
-		948B7440304C7D6500CD0D05 /* TaySwitfUILibrary */ = {
+		94917D5D3055B33F008BF3E5 /* Swinject */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 94917D5C3055B33F008BF3E5 /* XCRemoteSwiftPackageReference "Swinject" */;
+			productName = Swinject;
+		};
+		94E309453054CAB70003CD3E /* TaySwitfUILibrary */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = TaySwitfUILibrary;
 		};

@@ -1,13 +1,21 @@
 import Foundation
 import Shared
-import Combine
+internal import Combine
 
 class CartManager: ObservableObject {
+    
     static let shared = CartManager()
+    
+    
     
     @Published var cart: [OrderItemSwift] = []
     @Published var deliveryAddress: String = ""
     @Published var receptionMode: String = "DELIVERY"
+    
+    @Published var pizzaProducts: [ProductModel] = []
+    @Published var extraProducts: [ProductModel] = []
+    @Published var deliveryProducts: [ProductModel] = []
+    @Published var selectedProduct: ProductModel? = nil
     
     private let dataUseCase = KoinHelper.shared.getDataUseCase()
     

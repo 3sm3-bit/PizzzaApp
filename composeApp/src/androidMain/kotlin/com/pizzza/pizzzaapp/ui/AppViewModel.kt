@@ -16,8 +16,6 @@ class AppViewModel(
     ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
     defaultDispatcher: CoroutineDispatcher = Dispatchers.Default
 ) : BaseViewModel(ioDispatcher, defaultDispatcher) {
-    private val appDataOrder = MutableStateFlow<OrderUiState?>(null)
-    val orderUiState: StateFlow<OrderUiState?> = appDataOrder.asStateFlow()
 
     fun syncProducts(onComplete: (Boolean) -> Unit = {}) {
         execute(loading = false, globalUiStateManager = globalUiStateManager) {

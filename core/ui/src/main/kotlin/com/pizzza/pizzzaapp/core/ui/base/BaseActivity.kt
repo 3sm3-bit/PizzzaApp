@@ -21,6 +21,7 @@ import com.valu.uitaycompose.model.UiTayDialogModel
 import com.valu.uitaycompose.utils.tay_red_600
 import org.koin.android.ext.android.inject
 import com.pizzza.pizzzaapp.core.ui.R
+import com.pizzza.pizzzaapp.repository.network.exception.UiTayApiException
 
 abstract class BaseActivity : ComponentActivity() {
 
@@ -96,9 +97,20 @@ abstract class BaseActivity : ComponentActivity() {
 }
 
 fun Throwable.mapperError(): Triple<Int, String, String> {
-    return Triple(
-        R.drawable.ic_pizzza,
-        "Error",
-        this.message ?: "Ocurrió un error inesperado"
-    )
+    return when (this) {
+        is UiTayApiException -> {
+            Triple(
+                R.drawable.ic_pizzza,
+                this.title.ifEmpty { "Error" },
+                this.messageApi.ifEmpty { "Ocurrió un error inesperado" }
+            )
+        }
+        else -> {
+            Triple(
+                R.drawable.ic_pizzza,
+                "Error",
+                this.message ?: "Ocurrió un error inesperado"
+            )
+        }
+    }
 }

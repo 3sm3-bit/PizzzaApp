@@ -1,9 +1,10 @@
 import Foundation
 import Shared
-import Combine
+internal import Combine
+import Shared
 
-class AppViewModel: ObservableObject {
-    @Published var pizzaProducts: [ProductModel] = []
+@MainActor
+class AppViewModel: BaseViewModel {
     @Published var extraProducts: [ProductModel] = []
     @Published var deliveryProducts: [ProductModel] = []
     @Published var orders: [ParentOrderModel] = []
@@ -13,39 +14,8 @@ class AppViewModel: ObservableObject {
     @Published var ordersLoaded: Bool = false
     
     private let dataUseCase = KoinHelper.shared.getDataUseCase()
+    @Published var successLogin : Bool? = nil
     
-    func syncProducts(onComplete: @escaping (Bool) -> Void) {
-        isLoading = true
-        dataUseCase.syncProducts { [weak self] _, error in
-            if error != nil {
-                DispatchQueue.main.async {
-                    self?.isLoading = false
-                    onComplete(false)
-                }
-                return
-            }
-            
-            self?.getProductsList { success in
-                onComplete(success)
-            }
-        }
-    }
-    
-    func getProductsList(onComplete: ((Bool) -> Void)? = nil) {
-        dataUseCase.getProducts { [weak self] response, error in
-            DispatchQueue.main.async {
-                self?.isLoading = false
-                if let products = response {
-                    self?.pizzaProducts = products.filter { $0.type == "1" }
-                    self?.extraProducts = products.filter { $0.type == "2" || $0.type == "3" }
-                    self?.deliveryProducts = products.filter { $0.type == "4" }
-                    onComplete?(true)
-                } else {
-                    onComplete?(false)
-                }
-            }
-        }
-    }
     
     func getGeneralOrderList(forceLoading: Bool = false) {
         if ordersLoaded && !forceLoading { return }
@@ -92,4 +62,20 @@ class AppViewModel: ObservableObject {
     func selectOrder(_ order: ParentOrderModel?) {
         self.selectedOrder = order
     }
+    
+    
+    func loadValidData(){
+        Task{
+            await self.execute(loading: false,errorFlag : false) {
+                let response = try await self.dataUseCase.syncProducts()
+                let data = try await self.dataUseCase.getProducts()
+                CartManager.shared.pizzaProducts = data.filter { $0.type == "1" }
+                CartManager.shared.extraProducts = data.filter { $0.type == "2" || $0.type == "3" }
+                CartManager.shared.deliveryProducts = data.filter { $0.type == "4" }
+                let user = try await self.dataUseCase.getUserLocal()
+                self.successLogin = user != nil
+            }
+        }
+    }
+    
 }

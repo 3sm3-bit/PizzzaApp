@@ -3,20 +3,20 @@ import Shared
 
 struct HomeTabView: View {
     @State private var selectedTab = 0
-    @StateObject private var appViewModel = AppViewModel()
+    @StateObject private var appViewModel = HomeViewModel()
     @ObservedObject var cartManager = CartManager.shared
     @State private var showLogoutAlert = false
     @Environment(\.presentationMode) var presentationMode
     
     var body: some View {
         TabView(selection: $selectedTab) {
-            PizzaListView(viewModel: appViewModel, onLogout: { showLogoutAlert = true })
+            PizzaView(viewModel: appViewModel, onLogout: { showLogoutAlert = true })
                 .tabItem {
                     Label("Pizza", systemImage: "pizzaslice")
                 }
                 .tag(0)
             
-            ExtraListView(viewModel: appViewModel, onLogout: { showLogoutAlert = true })
+            ExtraView(viewModel: appViewModel, onLogout: { showLogoutAlert = true })
                 .tabItem {
                     Label("Extra", systemImage: "takeoutbag.and.cup.and.straw")
                 }
@@ -29,7 +29,7 @@ struct HomeTabView: View {
                 .badge(cartManager.cart.count > 0 ? String(cartManager.cart.count) : nil)
                 .tag(2)
             
-            OrdersHistoryView(viewModel: appViewModel)
+            OrdersView(viewModel: appViewModel)
                 .tabItem {
                     Label("Orden", systemImage: "doc.text.magnifyingglass")
                 }

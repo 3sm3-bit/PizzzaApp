@@ -1,6 +1,6 @@
 import Foundation
 import Shared
-import Combine
+internal import Combine
 
 class StoreViewModel: ObservableObject {
     @Published var pizzaProducts: [ProductModel] = []

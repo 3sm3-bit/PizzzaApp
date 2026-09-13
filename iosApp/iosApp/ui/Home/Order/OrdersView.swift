@@ -1,19 +1,22 @@
+//
+//  OrdersView.swift
+//  iosApp
+//
+//  Created by Developer on 12/09/26.
+//
+
 import SwiftUI
 import Shared
 
-struct OrdersHistoryView: View {
-    @ObservedObject var viewModel: AppViewModel
+struct OrdersView: View {
+    @ObservedObject var viewModel: HomeViewModel
     @State private var selectedOrderForMonitoring: ParentOrderModel?
     
     var body: some View {
         VStack(spacing: 0) {
             PizzaToolbar(title: "Mis Pedidos", showBackButton: false)
             
-            if viewModel.isLoading && viewModel.orders.isEmpty {
-                Spacer()
-                ProgressView().tint(PizzaColors.red600)
-                Spacer()
-            } else if viewModel.orders.isEmpty {
+            if viewModel.orders.isEmpty {
                 Spacer()
                 Text("Aún no tienes pedidos")
                     .font(PizzaFonts.medium14)
@@ -23,9 +26,9 @@ struct OrdersHistoryView: View {
                 ScrollView {
                     LazyVStack(spacing: 12) {
                         ForEach(viewModel.orders, id: \.uid) { order in
-                            OrderItemCard(order: order, viewModel: viewModel) {
-                                selectedOrderForMonitoring = order
-                            }
+                           // OrderItemCard(order: order, viewModel: viewModel) {
+                            //      selectedOrderForMonitoring = order
+                            //   }
                         }
                     }
                     .padding()
@@ -33,7 +36,7 @@ struct OrdersHistoryView: View {
             }
         }
         .onAppear {
-            viewModel.getGeneralOrderList(forceLoading: true)
+           // viewModel.getGeneralOrderList(forceLoading: true)
         }
         .background(PizzaColors.background)
         .fullScreenCover(item: $selectedOrderForMonitoring) { order in

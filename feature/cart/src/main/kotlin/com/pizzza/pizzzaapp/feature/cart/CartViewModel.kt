@@ -55,10 +55,50 @@ class CartViewModel(
         }
     }
 
-    fun confirmOrder(onComplete: () -> Unit) {
+    fun startPayment(onUrlReady: (String) -> Unit) {
         execute(globalUiStateManager = globalUiStateManager) {
             val state = cartUiState.value
             if (state.cart.isEmpty()) return@execute
+
+            val cartProductsTotal = state.cart.sumOf { item ->
+                val basePrice = item.product.price.toDoubleOrNull() ?: 0.0
+                val crustPrice = if (item.cheeseFilledCrust) item.product.priceChosse.toDoubleOrNull() ?: 0.0 else 0.0
+                (basePrice + crustPrice) * item.quantity
+            }
+            val deliveryPrice = if (state.receptionMode == "DELIVERY") kotlin.math.round(cartProductsTotal * 0.20) else 0.0
+            val total = cartProductsTotal + deliveryPrice
+
+            val user = io { dataUseCase.getUserLocal() }
+            val orderId = UUID.randomUUID().toString() // Generamos ID de orden para el pago
+            
+            val paymentUrl = io { 
+                dataUseCase.createPaymentSession(
+                    amount = total,
+                    email = user?.email ?: "",
+                    orderId = orderId
+                ) 
+            }
+            
+            if (paymentUrl.isNotBlank()) {
+                onUrlReady(paymentUrl)
+            }
+        }
+    }
+
+    fun confirmOrder(statePay: String = "PENDIENTE", onComplete: () -> Unit) {
+        execute(globalUiStateManager = globalUiStateManager) {
+            val state = cartUiState.value
+            if (state.cart.isEmpty()) return@execute
+
+            val cartProductsTotal = state.cart.sumOf { item ->
+                val basePrice = item.product.price.toDoubleOrNull() ?: 0.0
+                val crustPrice = if (item.cheeseFilledCrust) item.product.priceChosse.toDoubleOrNull() ?: 0.0 else 0.0
+                (basePrice + crustPrice) * item.quantity
+            }
+
+            val deliveryPrice = if (state.receptionMode == "DELIVERY") {
+                kotlin.math.round(cartProductsTotal * 0.20).toLong().toString()
+            } else "0"
 
             io {
                 val user = dataUseCase.getUserLocal()
@@ -66,11 +106,6 @@ class CartViewModel(
 
                 val orderRequest = state.cart.map { item ->
                     val isDelivery = state.receptionMode == "DELIVERY"
-                    val deliveryPrice = if (isDelivery) {
-                        state.selectedDeliveryProduct?.price
-                            ?: state.deliveryProducts.firstOrNull()?.price
-                            ?: "25"
-                    } else "0"
 
                     val itemPrice = (item.product.price.toDoubleOrNull() ?: 0.0) +
                             (if (item.cheeseFilledCrust) item.product.priceChosse.toDoubleOrNull() ?: 0.0 else 0.0)
@@ -97,7 +132,8 @@ class CartViewModel(
                         idOrden = idOrder,
                         userId = user?.uid ?: "",
                         latitude = if (isDelivery) state.latitude else "0",
-                        longitude = if (isDelivery) state.longitude else "0"
+                        longitude = if (isDelivery) state.longitude else "0",
+                        statePay = statePay
                     )
                 }
 

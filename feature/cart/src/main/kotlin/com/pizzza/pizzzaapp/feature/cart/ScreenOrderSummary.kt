@@ -37,6 +37,7 @@ import org.koin.compose.viewmodel.koinViewModel
 fun ScreenOrderSummary(
     cartViewModel: CartViewModel = koinViewModel(),
     onConfirm: () -> Unit,
+    onPaymentRedirect: (String) -> Unit,
     onBack: () -> Unit,
 ) {
     val context = LocalContext.current
@@ -47,13 +48,9 @@ fun ScreenOrderSummary(
         (basePrice + crustPrice) * it.quantity
     }
     
-    val deliveryPriceStr = if (uiState.receptionMode == "DELIVERY") {
-        uiState.selectedDeliveryProduct?.price
-            ?: uiState.deliveryProducts.firstOrNull()?.price
-            ?: "25"
-    } else "0"
-    
-    val deliveryPrice = deliveryPriceStr.toDoubleOrNull() ?: 0.0
+    val deliveryPrice = if (uiState.receptionMode == "DELIVERY") {
+        kotlin.math.round(cartProductsTotal * 0.20)
+    } else 0.0
     val cartTotal = cartProductsTotal + deliveryPrice
 
     Scaffold(
@@ -211,11 +208,10 @@ fun ScreenOrderSummary(
             Spacer(Modifier.height(24.dp))
 
             UiTayButton(
-                uiTayText = "Confirmar y Enviar Pedido",
+                uiTayText = "Pagar y Enviar Pedido",
                 uiTayClick = {
-                    cartViewModel.confirmOrder {
-                        Toast.makeText(context, "Orden generada", Toast.LENGTH_LONG).show()
-                        onConfirm() // Navegar a la pestaña de Pedidos (index ya seteado en VM)
+                    cartViewModel.startPayment { url ->
+                        onPaymentRedirect(url)
                     }
                 },
                 uiTayBtnModifier = UiTayButtonModel(

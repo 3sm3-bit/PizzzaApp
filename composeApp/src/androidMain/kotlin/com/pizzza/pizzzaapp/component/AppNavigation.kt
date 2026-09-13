@@ -10,6 +10,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.toRoute
 import com.pizzza.pizzzaapp.core.navigation.*
 import com.pizzza.pizzzaapp.core.ui.*
 import com.pizzza.pizzzaapp.feature.auth.AuthViewModel
@@ -18,6 +19,7 @@ import com.pizzza.pizzzaapp.feature.auth.register.RegisterScreen
 import com.pizzza.pizzzaapp.feature.cart.AddressScreen
 import com.pizzza.pizzzaapp.feature.cart.CartViewModel
 import com.pizzza.pizzzaapp.feature.cart.ScreenOrderSummary
+import com.pizzza.pizzzaapp.feature.cart.ScreenPaymentWebView
 import com.pizzza.pizzzaapp.feature.home.HomeViewModel
 import com.pizzza.pizzzaapp.feature.home.ScreenClientHome
 import com.pizzza.pizzzaapp.feature.monitoring.ScreenMonitor
@@ -77,8 +79,7 @@ fun AppNavigation() {
                     navController.navigateSafe(Login) {
                         popUpTo(Register) { inclusive = true }
                     }
-                },
-                onBack = onBack
+                }
             )
         }
 
@@ -115,6 +116,26 @@ fun AppNavigation() {
                 onConfirm = {
                     navController.navigateSafe(ClientHome) {
                         popUpTo(ClientHome) { inclusive = true }
+                    }
+                },
+                onPaymentRedirect = { url ->
+                    navController.navigateSafe(PaymentWebView(url))
+                },
+                onBack = onBack
+            )
+        }
+
+        composable<PaymentWebView> { backStackEntry ->
+            val route: PaymentWebView = backStackEntry.toRoute()
+            val cartViewModel: CartViewModel = koinViewModel()
+            
+            ScreenPaymentWebView(
+                url = route.url,
+                onSuccess = {
+                    cartViewModel.confirmOrder(statePay = "PAGADO") {
+                        navController.navigateSafe(ClientHome) {
+                            popUpTo(ClientHome) { inclusive = true }
+                        }
                     }
                 },
                 onBack = onBack

@@ -192,7 +192,11 @@ fun OrderItemCard(
             }
 
             if (order.reception.uppercase() == "DELIVERY") {
-                val deliveryPrice = order.orders.firstOrNull()?.priceDelivery ?: "0"
+                val rawDeliveryPrice = order.orders.firstOrNull()?.priceDelivery ?: "0"
+                val deliveryPrice = rawDeliveryPrice.toDoubleOrNull()?.let { 
+                    kotlin.math.round(it).toLong().toString() 
+                } ?: rawDeliveryPrice
+                
                 if (deliveryPrice != "0" && deliveryPrice.isNotEmpty()) {
                     Row(
                         modifier = Modifier.fillMaxWidth().padding(top = 4.dp),

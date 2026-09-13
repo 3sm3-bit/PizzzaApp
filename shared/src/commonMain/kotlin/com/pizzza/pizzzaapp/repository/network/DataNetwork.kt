@@ -95,4 +95,19 @@ class DataNetwork(
     override suspend fun logout() {
         database.userDao().logout()
     }
+
+    override suspend fun createPaymentSession(amount: Double, email: String, orderId: String): String {
+        val request = com.pizzza.pizzzaapp.repository.network.model.PaymentRequest(
+            amount = (amount * 100).toLong(),
+            currency = "mxn",
+            orderId = orderId,
+            customerEmail = email,
+            successUrl = "https://pizzzaapp.com/success?orderId=$orderId",
+            cancelUrl = "https://pizzzaapp.com/cancel?orderId=$orderId",
+            appSuccessUrl = "pizzitas://payment/success",
+            appCancelUrl = "pizzitas://payment/cancel"
+        )
+        val response = apiService.createPaymentSession(request)
+        return response.url ?: ""
+    }
 }

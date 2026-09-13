@@ -1,4 +1,5 @@
 import SwiftUI
+import TaySwitfUILibrary
 import MapKit
 
 struct AddressSelectionView: View {
@@ -6,7 +7,7 @@ struct AddressSelectionView: View {
     var onConfirm: (String, String, String) -> Void
     
     @State private var region = MKCoordinateRegion(
-        center: CLLocationCoordinate2D(latitude: 19.4326, longitude: -99.1332), // Default CDMX or similar
+        center: CLLocationCoordinate2D(latitude: 19.4326, longitude: -99.1332),
         span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05)
     )
     
@@ -18,34 +19,30 @@ struct AddressSelectionView: View {
             Map(coordinateRegion: $region, interactionModes: .all, showsUserLocation: true)
                 .edgesIgnoringSafeArea(.all)
             
-            // Center Pin
             Image(systemName: "mappin")
                 .font(.system(size: 40))
                 .foregroundColor(PizzaColors.red600)
                 .offset(y: -20)
             
             VStack {
-                PizzaToolbar(title: "Seleccionar Dirección", onBack: {
+                UiTayCToolBar(uiTayText: "Seleccionar Dirección"){_ in
                     presentationMode.wrappedValue.dismiss()
-                })
-                
+                }
                 Spacer()
-                
-                // Bottom Card
                 VStack(spacing: 16) {
                     HStack {
                         Image(systemName: "location.fill")
-                            .foregroundColor(PizzaColors.red600)
+                            .foregroundColor(Color.uiTayRed600)
                         Text(address)
                             .font(PizzaFonts.medium14)
                             .lineLimit(2)
                         Spacer()
                     }
                     .padding()
-                    .background(PizzaColors.red50)
+                    .background(Color.uiTayRed50)
                     .cornerRadius(12)
                     
-                    PizzaButton(title: "Confirmar Ubicación", isEnabled: !isLocating) {
+                    UITayButton(text: "Confirmar Ubicación") {
                         onConfirm(
                             address,
                             String(region.center.latitude),
@@ -70,7 +67,6 @@ struct AddressSelectionView: View {
     
     private func debounceAddressUpdate() {
         isLocating = true
-        // In a real app, use a proper debounce
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
             updateAddress()
         }
@@ -93,7 +89,6 @@ struct AddressSelectionView: View {
     }
 }
 
-// Helper for rounded corners
 extension View {
     func uiTayCornerRadius(_ radius: CGFloat, corners: UIRectCorner) -> some View {
         clipShape( RoundedCorner(radius: radius, corners: corners) )

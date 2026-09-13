@@ -18,6 +18,12 @@ import io.ktor.client.request.setBody
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
+import com.pizzza.pizzzaapp.repository.network.model.PaymentRequest
+import com.pizzza.pizzzaapp.repository.network.model.PaymentResponse
+import io.ktor.client.request.forms.submitForm
+import io.ktor.http.Parameters
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.jsonPrimitive
 
 class KmmService(private val client: HttpClient) {
 
@@ -61,6 +67,13 @@ class KmmService(private val client: HttpClient) {
 
     suspend fun login(request: LoginRequest): LoginResponse {
         return client.post("${BASE_URL}/services/user/login") {
+            contentType(ContentType.Application.Json)
+            setBody(request)
+        }.body()
+    }
+
+    suspend fun createPaymentSession(request: PaymentRequest): PaymentResponse {
+        return client.post("${BASE_URL}/services/payment/create") {
             contentType(ContentType.Application.Json)
             setBody(request)
         }.body()

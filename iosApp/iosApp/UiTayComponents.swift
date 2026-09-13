@@ -57,15 +57,15 @@ struct FilterChip: View {
     var body: some View {
         Button(action: onClick) {
             Text(text)
-                .font(PizzaFonts.bold12)
-                .padding(.horizontal, 16)
+                .font(Font.uiMontB16)
                 .padding(.vertical, 8)
-                .background(isSelected ? PizzaColors.red600 : Color.white)
-                .foregroundColor(isSelected ? .white : PizzaColors.red600)
+                .frame(maxWidth: .infinity)
+                .background(isSelected ? Color.uiTayRed600 : Color.white)
+                .foregroundColor(isSelected ? .white : Color.uiTayRed600)
                 .cornerRadius(12)
                 .overlay(
                     RoundedRectangle(cornerRadius: 12)
-                        .stroke(PizzaColors.red600, lineWidth: 1)
+                        .stroke(Color.uiTayRed600, lineWidth: 1)
                 )
         }
     }

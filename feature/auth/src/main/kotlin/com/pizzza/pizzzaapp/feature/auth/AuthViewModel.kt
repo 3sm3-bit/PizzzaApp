@@ -7,6 +7,7 @@ import com.pizzza.pizzzaapp.core.ui.base.BaseViewModel
 import com.pizzza.pizzzaapp.core.ui.singleton.GlobalUiStateManager
 import com.pizzza.pizzzaapp.core.ui.singleton.AppDataOrder
 import com.pizzza.pizzzaapp.usecases.DataUseCase
+import com.pizzza.pizzzaapp.repository.network.exception.UiTayApiException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -67,8 +68,16 @@ class AuthViewModel(
                 password = _authUiState.value.pass
             )
             val response = io { dataUseCase.login(request) }
-
             val userValid = response.userValid
+            val userRole = userValid.rol?.uppercase() ?: ""
+            if (userRole != "CLIENTE" && userRole != "ADMIN") {
+                throw UiTayApiException(
+                    code = 401,
+                    title = "Usuario no autorizado",
+                    messageApi = "El usuario ingresado no está autorizado para esta aplicación"
+                )
+            }
+
             val userEntity = UserEntity(
                 uid = userValid.uid ?: "",
                 nameUser = userValid.nameUser ?: "",
@@ -101,9 +110,6 @@ class AuthViewModel(
         }
     }
 
-    fun resetState() {
-        _authUiState.update { AuthUiState() }
-    }
 
     fun checkExistingUser(onResult: (String?) -> Unit) {
         execute(loading = false, globalUiStateManager = globalUiStateManager) {

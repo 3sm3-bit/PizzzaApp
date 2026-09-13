@@ -1,6 +1,7 @@
 package com.pizzza.pizzzaapp.feature.home
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -10,6 +11,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Assignment
@@ -48,8 +50,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.pizzza.pizzzaapp.core.ui.R
 import com.pizzza.pizzzaapp.feature.home.HomeViewModel
 import com.pizzza.pizzzaapp.feature.orders.OrdersViewModel
 import com.pizzza.pizzzaapp.feature.cart.CartViewModel
@@ -180,22 +185,23 @@ fun ScreenClientHome(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(start=16.dp, top = 16.dp, end = 8.dp),
+                    .padding(top = 16.dp, start = 16.dp, end = 8.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.Top
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 Column {
                     Text(
-                        text = if (selectedTab == 3) "Monitorea tus pedidos aquí" else "Bienvenido a la pizzeria",
+                        modifier = Modifier
+                            .padding(start = 8.dp),
+                        text = "Bienvenido a la",
                         style = textSe16,
                         color = tay_red_600
                     )
-                    Text(
-                        modifier = Modifier.padding(top = 4.dp),
-                        text = if (selectedTab == 3) "Tus pedidos de hoy" else "Has tu pedido ya!",
-                        style = textSeB20,
-                        color = Color.Black
-                    )
+                    Image(painter = painterResource(R.drawable.ic_logo_pizzzeria),
+                        contentDescription = "logo_ic",
+                        contentScale = ContentScale.FillBounds,
+                        alignment = Alignment.CenterStart,
+                        modifier = Modifier.width(150.dp).height(50.dp))
                 }
 
                 Row(verticalAlignment = Alignment.CenterVertically) {
