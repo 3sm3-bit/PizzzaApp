@@ -2,13 +2,9 @@ package com.pizzza.pizzzaapp.ui
 
 import com.pizzza.pizzzaapp.core.ui.base.BaseViewModel
 import com.pizzza.pizzzaapp.core.ui.singleton.GlobalUiStateManager
-import com.pizzza.pizzzaapp.core.ui.model.OrderUiState
 import com.pizzza.pizzzaapp.usecases.DataUseCase
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 
 class AppViewModel(
     private val dataUseCase: DataUseCase,

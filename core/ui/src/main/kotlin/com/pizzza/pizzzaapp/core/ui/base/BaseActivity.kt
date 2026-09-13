@@ -1,5 +1,6 @@
 package com.pizzza.pizzzaapp.core.ui.base
 
+import android.content.pm.ActivityInfo
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
@@ -52,8 +53,8 @@ abstract class BaseActivity : ComponentActivity() {
     abstract fun setDataGlobal()
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
         super.onCreate(savedInstanceState)
-        
         enableEdgeToEdge(
             statusBarStyle = SystemBarStyle.dark(Color(0xFFA62626).toArgb())
         )

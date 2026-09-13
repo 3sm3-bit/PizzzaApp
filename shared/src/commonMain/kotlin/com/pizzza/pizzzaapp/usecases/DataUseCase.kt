@@ -1,6 +1,5 @@
 package com.pizzza.pizzzaapp.usecases
 
-import com.pizzza.pizzzaapp.model.ProductModel
 import com.pizzza.pizzzaapp.repository.network.model.LoginRequest
 import com.pizzza.pizzzaapp.repository.network.model.LoginResponse
 import com.pizzza.pizzzaapp.repository.network.model.OrderResponse
