@@ -13,7 +13,7 @@ actual val dbModule = module {
     
     single<AppDataBase> {
         val context: Context = get()
-        val dbFile = context.getDatabasePath("pizzza_app.db")
+        val dbFile = context.getDatabasePath("pizzza_appclient.db")
         Room.databaseBuilder<AppDataBase>(
             context = context,
             name = dbFile.absolutePath

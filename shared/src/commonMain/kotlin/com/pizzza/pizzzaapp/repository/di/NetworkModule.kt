@@ -1,24 +1,22 @@
 package com.pizzza.pizzzaapp.repository.di
 
-import androidx.room.RoomDatabase
-import com.pizzza.pizzzaapp.repository.db.manager.AppDataBase
-import com.pizzza.pizzzaapp.repository.network.exception.CompleteErrorModel
-import com.pizzza.pizzzaapp.repository.network.exception.UiTayApiException
-import com.pizzza.pizzzaapp.repository.network.exception.UnAuthorizedException
-import com.pizzza.pizzzaapp.repository.network.manager.InstantSerializer
 import com.pizzza.pizzzaapp.repository.network.KmmService
 import com.pizzza.pizzzaapp.repository.network.WebSocketManager
+import com.pizzza.pizzzaapp.repository.network.exception.CompleteErrorModel
+import com.pizzza.pizzzaapp.repository.network.exception.ErrorNetwork
+import com.pizzza.pizzzaapp.repository.network.exception.UiTayApiException
+import com.pizzza.pizzzaapp.repository.network.manager.InstantSerializer
+import com.pizzza.pizzzaapp.repository.utils.ConnectivityManager
 import com.pizzza.pizzzaapp.requestLogger
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.HttpResponseValidator
 import io.ktor.client.plugins.HttpTimeout
-import io.ktor.client.plugins.defaultRequest
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.client.plugins.defaultRequest
 import io.ktor.client.plugins.logging.LogLevel
 import io.ktor.client.plugins.logging.Logging
 import io.ktor.client.plugins.websocket.WebSockets
 import io.ktor.client.statement.bodyAsText
-import io.ktor.http.HttpStatusCode
 import io.ktor.http.isSuccess
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.datetime.Instant
@@ -30,8 +28,8 @@ import org.koin.dsl.module
 val jsonLenient = Json { ignoreUnknownKeys = true }
 
 val networkModule = module {
-    // Cliente para peticiones REST (con ContentNegotiation y validación)
     single(named("httpClient")) {
+        val connectivityManager: ConnectivityManager = get()
         HttpClient {
             install(ContentNegotiation) {
                 json(
@@ -46,6 +44,7 @@ val networkModule = module {
             }
 
             defaultRequest {
+                if (!connectivityManager.isConnected()) throw ErrorNetwork()
                 headers.append("ngrok-skip-browser-warning", "true")
             }
 
@@ -53,8 +52,13 @@ val networkModule = module {
                 validateResponse { response ->
                     if (!response.status.isSuccess()) {
                         val statusCode = response.status.value
-                        val errorText = try { response.bodyAsText() } catch (e: Exception) { "" }
-                        
+                        val errorText = try {
+                            response.bodyAsText()
+                        } catch (e: Exception) {
+                            e.printStackTrace()
+                            ""
+                        }
+
                         when (statusCode) {
                             //401 -> throw UnAuthorizedException()
                             in 400..599 -> {
@@ -66,7 +70,8 @@ val networkModule = module {
                                 throw UiTayApiException(
                                     code = statusCode,
                                     title = errorModel?.title ?: "Error $statusCode",
-                                    messageApi = errorModel?.errorMessage ?: errorText.takeIf { it.isNotBlank() } ?: "Ocurrió un error inesperado"
+                                    messageApi = errorModel?.errorMessage ?: errorText.takeIf { it.isNotBlank() }
+                                    ?: "Ocurrió un error inesperado"
                                 )
                             }
                         }
@@ -86,13 +91,16 @@ val networkModule = module {
         }
     }
 
-    // Cliente dedicado para WebSockets (sin ContentNegotiation global para evitar conflictos)
     single(named("wsClient")) {
+        val connectivityManager: ConnectivityManager = get()
         HttpClient {
             install(WebSockets)
             install(Logging) {
                 logger = requestLogger
                 level = LogLevel.ALL
+            }
+            defaultRequest {
+                if (!connectivityManager.isConnected()) throw ErrorNetwork()
             }
         }
     }
@@ -101,8 +109,3 @@ val networkModule = module {
     single { WebSocketManager(get(named("wsClient"))) }
 }
 
-fun getDatabaseBuilder(): RoomDatabase.Builder<AppDataBase> {
-    // Esta función debe ser implementada en cada plataforma (expect/actual)
-    // O usar un factory de Koin que ya esté configurado.
-    throw Exception("Use platform specific builder")
-}

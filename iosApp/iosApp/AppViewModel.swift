@@ -66,12 +66,11 @@ class AppViewModel: BaseViewModel {
     
     func loadValidData(){
         Task{
-            await self.execute(loading: false,errorFlag : false) {
+            await self.execute(loading: false) {
                 let response = try await self.dataUseCase.syncProducts()
-                let data = try await self.dataUseCase.getProducts()
-                CartManager.shared.pizzaProducts = data.filter { $0.type == "1" }
-                CartManager.shared.extraProducts = data.filter { $0.type == "2" || $0.type == "3" }
-                CartManager.shared.deliveryProducts = data.filter { $0.type == "4" }
+                CartManager.shared.pizzaProducts = response.filter { $0.type == "1" }
+                CartManager.shared.extraProducts = response.filter { $0.type == "2" || $0.type == "3" }
+                CartManager.shared.deliveryProducts = response.filter { $0.type == "4" }
                 let user = try await self.dataUseCase.getUserLocal()
                 self.successLogin = user != nil
             }

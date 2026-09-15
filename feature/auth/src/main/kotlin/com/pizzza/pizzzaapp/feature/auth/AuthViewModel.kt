@@ -2,10 +2,10 @@ package com.pizzza.pizzzaapp.feature.auth
 
 import com.pizzza.pizzzaapp.repository.network.model.UserResponse
 import com.pizzza.pizzzaapp.repository.network.model.LoginRequest
-import com.pizzza.pizzzaapp.repository.db.entity.UserEntity
 import com.pizzza.pizzzaapp.core.ui.base.BaseViewModel
 import com.pizzza.pizzzaapp.core.ui.singleton.GlobalUiStateManager
 import com.pizzza.pizzzaapp.core.ui.singleton.AppDataOrder
+import com.pizzza.pizzzaapp.model.UserModel
 import com.pizzza.pizzzaapp.usecases.DataUseCase
 import com.pizzza.pizzzaapp.repository.network.exception.UiTayApiException
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -78,7 +78,7 @@ class AuthViewModel(
                 )
             }
 
-            val userEntity = UserEntity(
+            val userModel = UserModel(
                 uid = userValid.uid ?: "",
                 nameUser = userValid.nameUser ?: "",
                 names = userValid.names ?: "",
@@ -94,14 +94,14 @@ class AuthViewModel(
                 token = response.token
             )
 
-            io { dataUseCase.saveUserLocal(userEntity) }
+            io { dataUseCase.saveUserLocal(userModel) }
 
             // Update global data
             appDataOrder.update {
                 it.copy(
-                    deliveryAddress = userEntity.address,
-                    latitude = userEntity.latitude,
-                    longitude = userEntity.longitude
+                    deliveryAddress = userModel.address,
+                    latitude = userModel.latitude,
+                    longitude = userModel.longitude
                 )
             }
 

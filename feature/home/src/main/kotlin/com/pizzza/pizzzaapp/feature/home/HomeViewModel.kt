@@ -20,7 +20,7 @@ class HomeViewModel(
         if (homeUiState.value.products.isNotEmpty()) return // Evita recargas innecesarias
 
         execute(loading = false, globalUiStateManager = globalUiStateManager) {
-            val response = io { dataUseCase.getProducts() }
+            val response = io { dataUseCase.getProductsLocal() }
             appDataOrder.update {
                 it.copy(
                     products = response,

@@ -69,7 +69,7 @@ fun SplashScreen(
             onComplete = { success ->
                 if (success) {
                     authViewModel.checkExistingUser { role ->
-                        onFinished(role == "CLIENTE")
+                        onFinished(role?.equals("CLIENTE", ignoreCase = true) == true || role?.equals("ADMIN", ignoreCase = true) == true)
                     }
                 } else {
                     error = "Error al conectar con el servidor. Revisa tu conexión."
@@ -126,7 +126,7 @@ fun SplashScreen(
                         viewModel.syncProducts(onComplete = { success ->
                             if (success) {
                                 authViewModel.checkExistingUser { role ->
-                                    onFinished(role == "CLIENTE")
+                                    onFinished(role?.equals("CLIENTE", ignoreCase = true) == true || role?.equals("ADMIN", ignoreCase = true) == true)
                                 }
                             }
                             else error = "Reintento fallido. Verifica tu red."

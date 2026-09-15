@@ -17,19 +17,11 @@ interface IDataNetwork {
 
     suspend fun syncProducts(): List<ProductModel>
 
-    suspend fun getProducts(): List<ProductModel>
-
     suspend fun createOrder(data: List<OrderResponse>): String
 
     suspend fun registerUser(data: UserResponse): String
 
     suspend fun login(data: LoginRequest): LoginResponse
-
-    suspend fun saveUserLocal(user: UserEntity)
-
-    suspend fun getUserLocal(): UserEntity?
-
-    suspend fun logout()
 
     suspend fun createPaymentSession(amount: Double, email: String, orderId: String): String
 

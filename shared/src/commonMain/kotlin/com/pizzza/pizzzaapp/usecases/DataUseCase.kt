@@ -1,43 +1,55 @@
 package com.pizzza.pizzzaapp.usecases
 
+import com.pizzza.pizzzaapp.model.ProductModel
+import com.pizzza.pizzzaapp.model.UserModel
 import com.pizzza.pizzzaapp.repository.network.model.LoginRequest
-import com.pizzza.pizzzaapp.repository.network.model.LoginResponse
 import com.pizzza.pizzzaapp.repository.network.model.OrderResponse
 import com.pizzza.pizzzaapp.repository.network.model.UserResponse
+import com.pizzza.pizzzaapp.usecases.network.IDataDataBase
 import com.pizzza.pizzzaapp.usecases.network.IDataNetwork
 
 
-class DataUseCase(private val iDataNetwork: IDataNetwork) {
+class DataUseCase(private val iDataNetwork: IDataNetwork, private val iDataDBNetwork: IDataDataBase) {
 
+    @Throws(Exception::class)
     suspend fun loadParentOrder(userId: String) = iDataNetwork.loadParentOrder(userId)
 
+    @Throws(Exception::class)
     suspend fun getOrderById(orderId: String) = iDataNetwork.getOrderById(orderId)
 
-    suspend fun syncProducts() = iDataNetwork.syncProducts()
-
-    suspend fun getProducts() = iDataNetwork.getProducts()
-
-    suspend fun createOrder(data: List<OrderResponse>) = iDataNetwork.createOrder(data)
-
-    suspend fun registerUser(data: UserResponse) = iDataNetwork.registerUser(data)
-
-    suspend fun login(data: LoginRequest) = iDataNetwork.login(data)
-
-    suspend fun loginAndSave(data: LoginRequest):LoginResponse{
-        val response = iDataNetwork.login(data)
-        saveUserLocal(response.toUserEntity())
+    @Throws(Exception::class)
+    suspend fun syncProducts(): List<ProductModel> {
+        val response = iDataNetwork.syncProducts()
+        iDataDBNetwork.getProducts()
+        iDataDBNetwork.deleteAll()
+        iDataDBNetwork.insertAll(response)
         return response
     }
 
-    suspend fun saveUserLocal(user: com.pizzza.pizzzaapp.repository.db.entity.UserEntity) = iDataNetwork.saveUserLocal(user)
+    @Throws(Exception::class)
+    suspend fun getProductsLocal() = iDataDBNetwork.getProducts()
 
-    suspend fun getUserLocal() = iDataNetwork.getUserLocal()
+    @Throws(Exception::class)
+    suspend fun createOrder(data: List<OrderResponse>) = iDataNetwork.createOrder(data)
 
+    @Throws(Exception::class)
+    suspend fun registerUser(data: UserResponse) = iDataNetwork.registerUser(data)
+
+    @Throws(Exception::class)
+    suspend fun login(data: LoginRequest) = iDataNetwork.login(data)
+
+    @Throws(Exception::class)
+    suspend fun saveUserLocal(user: UserModel) = iDataDBNetwork.saveUserLocal(user)
+
+    @Throws(Exception::class)
+    suspend fun getUserLocal() = iDataDBNetwork.getUserLocal()
+
+    @Throws(Exception::class)
     suspend fun logout() {
-        iDataNetwork.logout()
+        iDataDBNetwork.logout()
     }
 
-    suspend fun createPaymentSession(amount: Double, email: String, orderId: String) = 
+    @Throws(Exception::class)
+    suspend fun createPaymentSession(amount: Double, email: String, orderId: String) =
         iDataNetwork.createPaymentSession(amount, email, orderId)
-
 }

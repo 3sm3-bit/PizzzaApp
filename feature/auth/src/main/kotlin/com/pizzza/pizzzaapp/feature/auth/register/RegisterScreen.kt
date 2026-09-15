@@ -4,7 +4,6 @@ import android.util.Patterns
 import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -27,7 +26,6 @@ import com.pizzza.pizzzaapp.core.ui.R
 import com.pizzza.pizzzaapp.feature.auth.AuthViewModel
 import com.valu.uitaycompose.button.UiTayButton
 import org.koin.compose.viewmodel.koinViewModel
-import com.valu.uitaycompose.extra.UiTayCToolBar
 import com.valu.uitaycompose.label.UiTayEditLayout
 import com.valu.uitaycompose.model.*
 import com.valu.uitaycompose.utils.*

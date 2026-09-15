@@ -16,12 +16,12 @@ struct BaseViewGeneral<ViewModel: BaseViewModel, Content: View>: View {
     @FocusState var isTextFielFicudedd: Bool
     @State private var lastInteractionDate = Date()
     @State private var optimizeKeyBoard = false
-    var onDetectedError: (CmActionErrorFlow) -> Void = { _ in }
+    var onDetectedError: (UiTayActionErrorFlow) -> Void = { _ in }
     
     init(viewModel: ViewModel? = nil,
          expireSession: Bool = true,
          optimizeKeyBoard : Bool = false,
-         onDetectedError: @escaping (CmActionErrorFlow) -> Void = { _ in },
+         onDetectedError: @escaping (UiTayActionErrorFlow) -> Void = { _ in },
          @ViewBuilder content: () -> Content) {
         self.viewModel = viewModel ?? (BaseViewModel() as! ViewModel)
         self.onDetectedError = onDetectedError

@@ -16,7 +16,7 @@ actual val dbModule = module {
     }
 
     single<AppDataBase> {
-        val dbFilePath = NSHomeDirectory() + "/pizzza_app.db"
+        val dbFilePath = NSHomeDirectory() + "/pizzza_appclient.db"
         Room.databaseBuilder<AppDataBase>(
             name = dbFilePath,
             factory = { AppDataBaseConstructor.initialize() }
