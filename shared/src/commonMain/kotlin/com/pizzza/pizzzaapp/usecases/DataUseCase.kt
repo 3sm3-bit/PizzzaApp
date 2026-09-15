@@ -8,7 +8,6 @@ import com.pizzza.pizzzaapp.repository.network.model.UserResponse
 import com.pizzza.pizzzaapp.usecases.network.IDataDataBase
 import com.pizzza.pizzzaapp.usecases.network.IDataNetwork
 
-
 class DataUseCase(private val iDataNetwork: IDataNetwork, private val iDataDBNetwork: IDataDataBase) {
 
     @Throws(Exception::class)

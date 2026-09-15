@@ -157,11 +157,13 @@ fun ScreenDetailOrder(
                             maxLines = 2,
                             overflow = TextOverflow.Ellipsis
                         )
-                        Text(
-                            text = "TAMAÑO: ${product.tamanio}",
-                            style = textM12,
-                            color = Color.Black
-                        )
+                        if (product.type == "1") {
+                            Text(
+                                text = "TAMAÑO: ${product.tamanio}",
+                                style = textM12,
+                                color = Color.Black
+                            )
+                        }
                     }
                     Text(
                         text = "${product.currencySymbol}${product.price}",

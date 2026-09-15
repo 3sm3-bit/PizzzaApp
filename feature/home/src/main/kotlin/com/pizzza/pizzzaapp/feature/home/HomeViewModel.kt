@@ -21,12 +21,13 @@ class HomeViewModel(
 
         execute(loading = false, globalUiStateManager = globalUiStateManager) {
             val response = io { dataUseCase.getProductsLocal() }
-            appDataOrder.update {
-                it.copy(
+            appDataOrder.update { state ->
+                state.copy(
                     products = response,
-                    pizzaProducts = response.filter { it.type == "1" },
-                    extraProducts = response.filter { it.type == "2" || it.type == "3" },
-                    deliveryProducts = response.filter { it.type == "4" }
+                    pizzaProducts = response.filter { product -> product.type == "1" },
+                    extraProducts = response.filter { product -> product.type == "2" || product.type == "3" },
+                    promotionsProducts = response.filter { product -> product.type == "4" },
+                    deliveryProducts = response.filter { product -> product.type == "5" }
                 )
             }
         }

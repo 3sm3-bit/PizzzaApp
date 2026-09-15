@@ -10,6 +10,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.pizzza.pizzzaapp.feature.home.FilterChipSurface
 import com.pizzza.pizzzaapp.feature.home.ProductCard
+import com.pizzza.pizzzaapp.feature.home.PromotionsBanner
 import com.pizzza.pizzzaapp.feature.home.HomeViewModel
 import com.pizzza.pizzzaapp.core.ui.singleton.LocalAppDataOrder
 
@@ -22,7 +23,12 @@ fun ScreenPizza(
     var selectedSize by remember { mutableStateOf("GRANDE") }
     val sizes = listOf("GRANDE", "MEDIANO", "CHICO")
 
-    Column(modifier = Modifier.fillMaxSize().padding(top = 8.dp)) {
+    Column(modifier = Modifier.fillMaxSize()) {
+        PromotionsBanner(promotions = uiState.promotionsProducts) { product ->
+            viewModel.selectProduct(product)
+            onNavigateToDetail()
+        }
+
         LazyRow(
             modifier = Modifier
                 .fillMaxWidth()

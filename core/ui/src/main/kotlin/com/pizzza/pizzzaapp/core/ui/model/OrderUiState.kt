@@ -9,6 +9,7 @@ data class OrderUiState(
     val products: List<ProductModel> = emptyList(),
     val pizzaProducts: List<ProductModel> = emptyList(),
     val extraProducts: List<ProductModel> = emptyList(),
+    val promotionsProducts: List<ProductModel> = emptyList(),
     val deliveryProducts: List<ProductModel> = emptyList(),
     val branches: List<BranchModel> = emptyList(),
     val selectedOrder: ParentOrderModel? = null,

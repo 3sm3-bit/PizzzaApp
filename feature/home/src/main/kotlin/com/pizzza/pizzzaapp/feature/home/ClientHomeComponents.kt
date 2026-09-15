@@ -21,6 +21,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.pizzza.pizzzaapp.core.ui.R
 import com.pizzza.pizzzaapp.model.ProductModel
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import com.valu.uitaycompose.swipe.UiTayUrlImage
 import com.valu.uitaycompose.utils.*
 import java.util.Locale
@@ -205,4 +207,42 @@ fun ExtraProductCard(product: ProductModel, onClick: () -> Unit) {
         }
     }
 }
+
+@Composable
+fun PromotionsBanner(promotions: List<ProductModel>, onProductClick: (ProductModel) -> Unit) {
+    if (promotions.isEmpty()) return
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp)
+    ) {
+        LazyRow(
+            modifier = Modifier.fillMaxWidth(),
+            contentPadding = PaddingValues(horizontal = 16.dp),
+            horizontalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            items(promotions) { product ->
+                Card(
+                    shape = RoundedCornerShape(16.dp),
+                    colors = CardDefaults.cardColors(containerColor = Color.Transparent),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .width(340.dp) // Ancho grande para que ocupe casi toda la pantalla visible por tarjeta
+                        .height(150.dp), // Altura ideal para un banner de imagen completa
+                    onClick = { onProductClick(product) }
+                ) {
+                    Box(modifier = Modifier.fillMaxSize()) {
+                        UiTayUrlImage(
+                            url = product.urlImg, 
+                            drawable = R.drawable.peperoni
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
 

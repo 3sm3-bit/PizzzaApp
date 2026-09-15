@@ -12,6 +12,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.pizzza.pizzzaapp.feature.home.ExtraProductCard
 import com.pizzza.pizzzaapp.feature.home.FilterChipSurface
+import com.pizzza.pizzzaapp.feature.home.PromotionsBanner
 import com.pizzza.pizzzaapp.feature.home.HomeViewModel
 import com.pizzza.pizzzaapp.core.ui.singleton.LocalAppDataOrder
 
@@ -24,7 +25,12 @@ fun ScreenExtra(
     var selectedCategory by remember { mutableStateOf("TODOS") }
     val categories = listOf("TODOS", "EXTRAS", "BEBIDAS")
 
-    Column(modifier = Modifier.fillMaxSize().padding(top = 8.dp)) {
+    Column(modifier = Modifier.fillMaxSize()) {
+        PromotionsBanner(promotions = uiState.promotionsProducts) { product ->
+            viewModel.selectProduct(product)
+            onNavigateToDetail()
+        }
+
         LazyRow(
             modifier = Modifier
                 .fillMaxWidth()
