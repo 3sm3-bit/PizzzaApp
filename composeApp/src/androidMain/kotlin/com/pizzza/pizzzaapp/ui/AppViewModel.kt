@@ -19,6 +19,13 @@ class AppViewModel(
                 io {
                     val data  = dataUseCase.getProducts()
                     val branch  = dataUseCase.getBranch()
+                    
+                    // Lógica para pre-seleccionar el branchId por defecto
+                    val defaultBranchId = when {
+                        branch.isEmpty() -> "1"
+                        else -> branch.first().identifier
+                    }
+
                     appDataOrder.update { state ->
                         state.copy(
                             products = data,
@@ -26,7 +33,8 @@ class AppViewModel(
                             extraProducts = data.filter { product -> product.type == "2" || product.type == "3" },
                             promotionsProducts = data.filter { product -> product.type == "4" },
                             deliveryProducts = data.filter { product -> product.type == "5" },
-                            branches = branch
+                            branches = branch,
+                            branchId = defaultBranchId
                         )
                     }
 

@@ -31,6 +31,10 @@ class CartViewModel(
         appDataOrder.update { it.copy(initialTab = index) }
     }
 
+    fun selectBranch(branchId: String) {
+        appDataOrder.update { it.copy(branchId = branchId) }
+    }
+
     fun setReceptionMode(mode: String, defaultDeliveryProduct: ProductModel?) {
         appDataOrder.update { 
             it.copy(
@@ -107,7 +111,6 @@ class CartViewModel(
 
                 io {
                     val user = dataUseCase.getUserLocal()
-                    val idOrder = UUID.randomUUID().toString()
 
                     val orderRequest = state.cart.map { item ->
                         val isDelivery = state.receptionMode == "DELIVERY"
@@ -134,7 +137,8 @@ class CartViewModel(
                             reception = state.receptionMode,
                             priceDelivery = deliveryPrice,
                             priceChosse = item.product.priceChosse,
-                            idOrden = idOrder,
+                            idOrden = "",
+                            branchId = state.branchId,
                             userId = user?.uid ?: "",
                             latitude = if (isDelivery) state.latitude else "0",
                             longitude = if (isDelivery) state.longitude else "0",

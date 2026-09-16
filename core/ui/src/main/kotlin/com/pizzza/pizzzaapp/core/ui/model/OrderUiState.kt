@@ -21,5 +21,6 @@ data class OrderUiState(
     val latitude: String = "",
     val longitude: String = "",
     val initialTab: Int = 0,
+    val branchId: String = "1",
     val ordersLoaded: Boolean = false
 )

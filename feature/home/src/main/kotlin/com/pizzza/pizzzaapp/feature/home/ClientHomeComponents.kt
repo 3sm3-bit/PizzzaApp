@@ -1,5 +1,6 @@
 package com.pizzza.pizzzaapp.feature.home
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -207,6 +208,7 @@ fun ExtraProductCard(product: ProductModel, onClick: () -> Unit) {
     }
 }
 
+@SuppressLint("ConfigurationScreenWidthHeight")
 @OptIn(androidx.compose.foundation.ExperimentalFoundationApi::class)
 @Composable
 fun PromotionsBanner(promotions: List<ProductModel>, onProductClick: (ProductModel) -> Unit) {
@@ -230,13 +232,11 @@ fun PromotionsBanner(promotions: List<ProductModel>, onProductClick: (ProductMod
             state = lazyListState,
             modifier = Modifier.fillMaxWidth(),
             contentPadding = PaddingValues(horizontal = horizontalPadding),
-            horizontalArrangement = Arrangement.spacedBy((-18).dp), // Incrementamos el valor negativo para juntarlos físicamente más
+            horizontalArrangement = Arrangement.spacedBy((-18).dp),
             flingBehavior = androidx.compose.foundation.gestures.snapping.rememberSnapFlingBehavior(lazyListState = lazyListState)
         ) {
             items(promotions.size) { index ->
                 val product = promotions[index]
-                
-                // Calculamos el escalado dinámico basado en la posición visible
                 val scale by remember {
                     derivedStateOf {
                         val layoutInfo = lazyListState.layoutInfo
@@ -261,7 +261,7 @@ fun PromotionsBanner(promotions: List<ProductModel>, onProductClick: (ProductMod
                     elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
                     modifier = Modifier
                         .width(cardWidth)
-                        .height(150.dp)
+                        .height(120.dp)
                         .graphicsLayer {
                             scaleX = scale
                             scaleY = scale
@@ -271,8 +271,7 @@ fun PromotionsBanner(promotions: List<ProductModel>, onProductClick: (ProductMod
                 ) {
                     Box(modifier = Modifier.fillMaxSize()) {
                         UiTayUrlImage(
-                            url = product.urlImg, 
-                            drawable = R.drawable.peperoni
+                            url = product.urlImg
                         )
                     }
                 }

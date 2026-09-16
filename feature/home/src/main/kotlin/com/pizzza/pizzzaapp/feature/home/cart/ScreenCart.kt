@@ -3,6 +3,7 @@ package com.pizzza.pizzzaapp.feature.home.cart
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -22,7 +23,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.pizzza.pizzzaapp.feature.cart.CartViewModel
 import com.pizzza.pizzzaapp.feature.cart.CartItemCard
 import com.pizzza.pizzzaapp.core.ui.singleton.LocalAppDataOrder
-import com.pizzza.pizzzaapp.feature.orders.OrdersViewModel
 import com.valu.uitaycompose.utils.*
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -34,8 +34,6 @@ fun ScreenCart(
 ) {
     val cartViewModel: CartViewModel = koinViewModel()
     val uiState by LocalAppDataOrder.current.state.collectAsStateWithLifecycle()
-    // val storeState by homeViewModel.homeUiState.collectAsStateWithLifecycle() // No longer needed as uiState is global
-
     val isButtonEnabled = if (uiState.receptionMode == "RECOJO") {
         uiState.cart.isNotEmpty()
     } else {
@@ -127,9 +125,37 @@ fun ScreenCart(
                                     }
                                 }
                             }
-                            Spacer(Modifier.height(16.dp))
-                            HorizontalDivider(color = Color(0xFFDDDFE2), thickness = 1.dp)
-                            Spacer(Modifier.height(8.dp))
+                            if (uiState.branches.size >= 2) {
+                                Spacer(Modifier.height(16.dp))
+                                Text("Elije sucursal", style = textB16, color = Color.Black)
+                                Spacer(Modifier.height(8.dp))
+                                
+                                LazyRow(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    contentPadding = PaddingValues(vertical = 4.dp),
+                                    horizontalArrangement = Arrangement.spacedBy(10.dp)
+                                ) {
+                                    items(uiState.branches.size) { index ->
+                                        val branch = uiState.branches[index]
+                                        val isBranchSelected = uiState.branchId == branch.identifier
+                                        Surface(
+                                            onClick = { cartViewModel.selectBranch(branch.identifier) },
+                                            modifier = Modifier.widthIn(min = 100.dp).height(32.dp),
+                                            shape = RoundedCornerShape(10.dp),
+                                            color = if (isBranchSelected) tay_green_600 else Color.White,
+                                            border = if (!isBranchSelected) BorderStroke(1.dp, tay_green_600) else null
+                                        ) {
+                                            Box(contentAlignment = Alignment.Center, modifier = Modifier.padding(horizontal = 12.dp)) {
+                                                Text(
+                                                    text = branch.nameBranch, 
+                                                    style = textB10, 
+                                                    color = if (isBranchSelected) Color.White else tay_green_600
+                                                )
+                                            }
+                                        }
+                                    }
+                                }
+                            }
                         }
                     }
 
