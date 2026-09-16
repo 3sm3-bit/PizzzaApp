@@ -23,6 +23,7 @@ import com.pizzza.pizzzaapp.core.ui.R
 import com.pizzza.pizzzaapp.model.ProductModel
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.ui.graphics.graphicsLayer
 import com.valu.uitaycompose.swipe.UiTayUrlImage
 import com.valu.uitaycompose.utils.*
 import java.util.Locale
@@ -139,14 +140,13 @@ fun ExtraProductCard(product: ProductModel, onClick: () -> Unit) {
         elevation = CardDefaults.cardElevation(defaultElevation = 20.dp),
         modifier = Modifier
             .fillMaxWidth()
-            .height(190.dp),
+            .height(160.dp),
         onClick = onClick
     ) {
         Column(
             modifier = Modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Imagen en la parte superior
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -164,10 +164,9 @@ fun ExtraProductCard(product: ProductModel, onClick: () -> Unit) {
                 verticalArrangement = Arrangement.SpaceBetween,
                 horizontalAlignment = Alignment.Start
             ) {
-                // Nombre del producto
                 Text(
                     text = product.nameProduct,
-                    style = textB14,
+                    style = textB12,
                     color = Color.Black,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
@@ -182,7 +181,7 @@ fun ExtraProductCard(product: ProductModel, onClick: () -> Unit) {
                 ) {
                     Text(
                         text = "${product.currencySymbol}${product.price}",
-                        style = textB16,
+                        style = textB14,
                         color = tay_green_600,
                     )
 
@@ -208,9 +207,19 @@ fun ExtraProductCard(product: ProductModel, onClick: () -> Unit) {
     }
 }
 
+@OptIn(androidx.compose.foundation.ExperimentalFoundationApi::class)
 @Composable
 fun PromotionsBanner(promotions: List<ProductModel>, onProductClick: (ProductModel) -> Unit) {
     if (promotions.isEmpty()) return
+
+    val configuration = androidx.compose.ui.platform.LocalConfiguration.current
+    val screenWidth = configuration.screenWidthDp.dp
+    
+    val isMultiple = promotions.size > 1
+    val cardWidth = if (isMultiple) screenWidth - 64.dp else screenWidth - 32.dp
+    val horizontalPadding = 16.dp
+
+    val lazyListState = androidx.compose.foundation.lazy.rememberLazyListState()
 
     Column(
         modifier = Modifier
@@ -218,19 +227,46 @@ fun PromotionsBanner(promotions: List<ProductModel>, onProductClick: (ProductMod
             .padding(vertical = 8.dp)
     ) {
         LazyRow(
+            state = lazyListState,
             modifier = Modifier.fillMaxWidth(),
-            contentPadding = PaddingValues(horizontal = 16.dp),
-            horizontalArrangement = Arrangement.spacedBy(16.dp)
+            contentPadding = PaddingValues(horizontal = horizontalPadding),
+            horizontalArrangement = Arrangement.spacedBy((-18).dp), // Incrementamos el valor negativo para juntarlos físicamente más
+            flingBehavior = androidx.compose.foundation.gestures.snapping.rememberSnapFlingBehavior(lazyListState = lazyListState)
         ) {
-            items(promotions) { product ->
+            items(promotions.size) { index ->
+                val product = promotions[index]
+                
+                // Calculamos el escalado dinámico basado en la posición visible
+                val scale by remember {
+                    derivedStateOf {
+                        val layoutInfo = lazyListState.layoutInfo
+                        val visibleItems = layoutInfo.visibleItemsInfo
+                        val itemInfo = visibleItems.find { it.index == index }
+                        
+                        if (itemInfo != null) {
+                            val center = layoutInfo.viewportEndOffset / 2f
+                            val itemCenter = itemInfo.offset + (itemInfo.size / 2f)
+                            val distanceFromCenter = kotlin.math.abs(center - itemCenter)
+                            val scale = 1f - (distanceFromCenter / layoutInfo.viewportEndOffset).coerceIn(0f, 0.15f)
+                            scale
+                        } else {
+                            0.85f
+                        }
+                    }
+                }
+
                 Card(
                     shape = RoundedCornerShape(16.dp),
                     colors = CardDefaults.cardColors(containerColor = Color.Transparent),
                     elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .width(340.dp) // Ancho grande para que ocupe casi toda la pantalla visible por tarjeta
-                        .height(150.dp), // Altura ideal para un banner de imagen completa
+                        .width(cardWidth)
+                        .height(150.dp)
+                        .graphicsLayer {
+                            scaleX = scale
+                            scaleY = scale
+                            alpha = scale.coerceIn(0.7f, 1f)
+                        },
                     onClick = { onProductClick(product) }
                 ) {
                     Box(modifier = Modifier.fillMaxSize()) {
@@ -253,7 +289,7 @@ fun PizzaGridCard(product: ProductModel, onClick: () -> Unit) {
         elevation = CardDefaults.cardElevation(defaultElevation = 12.dp),
         modifier = Modifier
             .fillMaxWidth()
-            .height(200.dp),
+            .height(180.dp),
         onClick = onClick
     ) {
         Column(modifier = Modifier.fillMaxSize()) {
@@ -280,16 +316,16 @@ fun PizzaGridCard(product: ProductModel, onClick: () -> Unit) {
                 ) {
                     Text(
                         text = product.nameProduct,
-                        style = textB14,
+                        style = textB12,
                         color = Color.Black,
                         maxLines = 2,
                         overflow = TextOverflow.Ellipsis
                     )
                     Text(
                         text = product.description,
-                        style = textSe10,
+                        style = textSe8,
                         color = Color.Gray,
-                        maxLines = 3,
+                        maxLines = 2,
                         overflow = TextOverflow.Ellipsis
                     )
                 }
@@ -301,7 +337,7 @@ fun PizzaGridCard(product: ProductModel, onClick: () -> Unit) {
                 ) {
                     Text(
                         text = "${product.currencySymbol}${product.price}",
-                        style = textB14,
+                        style = textB12,
                         color = tay_green_600,
                     )
 
@@ -310,7 +346,7 @@ fun PizzaGridCard(product: ProductModel, onClick: () -> Unit) {
                         color = Color.White,
                         shape = RoundedCornerShape(10.dp),
                         border = BorderStroke(1.dp, tay_green_600),
-                        modifier = Modifier.size(26.dp)
+                        modifier = Modifier.size(20.dp)
                     ) {
                         Box(contentAlignment = Alignment.Center) {
                             Icon(

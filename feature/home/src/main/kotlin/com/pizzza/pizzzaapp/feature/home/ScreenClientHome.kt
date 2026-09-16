@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Assignment
@@ -202,10 +203,10 @@ fun ScreenClientHome(
                     if (selectedTab == 0 || selectedTab == 1) {
                         IconButton(
                             onClick = { selectedTab = 2 },
-                            modifier = Modifier.padding(end = 4.dp) // Damos espacio horizontal para que no se pegue al borde y no recorte el Badge
+                            modifier = Modifier.size(32.dp) // Compacta la caja de toque invisible para juntar los íconos
                         ) {
                             BadgedBox(
-                                modifier = Modifier.padding(end = 4.dp, top = 4.dp), // Empuja ligeramente el Badge hacia adentro del contenedor seguro
+                                modifier = Modifier.padding(end = 2.dp, top = 2.dp), // Ajustado al nuevo tamaño compacto
                                 badge = {
                                     if (cartState.cart.isNotEmpty()) {
                                         Badge(containerColor = tay_green_600) {
@@ -229,7 +230,10 @@ fun ScreenClientHome(
                     }
 
                     if (selectedTab == 3) {
-                        IconButton(onClick = { ordersViewModel.getGeneralOrderList(forceLoading = true) }) {
+                        IconButton(
+                            onClick = { ordersViewModel.getGeneralOrderList(forceLoading = true) },
+                            modifier = Modifier.size(32.dp)
+                        ) {
                             Icon(
                                 imageVector = Icons.Default.Refresh,
                                 contentDescription = "Refrescar",
@@ -238,7 +242,11 @@ fun ScreenClientHome(
                             )
                         }
                     } else {
-                        IconButton(onClick = { showLogoutDialog = true }) {
+                        Spacer(Modifier.width(2.dp))
+                        IconButton(
+                            onClick = { showLogoutDialog = true },
+                            modifier = Modifier.size(32.dp)
+                        ) {
                             Icon(
                                 imageVector = Icons.AutoMirrored.Filled.Logout,
                                 contentDescription = "Cerrar Sesión",
