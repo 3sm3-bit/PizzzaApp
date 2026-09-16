@@ -35,7 +35,7 @@ fun FilterChipSurface(text: String, isSelected: Boolean, onClick: () -> Unit) {
         shape = RoundedCornerShape(12.dp),
         border = if (!isSelected) BorderStroke(1.dp, tay_red_600) else null,
         modifier = Modifier
-            .height(35.dp)
+            .height(30.dp)
             .widthIn(min = 100.dp),
         shadowElevation = if (isSelected) 4.dp else 0.dp,
     ) {
@@ -43,7 +43,7 @@ fun FilterChipSurface(text: String, isSelected: Boolean, onClick: () -> Unit) {
             Text(
                 text = text,
                 color = if (isSelected) Color.White else tay_red_400,
-                style = textS12
+                style = textB10
             )
         }
     }
@@ -238,6 +238,88 @@ fun PromotionsBanner(promotions: List<ProductModel>, onProductClick: (ProductMod
                             url = product.urlImg, 
                             drawable = R.drawable.peperoni
                         )
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun PizzaGridCard(product: ProductModel, onClick: () -> Unit) {
+    Card(
+        shape = RoundedCornerShape(20.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.White),
+        elevation = CardDefaults.cardElevation(defaultElevation = 12.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(200.dp),
+        onClick = onClick
+    ) {
+        Column(modifier = Modifier.fillMaxSize()) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(110.dp)
+            ) {
+                UiTayUrlImage(
+                    url = product.urlImg, drawable = R.drawable.peperoni
+                )
+            }
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f)
+                    .padding(12.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Column(
+                    modifier = Modifier.weight(1f),
+                    verticalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    Text(
+                        text = product.nameProduct,
+                        style = textB14,
+                        color = Color.Black,
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                    Text(
+                        text = product.description,
+                        style = textSe10,
+                        color = Color.Gray,
+                        maxLines = 3,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
+
+                Column(
+                    horizontalAlignment = Alignment.End,
+                    modifier = Modifier.fillMaxHeight(),
+                    verticalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(
+                        text = "${product.currencySymbol}${product.price}",
+                        style = textB14,
+                        color = tay_green_600,
+                    )
+
+                    Surface(
+                        onClick = onClick,
+                        color = Color.White,
+                        shape = RoundedCornerShape(10.dp),
+                        border = BorderStroke(1.dp, tay_green_600),
+                        modifier = Modifier.size(26.dp)
+                    ) {
+                        Box(contentAlignment = Alignment.Center) {
+                            Icon(
+                                Icons.Default.Add,
+                                contentDescription = null,
+                                tint = tay_green_600,
+                                modifier = Modifier.size(16.dp)
+                            )
+                        }
                     }
                 }
             }

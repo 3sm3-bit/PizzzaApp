@@ -80,7 +80,7 @@ struct PizzaView: View {
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(Color.white.ignoresSafeArea())
+        .background(Color.uiTayGrey100.ignoresSafeArea())
         .uiTayHideToolbar()
         .uiTayNavigate(
             item: self.product,

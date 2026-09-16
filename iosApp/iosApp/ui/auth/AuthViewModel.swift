@@ -34,7 +34,7 @@ class AuthViewModel: BaseViewModel {
             await self.execute(){
                 let request = LoginRequest(nameUser: self.userLolin, password: self.passLogin)
                 let response = try await self.dataUseCase.login(data: request)
-                let entity = UserEntity(
+                let entity = UserModel(
                         uid: response.userValid.uid ?? "",
                         nameUser: response.userValid.nameUser ?? "",
                         names: response.userValid.names ?? "",

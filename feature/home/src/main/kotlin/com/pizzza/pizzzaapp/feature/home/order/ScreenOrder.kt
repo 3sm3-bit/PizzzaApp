@@ -32,6 +32,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.pizzza.pizzzaapp.feature.orders.OrdersViewModel
 import com.pizzza.pizzzaapp.model.ParentOrderModel
 import com.pizzza.pizzzaapp.core.ui.singleton.LocalAppDataOrder
+import com.pizzza.pizzzaapp.feature.cart.CartViewModel
 import com.valu.uitaycompose.utils.tay_green_600
 import com.valu.uitaycompose.utils.tay_red_600
 import com.valu.uitaycompose.utils.textB12
@@ -39,12 +40,13 @@ import com.valu.uitaycompose.utils.textB16
 import com.valu.uitaycompose.utils.textB18
 import com.valu.uitaycompose.utils.textM10
 import com.valu.uitaycompose.utils.textM12
+import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun ScreenOrder(
-    viewModel: OrdersViewModel,
     onNavigateToMonitor: () -> Unit
 ) {
+    val viewModel: OrdersViewModel = koinViewModel()
     val uiState by LocalAppDataOrder.current.state.collectAsStateWithLifecycle()
 
     // Carga inicial solo si no se ha cargado antes

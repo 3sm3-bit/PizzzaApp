@@ -23,6 +23,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.pizzza.pizzzaapp.core.navigation.ScreenInitNav
 import com.pizzza.pizzzaapp.core.ui.R
 import com.pizzza.pizzzaapp.feature.auth.AuthViewModel
 import com.valu.uitaycompose.button.UiTayButton
@@ -38,10 +39,9 @@ import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun LoginScreen(
-    viewModel: AuthViewModel = koinViewModel(),
-    onNavigateToClientHome: () -> Unit,
-    onNavigateToRegister: () -> Unit
+    onNavigateTo: (ScreenInitNav) -> Unit,
 ) {
+    val  viewModel: AuthViewModel = koinViewModel()
     val uiState by viewModel.authUiState.collectAsStateWithLifecycle()
     val isButtonEnabled = uiState.user.length > 2 && uiState.pass.length > 2
 
@@ -105,7 +105,7 @@ fun LoginScreen(
                 uiTayEnable = isButtonEnabled,
                 uiTayClick = {
                     viewModel.login {
-                        onNavigateToClientHome()
+                        onNavigateTo(ScreenInitNav.ClientHome)
                     }
                 },
                 uiTayBtnModifier = UiTayButtonModel(
@@ -122,7 +122,7 @@ fun LoginScreen(
                 text = "registrate ahora",
                 style = textB14.copy(textDecoration = TextDecoration.Underline),
                 color = tay_green_600,
-                modifier = Modifier.clickable { onNavigateToRegister() }
+                modifier = Modifier.clickable {  onNavigateTo(ScreenInitNav.Register) }
             )
 
             Spacer(modifier = Modifier.weight(1f))

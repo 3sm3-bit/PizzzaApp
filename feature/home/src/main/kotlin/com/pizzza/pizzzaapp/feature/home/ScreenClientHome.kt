@@ -54,8 +54,8 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.pizzza.pizzzaapp.core.navigation.ScreenInitNav
 import com.pizzza.pizzzaapp.core.ui.R
-import com.pizzza.pizzzaapp.feature.home.HomeViewModel
 import com.pizzza.pizzzaapp.feature.orders.OrdersViewModel
 import com.pizzza.pizzzaapp.feature.cart.CartViewModel
 import com.pizzza.pizzzaapp.feature.home.cart.ScreenCart
@@ -75,16 +75,12 @@ data class NavItemData(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ScreenClientHome(
-    homeViewModel: HomeViewModel = koinViewModel(),
-    ordersViewModel: OrdersViewModel = koinViewModel(),
-    cartViewModel: CartViewModel = koinViewModel(),
-    authViewModel: AuthViewModel = koinViewModel(),
-    onNavigateToSummary: () -> Unit,
-    onNavigateToAddressSelection: () -> Unit,
-    onNavigateToDetail: () -> Unit,
-    onNavigateToMonitor: () -> Unit,
-    onLogout: () -> Unit
+    onNavigateTo: (ScreenInitNav) -> Unit
 ) {
+
+    val ordersViewModel: OrdersViewModel = koinViewModel()
+    val cartViewModel: CartViewModel = koinViewModel()
+    val authViewModel: AuthViewModel = koinViewModel()
     val cartState by cartViewModel.cartUiState.collectAsStateWithLifecycle()
     var selectedTab by rememberSaveable { mutableIntStateOf(cartState.initialTab) }
     var showLogoutDialog by remember { mutableStateOf(false) }
@@ -102,10 +98,6 @@ fun ScreenClientHome(
         NavItemData(2, "Cart", Icons.Default.ShoppingCart),
         NavItemData(3, "Orden", Icons.AutoMirrored.Filled.Assignment)
     )
-
-    LaunchedEffect(Unit) {
-        homeViewModel.getProductsList()
-    }
 
     Scaffold(
         containerColor = Color.White,
@@ -185,7 +177,7 @@ fun ScreenClientHome(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 16.dp, start = 16.dp, end = 8.dp),
+                    .padding(top = 8.dp, start = 8.dp, end = 8.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -194,20 +186,26 @@ fun ScreenClientHome(
                         modifier = Modifier
                             .padding(start = 8.dp),
                         text = "Bienvenido a la",
-                        style = textSe16,
+                        style = textSe14,
                         color = tay_red_600
                     )
                     Image(painter = painterResource(R.drawable.ic_logo_pizzzeria),
                         contentDescription = "logo_ic",
                         contentScale = ContentScale.FillBounds,
                         alignment = Alignment.CenterStart,
-                        modifier = Modifier.width(150.dp).height(50.dp))
+                        modifier = Modifier
+                            .width(120.dp)
+                            .height(40.dp))
                 }
 
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     if (selectedTab == 0 || selectedTab == 1) {
-                        IconButton(onClick = { selectedTab = 2 }) {
+                        IconButton(
+                            onClick = { selectedTab = 2 },
+                            modifier = Modifier.padding(end = 4.dp) // Damos espacio horizontal para que no se pegue al borde y no recorte el Badge
+                        ) {
                             BadgedBox(
+                                modifier = Modifier.padding(end = 4.dp, top = 4.dp), // Empuja ligeramente el Badge hacia adentro del contenedor seguro
                                 badge = {
                                     if (cartState.cart.isNotEmpty()) {
                                         Badge(containerColor = tay_green_600) {
@@ -221,7 +219,7 @@ fun ScreenClientHome(
                                     Icons.Default.ShoppingCart,
                                     contentDescription = "Carrito",
                                     modifier = Modifier
-                                        .size(28.dp)
+                                        .size(24.dp)
                                         .graphicsLayer {
                                             colorFilter = ColorFilter.tint(tay_red_400)
                                         }
@@ -236,7 +234,7 @@ fun ScreenClientHome(
                                 imageVector = Icons.Default.Refresh,
                                 contentDescription = "Refrescar",
                                 tint = tay_red_400,
-                                modifier = Modifier.size(28.dp)
+                                modifier = Modifier.size(24.dp)
                             )
                         }
                     } else {
@@ -245,7 +243,7 @@ fun ScreenClientHome(
                                 imageVector = Icons.AutoMirrored.Filled.Logout,
                                 contentDescription = "Cerrar Sesión",
                                 tint = tay_red_400,
-                                modifier = Modifier.size(28.dp)
+                                modifier = Modifier.size(24.dp)
                             )
                         }
                     }
@@ -265,7 +263,7 @@ fun ScreenClientHome(
                                 ordersViewModel.resetOrderState()
                                 cartViewModel.resetState()
                                 authViewModel.logout {
-                                    onLogout()
+                                    onNavigateTo(ScreenInitNav.Login)
                                 }
                             },
                             colors = ButtonDefaults.buttonColors(containerColor = tay_red_600)
@@ -284,17 +282,14 @@ fun ScreenClientHome(
             }
 
             when (selectedTab) {
-                0 -> ScreenPizza(homeViewModel, onNavigateToDetail)
-                1 -> ScreenExtra(homeViewModel, onNavigateToDetail)
+                0 -> ScreenPizza({ onNavigateTo(ScreenInitNav.OrderDetail) })
+                1 -> ScreenExtra({ onNavigateTo(ScreenInitNav.OrderDetail) })
                 2 -> ScreenCart(
-                    cartViewModel, 
-                    homeViewModel, 
-                    onNavigateToAddressSelection = onNavigateToAddressSelection,
-                    onNavigateToSummary = onNavigateToSummary
+                    onNavigateToAddressSelection = { onNavigateTo(ScreenInitNav.AddressSelection) },
+                    onNavigateToSummary = { onNavigateTo(ScreenInitNav.OrderSummary) }
                 )
                 3 -> ScreenOrder(
-                    viewModel = ordersViewModel,
-                    onNavigateToMonitor = onNavigateToMonitor
+                    onNavigateToMonitor = { onNavigateTo(ScreenInitNav.Monitor) }
                 )
             }
         }

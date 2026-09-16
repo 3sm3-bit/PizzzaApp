@@ -13,14 +13,15 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.pizzza.pizzzaapp.feature.home.ExtraProductCard
 import com.pizzza.pizzzaapp.feature.home.FilterChipSurface
 import com.pizzza.pizzzaapp.feature.home.PromotionsBanner
-import com.pizzza.pizzzaapp.feature.home.HomeViewModel
 import com.pizzza.pizzzaapp.core.ui.singleton.LocalAppDataOrder
+import com.pizzza.pizzzaapp.feature.orders.OrdersViewModel
+import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun ScreenExtra(
-    viewModel: HomeViewModel,
     onNavigateToDetail: () -> Unit,
 ) {
+    val viewModel: OrdersViewModel = koinViewModel()
     val uiState by LocalAppDataOrder.current.state.collectAsStateWithLifecycle()
     var selectedCategory by remember { mutableStateOf("TODOS") }
     val categories = listOf("TODOS", "EXTRAS", "BEBIDAS")

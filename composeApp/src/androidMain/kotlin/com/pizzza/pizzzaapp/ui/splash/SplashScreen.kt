@@ -13,9 +13,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -26,32 +23,28 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import com.pizzza.pizzzaapp.core.navigation.ScreenInitNav
 import com.pizzza.pizzzaapp.core.ui.R
-import com.pizzza.pizzzaapp.ui.AppViewModel
 import com.pizzza.pizzzaapp.feature.auth.AuthViewModel
-import com.valu.uitaycompose.swipe.UiTayGif
+import com.pizzza.pizzzaapp.ui.AppViewModel
 import com.valu.uitaycompose.utils.tay_red_600
-import com.valu.uitaycompose.utils.textGabbiB28
-import org.koin.compose.viewmodel.koinViewModel
 import com.valu.uitaycompose.utils.textGabbiB35
 import com.valu.uitaycompose.utils.textSe16
 import kotlinx.coroutines.delay
+import org.koin.compose.viewmodel.koinViewModel
 import kotlin.time.Duration.Companion.milliseconds
 
 @Composable
 fun SplashScreen(
-    viewModel: AppViewModel = koinViewModel(),
-    authViewModel: AuthViewModel = koinViewModel(),
-    onFinished: (Boolean) -> Unit
+    onNavigateTo: (ScreenInitNav) -> Unit
 ) {
+
+    val  viewModel: AppViewModel = koinViewModel()
+    val  authViewModel: AuthViewModel = koinViewModel()
     var error by remember { mutableStateOf<String?>(null) }
     val scale = remember { Animatable(0.6f) }
 
@@ -69,7 +62,8 @@ fun SplashScreen(
             onComplete = { success ->
                 if (success) {
                     authViewModel.checkExistingUser { role ->
-                        onFinished(role?.equals("CLIENTE", ignoreCase = true) == true || role?.equals("ADMIN", ignoreCase = true) == true)
+                        val flag = role?.equals("CLIENTE", ignoreCase = true) == true || role?.equals("ADMIN", ignoreCase = true) == true
+                        onNavigateTo(if(flag) ScreenInitNav.ClientHome else  ScreenInitNav.Login)
                     }
                 } else {
                     error = "Error al conectar con el servidor. Revisa tu conexión."
@@ -99,48 +93,18 @@ fun SplashScreen(
             )
             
             Spacer(Modifier.height(40.dp))
-
-            if (error == null) {
-                CircularProgressIndicator(
+            CircularProgressIndicator(
                     color = tay_red_600,
                     strokeWidth = 3.dp,
                     modifier = Modifier.size(36.dp)
                 )
-                Text(
+            Text(
                     text = "Cargando menú delicioso...",
                     style = textSe16,
                     color = Color.Black.copy(alpha = 0.7f),
                     modifier = Modifier.padding(top = 16.dp)
-                )
-            } else {
-                Text(
-                    text = error!!,
-                    color = Color.Black,
-                    modifier = Modifier.padding(horizontal = 40.dp),
-                    textAlign = TextAlign.Center
-                )
-                Spacer(Modifier.height(24.dp))
-                Button(
-                    onClick = {
-                        error = null
-                        viewModel.syncProducts(onComplete = { success ->
-                            if (success) {
-                                authViewModel.checkExistingUser { role ->
-                                    onFinished(role?.equals("CLIENTE", ignoreCase = true) == true || role?.equals("ADMIN", ignoreCase = true) == true)
-                                }
-                            }
-                            else error = "Reintento fallido. Verifica tu red."
-                        })
-                    },
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color.White, 
-                        contentColor = Color.Black
-                    ),
-                    shape = RoundedCornerShape(12.dp)
-                ) {
-                    Text("Reintentar", fontWeight = FontWeight.Bold)
-                }
-            }
+            )
+
         }
     }
 }

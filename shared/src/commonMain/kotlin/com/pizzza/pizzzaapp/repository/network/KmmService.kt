@@ -78,4 +78,9 @@ class KmmService(private val client: HttpClient) {
             setBody(request)
         }.body()
     }
+
+    suspend fun getBranches(): List<BranchResponse> {
+        return client.get("${BASE_URL}/pizzzeria/branch").body()
+    }
+
 }

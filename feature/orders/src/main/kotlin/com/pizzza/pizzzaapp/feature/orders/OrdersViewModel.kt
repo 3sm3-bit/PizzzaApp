@@ -16,10 +16,8 @@ import kotlinx.coroutines.flow.StateFlow
 class OrdersViewModel(
     private val dataUseCase: DataUseCase,
     private val globalUiStateManager: GlobalUiStateManager,
-    private val appDataOrder: AppDataOrder,
-    ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
-    defaultDispatcher: CoroutineDispatcher = Dispatchers.Default
-) : BaseViewModel(ioDispatcher, defaultDispatcher) {
+    private val appDataOrder: AppDataOrder
+) : BaseViewModel() {
 
     val orderUiState: StateFlow<OrderUiState> = appDataOrder.state
 

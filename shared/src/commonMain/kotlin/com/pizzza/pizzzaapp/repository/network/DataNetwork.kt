@@ -1,7 +1,10 @@
 package com.pizzza.pizzzaapp.repository.network
 
+import com.pizzza.pizzzaapp.model.BranchModel
 import com.pizzza.pizzzaapp.model.ParentOrderModel
 import com.pizzza.pizzzaapp.model.ProductModel
+import com.pizzza.pizzzaapp.repository.network.model.LoginRequest
+import com.pizzza.pizzzaapp.repository.network.model.LoginResponse
 import com.pizzza.pizzzaapp.repository.network.model.OrderResponse
 import com.pizzza.pizzzaapp.repository.network.model.UserResponse
 import com.pizzza.pizzzaapp.repository.network.model.loadParentOrder
@@ -41,7 +44,7 @@ class DataNetwork(
         apiService.registerUser(data)
     }
 
-    override suspend fun login(data: com.pizzza.pizzzaapp.repository.network.model.LoginRequest): com.pizzza.pizzzaapp.repository.network.model.LoginResponse = apiCall {
+    override suspend fun login(data: LoginRequest): LoginResponse = apiCall {
         apiService.login(data)
     }
 
@@ -58,5 +61,9 @@ class DataNetwork(
         )
         val response = apiService.createPaymentSession(request)
         return response.url ?: ""
+    }
+
+    override suspend fun getBranches(): List<BranchModel> = apiCall{
+        apiService.getBranches().toModelList()
     }
 }

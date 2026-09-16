@@ -1,6 +1,7 @@
 package com.pizzza.pizzzaapp.ui
 
 import com.pizzza.pizzzaapp.core.ui.base.BaseViewModel
+import com.pizzza.pizzzaapp.core.ui.singleton.AppDataOrder
 import com.pizzza.pizzzaapp.core.ui.singleton.GlobalUiStateManager
 import com.pizzza.pizzzaapp.usecases.DataUseCase
 import kotlinx.coroutines.CoroutineDispatcher
@@ -9,14 +10,27 @@ import kotlinx.coroutines.Dispatchers
 class AppViewModel(
     private val dataUseCase: DataUseCase,
     private val globalUiStateManager: GlobalUiStateManager,
-    ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
-    defaultDispatcher: CoroutineDispatcher = Dispatchers.Default
-) : BaseViewModel(ioDispatcher, defaultDispatcher) {
+    private val appDataOrder: AppDataOrder
+) : BaseViewModel() {
 
     fun syncProducts(onComplete: (Boolean) -> Unit = {}) {
         execute(loading = false, globalUiStateManager = globalUiStateManager) {
             try {
-                io { dataUseCase.syncProducts() }
+                io {
+                    val data  = dataUseCase.getProducts()
+                    val branch  = dataUseCase.getBranch()
+                    appDataOrder.update { state ->
+                        state.copy(
+                            products = data,
+                            pizzaProducts = data.filter { product -> product.type == "1" },
+                            extraProducts = data.filter { product -> product.type == "2" || product.type == "3" },
+                            promotionsProducts = data.filter { product -> product.type == "4" },
+                            deliveryProducts = data.filter { product -> product.type == "5" },
+                            branches = branch
+                        )
+                    }
+
+                }
                 onComplete(true)
             } catch (e: Exception) {
                 e.printStackTrace()

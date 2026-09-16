@@ -10,58 +10,51 @@ struct RegisterView: View {
     @Environment(\.dismiss) var dismiss
 
     var body: some View {
-        BaseViewGeneral(viewModel: viewModel){
+        BaseViewGeneral(viewModel: viewModel) {
             VStack(spacing: 0) {
                 
-                UiTayCToolBar(uiTayText: "Registrate"){_ in
-                    dismiss()
-                }
-            
-              
+                Image("ic_logo_pizzzeria")
+                    .resizable()
+                    .frame(width: 250, height: 100)
+                
                 ScrollView {
                     VStack(spacing: 8) {
                         Spacer().frame(height: 8)
-                        UiTayTextLayout(
-                                       value: $viewModel.nameUser,
-                                        hint: "Usuario",
-                                        uiTayChangeText :{validButton() }
-                                      
-                        )
-                        UiTayTextLayout(
-                                       value: $viewModel.names,
-                                        hint: "Nombres",
-                                        uiTayChangeText :{validButton() }
-                                      
-                        )
-                        UiTayTextLayout(
-                                       value: $viewModel.lastName,
-                                        hint: "Apellidos",
-                                        uiTayChangeText :{validButton() }
-                                      
-                        )
-                        UiTayTextLayout(
-                                       value: $viewModel.email,
-                                        hint: "Email",
-                                        uiTayChangeText :{validButton() }
-                                      
-                        )
-                     
-                        UiTayTextLayout(
-                                       value: $viewModel.phone,
-                                        hint: "Celular",
-                                        keyboardType : .numberPad,
-                                        uiTayChangeText :{validButton() }
-                                      
-                        )
                         
                         UiTayTextLayout(
-                                       value: $viewModel.pass,
-                                        hint: "Contraseña",
-                                        isPassword : true,
-                                        uiTayChangeText :{ validButton()}
+                            value: $viewModel.nameUser,
+                            hint: "Usuario",
+                            uiTayChangeText: { validButton() }
                         )
-                     
-                     
+                        UiTayTextLayout(
+                            value: $viewModel.names,
+                            hint: "Nombres",
+                            uiTayChangeText: { validButton() }
+                        )
+                        UiTayTextLayout(
+                            value: $viewModel.lastName,
+                            hint: "Apellidos",
+                            uiTayChangeText: { validButton() }
+                        )
+                        UiTayTextLayout(
+                            value: $viewModel.email,
+                            hint: "Email",
+                            uiTayChangeText: { validButton() }
+                        )
+                        UiTayTextLayout(
+                            value: $viewModel.phone,
+                            hint: "Celular",
+                            keyboardType: .numberPad,
+                            uiTayChangeText: { validButton() }
+                        )
+                        UiTayTextLayout(
+                            value: $viewModel.pass,
+                            hint: "Contraseña",
+                            isPassword: true,
+                            uiTayChangeText: { validButton() }
+                        )
+                        
+                    
                         VStack(alignment: .leading, spacing: 8) {
                             Text("Dirección")
                                 .font(PizzaFonts.medium14)
@@ -87,24 +80,31 @@ struct RegisterView: View {
                         .onTapGesture {
                             showAddressSelection = true
                         }
-                    
-                        Spacer()
-                        
-                        UITayButton(text: "Registrarse") {
-                            viewModel.register()
-                        }.disabled(!enableButton)
                         
                     }
                     .padding(.horizontal, 24)
                 }
+                
+                VStack {
+                    UITayButton(text: "Registrarse") {
+                        viewModel.register()
+                    }
+                    .disabled(!enableButton)
+                }
+                .padding(.horizontal, 24)
+                .padding(.top, 12)
+                .padding(.bottom, 8) // Espacio de resguardo para la barra inferior del iPhone
+                .background(Color.white) // Fondo opcional para que no se mezcle si el scroll pasa por detrás
             }
-        }.sheet(isPresented: $showAddressSelection) {
+        }
+        .sheet(isPresented: $showAddressSelection) {
             AddressSelectionView { address, lat, lng in
                 viewModel.address = address
                 viewModel.latitude = lat
                 viewModel.longitude = lng
             }
-        }.onChange(of: viewModel.isRegisterSuccessful) { oldValue, newValue in
+        }
+        .onChange(of: viewModel.isRegisterSuccessful) { oldValue, newValue in
             if newValue {
                 dismiss()
             }

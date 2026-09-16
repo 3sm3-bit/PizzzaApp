@@ -13,7 +13,8 @@ struct ExtraView: View {
     @ObservedObject var viewModel: HomeViewModel
     @State private var selectedCategory = "TODOS"
     var onLogout: () -> Void
-    
+    @State private var product   : ProductModel? = nil
+    @State   var destiny: ActionNav?
     let categories = ["TODOS", "EXTRAS", "BEBIDAS"]
     
     var filteredExtras: [ProductModel] {
@@ -76,17 +77,24 @@ struct ExtraView: View {
                     ForEach(filteredExtras, id: \.uid) { product in
                         ExtraProductCard(product: product)
                             .onTapGesture {
-                                // viewModel.selectProduct(product)
+                                self.product = product
+                                destiny = .uiNext
                         }
                     }
                
             } .padding(.horizontal)
         }
-    }.frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(Color.white.ignoresSafeArea())
+       }.frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(Color.uiTayGrey100.ignoresSafeArea())
         .uiTayHideToolbar()
+        .uiTayNavigate(
+            item: self.product,
+            to: { safeProduct in ProductDetailView(product: safeProduct) },
+            when: $destiny.cmToBool(.uiNext)
+        )
     
-}
+    
+   }
 }
 
 struct ExtraProductCard: View {

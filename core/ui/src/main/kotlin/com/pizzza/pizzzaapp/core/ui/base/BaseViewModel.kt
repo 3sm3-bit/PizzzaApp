@@ -4,7 +4,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.pizzza.pizzzaapp.core.ui.singleton.GlobalUiStateManager
 import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -13,10 +12,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-open class BaseViewModel(
-    private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
-    private val defaultDispatcher: CoroutineDispatcher = Dispatchers.Default,
-) : ViewModel() {
+open class BaseViewModel : ViewModel() {
 
     private val _uiStateBase = MutableStateFlow(BaseUiState())
     val uiStateBase: StateFlow<BaseUiState> = _uiStateBase.asStateFlow()
@@ -67,11 +63,11 @@ open class BaseViewModel(
         }
     }
 
-    protected suspend fun <T> io(block: suspend () -> T): T = withContext(ioDispatcher) {
+    protected suspend fun <T> io(block: suspend () -> T): T = withContext(Dispatchers.IO) {
         block()
     }
 
-    protected suspend fun <T> default(block: suspend () -> T): T = withContext(defaultDispatcher) {
+    protected suspend fun <T> default(block: suspend () -> T): T = withContext(Dispatchers.Default) {
         block()
     }
 }

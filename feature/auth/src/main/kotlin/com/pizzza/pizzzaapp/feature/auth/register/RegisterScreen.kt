@@ -22,6 +22,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.pizzza.pizzzaapp.core.navigation.ScreenInitNav
 import com.pizzza.pizzzaapp.core.ui.R
 import com.pizzza.pizzzaapp.feature.auth.AuthViewModel
 import com.valu.uitaycompose.button.UiTayButton
@@ -33,10 +34,9 @@ import com.valu.uitaycompose.utils.*
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RegisterScreen(
-    viewModel: AuthViewModel = koinViewModel(),
-    onNavigateToAddressSelection: () -> Unit,
-    onRegisterSuccess: () -> Unit
+    onNavigateTo: (ScreenInitNav) -> Unit
 ) {
+    val  viewModel: AuthViewModel = koinViewModel()
     val uiState by viewModel.authUiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
     val isEmailValid = Patterns.EMAIL_ADDRESS.matcher(uiState.email).matches()
@@ -184,7 +184,7 @@ fun RegisterScreen(
                 }
                 item {
                     Surface(
-                        onClick = onNavigateToAddressSelection,
+                        onClick = {onNavigateTo(ScreenInitNav.AddressSelection)},
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(42.dp),
@@ -198,7 +198,7 @@ fun RegisterScreen(
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
                             Text(
-                                text = if (uiState.address.isBlank()) "Selecciona dirección en el mapa" else uiState.address,
+                                text = uiState.address.ifBlank { "Selecciona dirección en el mapa" },
                                 style = textM12,
                                 color = if (uiState.address.isBlank()) Color.Gray else tay_red_600,
                                 maxLines = 1,
@@ -227,7 +227,7 @@ fun RegisterScreen(
                     uiTayClick = {
                         viewModel.register { _ ->
                             Toast.makeText(context, "Registro exitoso", Toast.LENGTH_LONG).show()
-                            onRegisterSuccess()
+                            onNavigateTo(ScreenInitNav.Login)
                         }
                     },
                     uiTayBtnModifier = UiTayButtonModel(

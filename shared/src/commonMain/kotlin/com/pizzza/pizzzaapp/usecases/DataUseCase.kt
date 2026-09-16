@@ -25,6 +25,12 @@ class DataUseCase(private val iDataNetwork: IDataNetwork, private val iDataDBNet
         return response
     }
 
+
+    @Throws(Exception::class)
+    suspend fun getProducts(): List<ProductModel> {
+        return iDataNetwork.syncProducts()
+    }
+
     @Throws(Exception::class)
     suspend fun getProductsLocal() = iDataDBNetwork.getProducts()
 
@@ -51,4 +57,7 @@ class DataUseCase(private val iDataNetwork: IDataNetwork, private val iDataDBNet
     @Throws(Exception::class)
     suspend fun createPaymentSession(amount: Double, email: String, orderId: String) =
         iDataNetwork.createPaymentSession(amount, email, orderId)
+
+    @Throws(Exception::class)
+    suspend fun getBranch() = iDataNetwork.getBranches()
 }

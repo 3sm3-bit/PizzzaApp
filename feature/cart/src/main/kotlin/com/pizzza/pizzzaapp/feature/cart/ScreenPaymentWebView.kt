@@ -70,8 +70,6 @@ fun ScreenPaymentWebView(
                                 request: WebResourceRequest?
                             ): Boolean {
                                 val newUrl = request?.url?.toString() ?: ""
-                                
-                                // Interceptamos tanto el Deep Link como la URL de la web de PizzzaApp
                                 if (newUrl.contains("pizzitas://payment/success") || newUrl.contains("pizzzaapp.com/success")) {
                                     onSuccess()
                                     return true

@@ -15,7 +15,6 @@ data class OrderUiState(
     val selectedOrder: ParentOrderModel? = null,
     val selectedProduct: ProductModel? = null,
     val cart: List<OrderItem> = emptyList(),
-    val notificationsEnabled: Boolean = false,
     val receptionMode: String = "DELIVERY",
     val selectedDeliveryProduct: ProductModel? = null,
     val deliveryAddress: String = "",

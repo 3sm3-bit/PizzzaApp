@@ -20,19 +20,19 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.pizzza.pizzzaapp.feature.cart.CartViewModel
-import com.pizzza.pizzzaapp.feature.home.HomeViewModel
 import com.pizzza.pizzzaapp.feature.cart.CartItemCard
 import com.pizzza.pizzzaapp.core.ui.singleton.LocalAppDataOrder
+import com.pizzza.pizzzaapp.feature.orders.OrdersViewModel
 import com.valu.uitaycompose.utils.*
+import org.koin.compose.viewmodel.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ScreenCart(
-    cartViewModel: CartViewModel,
-    homeViewModel: HomeViewModel,
     onNavigateToAddressSelection: () -> Unit,
     onNavigateToSummary: () -> Unit,
 ) {
+    val cartViewModel: CartViewModel = koinViewModel()
     val uiState by LocalAppDataOrder.current.state.collectAsStateWithLifecycle()
     // val storeState by homeViewModel.homeUiState.collectAsStateWithLifecycle() // No longer needed as uiState is global
 
@@ -45,7 +45,6 @@ fun ScreenCart(
     }
 
     LaunchedEffect(Unit) {
-        homeViewModel.getProductsList()
         cartViewModel.loadUserAddress()
     }
 

@@ -2,32 +2,39 @@ package com.pizzza.pizzzaapp.core.navigation
 
 import kotlinx.serialization.Serializable
 
-@Serializable
-object Splash
+
 
 @Serializable
-object Login
+sealed class ScreenInitNav {
 
-@Serializable
-object Register
+    @Serializable
+    object Splash : ScreenInitNav()
 
-@Serializable
-object ClientHome
+    @Serializable
+    object Login : ScreenInitNav()
 
-@Serializable
-object CartDetail
+    @Serializable
+    object Register : ScreenInitNav()
 
-@Serializable
-object OrderSummary
+    @Serializable
+    object ClientHome : ScreenInitNav()
 
-@Serializable
-object OrderDetail
+    @Serializable
+    object OrderSummary : ScreenInitNav()
 
-@Serializable
-object AddressSelection
+    @Serializable
+    object OrderDetail : ScreenInitNav()
 
-@Serializable
-object Monitor
 
-@Serializable
-data class PaymentWebView(val url: String)
+    @Serializable
+    object AddressSelection : ScreenInitNav()
+
+    @Serializable
+    object Monitor : ScreenInitNav()
+
+    @Serializable
+    data class PaymentWebView(val url: String) : ScreenInitNav()
+
+}
+
+

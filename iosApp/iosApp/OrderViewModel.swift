@@ -26,14 +26,7 @@ class OrderViewModel: ObservableObject {
     
     func getProductsList() {
         isLoading = true
-        dataUseCase.getProducts { response, error in
-            DispatchQueue.main.async {
-                self.isLoading = false
-                if let products = response {
-                    self.products = products
-                }
-            }
-        }
+        
     }
     
     func getGeneralOrderList() {

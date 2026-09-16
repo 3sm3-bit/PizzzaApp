@@ -30,13 +30,11 @@ struct BaseViewGeneral<ViewModel: BaseViewModel, Content: View>: View {
     }
     
     var body: some View {
-        ZStack {
+        ZStack(alignment: .top) {
             content
             if viewModel.uiTayLoading || managerAPP.isLoading {
                 uiTayNextView { uiTayHideKeyboard() }
-                ProgressView()
-                    .progressViewStyle(CircularProgressViewStyle(tint: .uiTayRed600))
-                    .scaleEffect(1.5)
+                UITayLoadCircle()
             }
             
             if viewModel.uiTayError || managerAPP.hbError {
@@ -53,9 +51,13 @@ struct BaseViewGeneral<ViewModel: BaseViewModel, Content: View>: View {
                     
                 }
             }
+            Color.red.frame(height: 56).ignoresSafeArea(edges: .top)
         }
         .focused($isTextFielFicudedd)
         .uiTayOptimizeKeyBoard(optimizeKeyBoard)
+        .onTapGesture {
+            isTextFielFicudedd = false
+        }
         .uiTayHideToolbar()
     }
     

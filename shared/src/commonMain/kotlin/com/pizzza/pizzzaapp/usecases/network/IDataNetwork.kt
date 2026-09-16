@@ -25,4 +25,6 @@ interface IDataNetwork {
 
     suspend fun createPaymentSession(amount: Double, email: String, orderId: String): String
 
+    suspend fun getBranches(): List<BranchModel>
+
 }

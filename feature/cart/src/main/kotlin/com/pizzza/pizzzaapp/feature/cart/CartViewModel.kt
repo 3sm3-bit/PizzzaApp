@@ -85,69 +85,77 @@ class CartViewModel(
         }
     }
 
+    private var isConfirmingOrder = false
+
     fun confirmOrder(statePay: String = "PENDIENTE", onComplete: () -> Unit) {
+        if (isConfirmingOrder) return
+        val state = cartUiState.value
+        if (state.cart.isEmpty()) return
+
+        isConfirmingOrder = true
         execute(globalUiStateManager = globalUiStateManager) {
-            val state = cartUiState.value
-            if (state.cart.isEmpty()) return@execute
-
-            val cartProductsTotal = state.cart.sumOf { item ->
-                val basePrice = item.product.price.toDoubleOrNull() ?: 0.0
-                val crustPrice = if (item.cheeseFilledCrust) item.product.priceChosse.toDoubleOrNull() ?: 0.0 else 0.0
-                (basePrice + crustPrice) * item.quantity
-            }
-
-            val deliveryPrice = if (state.receptionMode == "DELIVERY") {
-                kotlin.math.round(cartProductsTotal * 0.20).toLong().toString()
-            } else "0"
-
-            io {
-                val user = dataUseCase.getUserLocal()
-                val idOrder = UUID.randomUUID().toString()
-
-                val orderRequest = state.cart.map { item ->
-                    val isDelivery = state.receptionMode == "DELIVERY"
-
-                    val itemPrice = (item.product.price.toDoubleOrNull() ?: 0.0) +
-                            (if (item.cheeseFilledCrust) item.product.priceChosse.toDoubleOrNull() ?: 0.0 else 0.0)
-
-                    OrderResponse(
-                        uid = UUID.randomUUID().toString(),
-                        nameClient = "${user?.names}",
-                        quantity = item.quantity.toString(),
-                        type = item.product.type,
-                        symbol = item.product.currencySymbol,
-                        nameProduct = item.product.nameProduct,
-                        tamanio = item.product.tamanio,
-                        typeDough = item.typeDough,
-                        cheeseFilledCrust = if (item.cheeseFilledCrust) "SI" else "NO",
-                        note = item.note,
-                        phone = user?.phone ?: "",
-                        price = item.product.price,
-                        priceTotal = (itemPrice * item.quantity).toString(),
-                        state = "CONFIRMADO",
-                        address = if (isDelivery) state.deliveryAddress else "RECOJO EN LOCAL",
-                        reception = state.receptionMode,
-                        priceDelivery = deliveryPrice,
-                        priceChosse = item.product.priceChosse,
-                        idOrden = idOrder,
-                        userId = user?.uid ?: "",
-                        latitude = if (isDelivery) state.latitude else "0",
-                        longitude = if (isDelivery) state.longitude else "0",
-                        statePay = statePay
-                    )
+            try {
+                val cartProductsTotal = state.cart.sumOf { item ->
+                    val basePrice = item.product.price.toDoubleOrNull() ?: 0.0
+                    val crustPrice = if (item.cheeseFilledCrust) item.product.priceChosse.toDoubleOrNull() ?: 0.0 else 0.0
+                    (basePrice + crustPrice) * item.quantity
                 }
 
-                dataUseCase.createOrder(orderRequest)
-            }
+                val deliveryPrice = if (state.receptionMode == "DELIVERY") {
+                    kotlin.math.round(cartProductsTotal * 0.20).toLong().toString()
+                } else "0"
 
-            appDataOrder.update {
-                it.copy(
-                    cart = emptyList(),
-                    initialTab = 3,
-                    ordersLoaded = false
-                )
+                io {
+                    val user = dataUseCase.getUserLocal()
+                    val idOrder = UUID.randomUUID().toString()
+
+                    val orderRequest = state.cart.map { item ->
+                        val isDelivery = state.receptionMode == "DELIVERY"
+
+                        val itemPrice = (item.product.price.toDoubleOrNull() ?: 0.0) +
+                                (if (item.cheeseFilledCrust) item.product.priceChosse.toDoubleOrNull() ?: 0.0 else 0.0)
+
+                        OrderResponse(
+                            uid = UUID.randomUUID().toString(),
+                            nameClient = "${user?.names}",
+                            quantity = item.quantity.toString(),
+                            type = item.product.type,
+                            symbol = item.product.currencySymbol,
+                            nameProduct = item.product.nameProduct,
+                            tamanio = item.product.tamanio,
+                            typeDough = item.typeDough,
+                            cheeseFilledCrust = if (item.cheeseFilledCrust) "SI" else "NO",
+                            note = item.note,
+                            phone = user?.phone ?: "",
+                            price = item.product.price,
+                            priceTotal = (itemPrice * item.quantity).toString(),
+                            state = "CONFIRMADO",
+                            address = if (isDelivery) state.deliveryAddress else "RECOJO EN LOCAL",
+                            reception = state.receptionMode,
+                            priceDelivery = deliveryPrice,
+                            priceChosse = item.product.priceChosse,
+                            idOrden = idOrder,
+                            userId = user?.uid ?: "",
+                            latitude = if (isDelivery) state.latitude else "0",
+                            longitude = if (isDelivery) state.longitude else "0",
+                            statePay = statePay
+                        )
+                    }
+
+                    dataUseCase.createOrder(orderRequest)
+                }
+
+                appDataOrder.update {
+                    it.copy(
+                        cart = emptyList(),
+                        initialTab = 3,
+                        ordersLoaded = false
+                    )
+                }
+                onComplete()
+            } finally {
+                isConfirmingOrder = false
             }
-            onComplete()
         }
     }
 
