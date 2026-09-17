@@ -261,7 +261,7 @@ fun PromotionsBanner(promotions: List<ProductModel>, onProductClick: (ProductMod
                     elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
                     modifier = Modifier
                         .width(cardWidth)
-                        .height(120.dp)
+                        .height(140.dp)
                         .graphicsLayer {
                             scaleX = scale
                             scaleY = scale
