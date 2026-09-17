@@ -237,7 +237,7 @@ fun ScreenDetailOrder(
                             value = note,
                             onValueChange = { note = it },
                             modifier = Modifier.fillMaxWidth(),
-                            label = { Text("Nota", style = textB14, color = tay_red_600) },
+                            label = { Text("Nota(Especificacion o sabor)", style = textB14, color = tay_red_600) },
                             placeholder = { Text("Instrucciones especiales (opcional)", style =
                                 textM12.copy(color = Color.Gray)) },
                             minLines = 4,
