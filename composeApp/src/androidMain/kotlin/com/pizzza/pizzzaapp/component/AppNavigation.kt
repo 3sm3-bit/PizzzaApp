@@ -3,6 +3,9 @@ package com.pizzza.pizzzaapp.component
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -10,6 +13,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import com.pizzza.pizzzaapp.core.navigation.ScreenInitNav
 import com.pizzza.pizzzaapp.core.navigation.navigateSafe
+import com.pizzza.pizzzaapp.feature.auth.AuthViewModel
 import com.pizzza.pizzzaapp.feature.auth.login.LoginScreen
 import com.pizzza.pizzzaapp.feature.auth.register.RegisterScreen
 import com.pizzza.pizzzaapp.feature.cart.AddressScreen
@@ -65,8 +69,44 @@ fun AppNavigation() {
             )
         }
 
-        composable<ScreenInitNav.AddressSelection> {
-            AddressScreen(onBack = onBack)
+        composable<ScreenInitNav.AddressSelection> { backStackEntry ->
+            val route: ScreenInitNav.AddressSelection = backStackEntry.toRoute()
+            
+            if (route.fromRegister) {
+                // Compartimos el ViewModel con la pantalla de Registro para que los datos coincidan
+                val registerEntry = remember(backStackEntry) {
+                    navController.getBackStackEntry<ScreenInitNav.Register>()
+                }
+                val authViewModel: AuthViewModel = koinViewModel(viewModelStoreOwner = registerEntry)
+                val authState by authViewModel.authUiState.collectAsStateWithLifecycle()
+                
+                AddressScreen(
+                    initialLat = authState.latitude,
+                    initialLng = authState.longitude,
+                    initialAddress = authState.address,
+                    onConfirm = { address, lat, lng ->
+                        authViewModel.updateAddress(address, lat, lng)
+                    },
+                    onBack = onBack
+                )
+            } else {
+                // Compartimos el ViewModel con el Home/Carrito para no perder la sesión de compra
+                val homeEntry = remember(backStackEntry) {
+                    navController.getBackStackEntry<ScreenInitNav.ClientHome>()
+                }
+                val cartViewModel: CartViewModel = koinViewModel(viewModelStoreOwner = homeEntry)
+                val uiState by cartViewModel.cartUiState.collectAsStateWithLifecycle()
+
+                AddressScreen(
+                    initialLat = uiState.latitude,
+                    initialLng = uiState.longitude,
+                    initialAddress = uiState.deliveryAddress,
+                    onConfirm = { address, lat, lng ->
+                        cartViewModel.updateDeliveryAddress(address, lat, lng)
+                    },
+                    onBack = onBack
+                )
+            }
         }
 
         composable<ScreenInitNav.ClientHome> {

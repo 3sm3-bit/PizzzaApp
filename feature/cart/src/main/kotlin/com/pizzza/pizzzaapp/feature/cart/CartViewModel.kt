@@ -59,6 +59,16 @@ class CartViewModel(
         }
     }
 
+    fun updateDeliveryAddress(address: String, lat: String, lng: String) {
+        appDataOrder.update {
+            it.copy(
+                deliveryAddress = address,
+                latitude = lat,
+                longitude = lng
+            )
+        }
+    }
+
     fun startPayment(onUrlReady: (String) -> Unit) {
         execute(globalUiStateManager = globalUiStateManager) {
             val state = cartUiState.value
