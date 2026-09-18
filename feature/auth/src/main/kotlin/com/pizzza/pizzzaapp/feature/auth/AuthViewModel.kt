@@ -61,6 +61,16 @@ class AuthViewModel(
         }
     }
 
+    fun updateAddress(address: String, lat: String, lng: String) {
+        _authUiState.update { 
+            it.copy(
+                address = address,
+                latitude = lat,
+                longitude = lng
+            )
+        }
+    }
+
     fun login(onSuccess: () -> Unit) {
         execute(globalUiStateManager = globalUiStateManager) {
             val request = LoginRequest(

@@ -293,7 +293,7 @@ fun ScreenClientHome(
                 0 -> ScreenPizza({ onNavigateTo(ScreenInitNav.OrderDetail) })
                 1 -> ScreenExtra({ onNavigateTo(ScreenInitNav.OrderDetail) })
                 2 -> ScreenCart(
-                    onNavigateToAddressSelection = { onNavigateTo(ScreenInitNav.AddressSelection) },
+                    onNavigateToAddressSelection = { onNavigateTo(ScreenInitNav.AddressSelection()) },
                     onNavigateToSummary = { onNavigateTo(ScreenInitNav.OrderSummary) }
                 )
                 3 -> ScreenOrder(

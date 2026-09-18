@@ -184,7 +184,7 @@ fun RegisterScreen(
                 }
                 item {
                     Surface(
-                        onClick = {onNavigateTo(ScreenInitNav.AddressSelection)},
+                        onClick = {onNavigateTo(ScreenInitNav.AddressSelection(fromRegister = true))},
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(42.dp),

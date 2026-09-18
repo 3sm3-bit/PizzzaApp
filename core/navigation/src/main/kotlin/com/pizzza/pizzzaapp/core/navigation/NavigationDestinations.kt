@@ -27,7 +27,7 @@ sealed class ScreenInitNav {
 
 
     @Serializable
-    object AddressSelection : ScreenInitNav()
+    data class AddressSelection(val fromRegister: Boolean = false) : ScreenInitNav()
 
     @Serializable
     object Monitor : ScreenInitNav()
