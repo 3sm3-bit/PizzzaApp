@@ -1,11 +1,14 @@
 import SwiftUI
 import Shared
+import TaySwitfUILibrary
 
 struct CartView: View {
-    @ObservedObject var cartManager = CartManager.shared
+    @ObservedObject var cartManager: CartManager = .shared
     @ObservedObject var viewModel: HomeViewModel
+    var onLogout: () -> Void
     @State private var showAddressSelection = false
     @State private var showOrderSummary = false
+    @State var destiny: ActionNav?
     
     var isButtonEnabled: Bool {
         if cartManager.receptionMode == "RECOJO" {
@@ -18,7 +21,9 @@ struct CartView: View {
     var body: some View {
         ZStack {
             VStack(spacing: 0) {
-                PizzaToolbar(title: "Tu Carrito", showBackButton: false)
+                UiToolBarHome(typeFlow: true, visibleCart: false) {
+                    onLogout()
+                }
                 
                 if cartManager.cart.isEmpty {
                     Spacer()
@@ -32,97 +37,134 @@ struct CartView: View {
                     }
                     Spacer()
                 } else {
-                    List {
-                        Section {
-                            VStack(alignment: .leading) {
-                                Text("Selecciona modo de recojo")
-                                    .font(PizzaFonts.bold16)
-                                Spacer().frame(height: 8)
-                                
-                                HStack(spacing: 12) {
-                                    ModeButton(label: "DOMICILIO", isSelected: cartManager.receptionMode == "DELIVERY") {
-                                        cartManager.receptionMode = "DELIVERY"
-                                    }
-                                    ModeButton(label: "LOCAL", isSelected: cartManager.receptionMode == "RECOJO") {
-                                        cartManager.receptionMode = "RECOJO"
-                                    }
+                    ScrollView {
+                        VStack(alignment: .leading, spacing: 16) {
+                            Text("Selecciona modo de recojo")
+                                .font(PizzaFonts.bold16)
+                            
+                            HStack(spacing: 12) {
+                                ModeButton(label: "DOMICILIO", isSelected: cartManager.receptionMode == "DELIVERY") {
+                                    cartManager.receptionMode = "DELIVERY"
                                 }
-                                
-                                if cartManager.receptionMode == "DELIVERY" {
-                                    Spacer().frame(height: 16)
-                                    Text("Cambiar dirección de entrega")
-                                        .font(PizzaFonts.bold14)
-                                    Spacer().frame(height: 4)
-                                    Button(action: { showAddressSelection = true }) {
-                                        HStack {
-                                            Text(cartManager.deliveryAddress.isEmpty ? "Selecciona dirección en el mapa" : cartManager.deliveryAddress)
-                                                .font(PizzaFonts.medium12)
-                                                .foregroundColor(cartManager.deliveryAddress.isEmpty ? .gray : .black)
-                                                .lineLimit(1)
-                                            Spacer()
-                                            Image(systemName: "location.fill")
-                                                .foregroundColor(.black)
-                                        }
-                                        .padding()
-                                        .background(Color.white)
-                                        .cornerRadius(12)
-                                        .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.black, lineWidth: 1))
-                                    }
+                                ModeButton(label: "LOCAL", isSelected: cartManager.receptionMode == "RECOJO") {
+                                    cartManager.receptionMode = "RECOJO"
                                 }
                             }
-                            .padding(.vertical, 8)
-                        }
-                        
-                        Section {
+                            
+                            if cartManager.branches.count >= 2 {
+                                Text("Elije sucursal")
+                                    .font(PizzaFonts.bold16)
+                                BranchSelectorView(cartManager: cartManager)
+                            }
+                           
+                            if cartManager.receptionMode == "DELIVERY" {
+                                Text("Cambiar dirección de entrega")
+                                    .font(PizzaFonts.bold14)
+                                Button(action: {
+                                    showAddressSelection = true
+                                }) {
+                                    HStack {
+                                        Text(cartManager.deliveryAddress.isEmpty ? "Selecciona dirección en el mapa" : cartManager.deliveryAddress)
+                                            .font(PizzaFonts.medium12)
+                                            .foregroundColor(cartManager.deliveryAddress.isEmpty ? .gray : .black)
+                                            .lineLimit(1)
+                                        Spacer()
+                                        Image(systemName: "location.fill")
+                                            .foregroundColor(.black)
+                                    }
+                                    .padding()
+                                    .background(Color.white)
+                                    .cornerRadius(12)
+                                    .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.black, lineWidth: 1))
+                                }
+                                .buttonStyle(PlainButtonStyle())
+                            }
+                            
                             ForEach(cartManager.cart) { item in
                                 CartItemCard(item: item) {
-                                    if let index = cartManager.cart.firstIndex(where: { $0.id == item.id }) {
-                                        cartManager.removeItem(at: IndexSet(integer: index))
-                                    }
+                                    cartManager.cart.removeAll(where: { $0.id == item.id })
                                 }
                             }
+                            
+                            Spacer().frame(height: 100)
                         }
-                        
-                        Section { Spacer().frame(height: 80) }
+                        .padding(.horizontal, 24)
+                        .padding(.vertical, 16)
                     }
-                    .listStyle(PlainListStyle())
                 }
             }
-            
-            // FAB Continue Button
+             
             if !cartManager.cart.isEmpty {
                 VStack {
-                    Spacer()
-                    HStack {
-                        Spacer()
-                        Button(action: { if isButtonEnabled { showOrderSummary = true } }) {
-                            Image(systemName: "arrow.right")
-                                .font(.system(size: 24, weight: .bold))
-                                .foregroundColor(.white)
-                                .frame(width: 60, height: 60)
-                                .background(isButtonEnabled ? PizzaColors.green600 : Color.gray.opacity(0.5))
-                                .cornerRadius(16)
-                                .shadow(radius: 8)
-                        }
-                        .disabled(!isButtonEnabled)
-                        .padding(16)
+                    Image(systemName: "arrow.right")
+                        .font(.system(size: 24, weight: .bold))
+                        .foregroundColor(.white)
+                        .frame(width: 60, height: 60)
+                        .background(isButtonEnabled ? PizzaColors.green600 : Color.gray.opacity(0.5))
+                        .cornerRadius(16)
+                        .shadow(radius: 8)
+                }
+                .disabled(!isButtonEnabled)
+                .padding(16)
+                .padding(.bottom, 40)
+                .onTapGesture {
+                    destiny = .uiNext
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomTrailing)
+            }
+        }
+        .background(Color.uiTayGrey50.ignoresSafeArea())
+        .navigationBarHidden(true)
+        .onAppear {
+            cartManager.loadUserAddress()
+        }
+        .sheet(isPresented: $showAddressSelection) {
+            AddressSelectionView(
+                initialLat: cartManager.latitude,
+                initialLng: cartManager.longitude,
+                initialAddress: cartManager.deliveryAddress
+            ) { address, lat, lng in
+                cartManager.deliveryAddress = address
+                cartManager.latitude = lat
+                cartManager.longitude = lng
+            }
+        }
+        .uiTayNavigate(to: {
+            OrderSummaryView(onConfirm: {
+                DispatchQueue.main.async {
+                    cartManager.selectedTab = 3
+                }
+            })
+        }, when: $destiny.cmToBool(.uiNext))
+    }
+}
+
+struct BranchSelectorView: View {
+    @ObservedObject var cartManager: CartManager
+    
+    var body: some View {
+        let branches: [BranchModel] = Array(cartManager.branches)
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 10) {
+                ForEach(branches, id: \.identifier) { (branch: BranchModel) in
+                    let isSelected = cartManager.branchId == branch.identifier
+                    Button(action: { cartManager.branchId = branch.identifier }) {
+                        Text(branch.nameBranch)
+                            .font(Font.uiMontB10)
+                            .padding(.horizontal, 12)
+                            .frame(minWidth: 100)
+                            .frame(height: 32)
+                            .background(isSelected ? PizzaColors.green600 : Color.white)
+                            .foregroundColor(isSelected ? .white : PizzaColors.green600)
+                            .cornerRadius(10)
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 10)
+                                    .stroke(isSelected ? Color.clear : PizzaColors.green600, lineWidth: 1)
+                            )
                     }
                 }
             }
-        }
-        .background(PizzaColors.background)
-        .onAppear {
-           // viewModel.getProductsList()
-        }
-        .sheet(isPresented: $showAddressSelection) {
-            AddressSelectionView { address, lat, lng in
-                cartManager.deliveryAddress = address
-            }
-        }
-        .fullScreenCover(isPresented: $showOrderSummary) {
-            OrderSummaryView {
-                showOrderSummary = false
-            }
+            .padding(.vertical, 4)
         }
     }
 }
@@ -133,16 +175,21 @@ struct ModeButton: View {
     let action: () -> Void
     
     var body: some View {
-        Button(action: action) {
-            Text(label)
-                .font(PizzaFonts.bold12)
-                .frame(maxWidth: .infinity)
-                .frame(height: 32)
-                .background(isSelected ? PizzaColors.red600 : Color.white)
-                .foregroundColor(isSelected ? .white : PizzaColors.red600)
-                .cornerRadius(12)
-                .overlay(isSelected ? nil : RoundedRectangle(cornerRadius: 12).stroke(PizzaColors.red600, lineWidth: 1))
-        }
+        Text(label)
+            .font(PizzaFonts.bold12)
+            .frame(maxWidth: .infinity)
+            .frame(height: 32)
+            .background(isSelected ? Color.uiTayRed600 : Color.white)
+            .foregroundColor(isSelected ? .white : Color.uiTayRed600)
+            .cornerRadius(12)
+            .overlay(
+                RoundedRectangle(cornerRadius: 12)
+                    .stroke(Color.uiTayRed600, lineWidth: 1)
+            )
+            .contentShape(Rectangle())
+            .onTapGesture {
+                action()
+            }
     }
 }
 
@@ -151,42 +198,67 @@ struct CartItemCard: View {
     let onRemove: () -> Void
     
     var body: some View {
-        HStack(spacing: 12) {
-            Image(systemName: item.product.type == "1" ? "pizza" : "takeoutbag.and.cup.and.straw")
-                .resizable()
-                .scaledToFit()
-                .frame(width: 50, height: 50)
-                .padding(8)
-                .background(PizzaColors.red50)
-                .cornerRadius(12)
-            
-            VStack(alignment: .leading, spacing: 4) {
-                Text(item.product.nameProduct)
-                    .font(PizzaFonts.bold16)
-                Text("Cantidad: \(item.quantity)")
-                    .font(PizzaFonts.medium12)
-                    .foregroundColor(.gray)
-                if item.product.type == "1" {
-                    Text("\(item.typeDough)\(item.cheeseFilledCrust ? " + Orilla Queso" : "")")
-                        .font(PizzaFonts.medium10)
-                        .foregroundColor(PizzaColors.red600)
+        VStack(alignment: .leading, spacing: 14) {
+            HStack(alignment: .center) {
+                HStack(alignment: .center, spacing: 12) {
+                    Text("\(item.quantity)x")
+                        .font(Font.uiMontB12)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 4)
+                        .background(Color.uiTayRed600)
+                        .foregroundColor(.white)
+                        .cornerRadius(8)
+                    
+                    Text(item.product.nameProduct.uppercased())
+                        .font(Font.uiMontB14)
+                        .foregroundColor(.black)
                 }
-            }
-            Spacer()
-            
-            VStack(alignment: .trailing) {
-                let itemPrice = (Double(item.product.price) ?? 0.0) + (item.cheeseFilledCrust ? (Double(item.product.priceChosse) ?? 0.0) : 0.0)
-                Text("\(item.product.currencySymbol)\(String(format: "%.2f", itemPrice * Double(item.quantity)))")
-                    .font(PizzaFonts.bold16)
+                
+                Spacer()
                 
                 Button(action: onRemove) {
                     Image(systemName: "trash")
-                        .foregroundColor(.red)
+                        .font(.system(size: 18))
+                        .foregroundColor(Color.uiTayRed600)
+                }
+                .buttonStyle(PlainButtonStyle())
+            }
+      
+            if item.product.type == "1" || !item.note.isEmpty {
+                VStack(alignment: .leading, spacing: 2) {
+                    if item.product.type == "1" {
+                        HStack(spacing: 0) {
+                            Text("Masa: \(item.typeDough), ")
+                            if item.cheeseFilledCrust {
+                                Text("Con Orilla de Queso")
+                                    .foregroundColor(Color.uiTayGreen600)
+                            }
+                        }
+                        .font(Font.uiMontM12)
+                        .foregroundColor(.gray)
+                    }
+                    
+                    if !item.note.isEmpty {
+                        Text("Nota: \(item.note)")
+                            .font(Font.uiMontM12)
+                            .foregroundColor(.gray)
+                            .italic()
+                    }
                 }
             }
-        }
-        .padding()
-        .background(Color.white)
-        .cornerRadius(12)
+      
+            HStack {
+                Spacer()
+                Text("Total ")
+                    .font(Font.uiMontM12)
+                    .foregroundColor(.gray)
+                
+                let unitPrice = (Double(item.product.price) ?? 0.0) + (item.cheeseFilledCrust ? (Double(item.product.priceChosse) ?? 0.0) : 0.0)
+                Text("$\(String(format: "%.2f", unitPrice * Double(item.quantity)))")
+                    .font(Font.uiMontB16)
+                    .foregroundColor(Color.uiTayRed600)
+            }
+        }.padding(14)
+        .uiTayBgShadowDark()
     }
 }

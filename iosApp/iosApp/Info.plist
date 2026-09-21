@@ -8,5 +8,7 @@
 	<array>
 		<string>fetch</string>
 	</array>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Necesitamos tu ubicación para entregar tu pizza a domicilio.</string>
 </dict>
 </plist>

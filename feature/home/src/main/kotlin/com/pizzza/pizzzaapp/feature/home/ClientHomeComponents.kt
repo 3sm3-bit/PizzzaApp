@@ -158,51 +158,27 @@ fun ExtraProductCard(product: ProductModel, onClick: () -> Unit) {
                 )
             }
 
-            Column(
+            Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 12.dp, vertical = 8.dp),
-                verticalArrangement = Arrangement.SpaceBetween,
-                horizontalAlignment = Alignment.Start
+                    .padding(12.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.Top
             ) {
                 Text(
                     text = product.nameProduct,
                     style = textB12,
                     color = Color.Black,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.weight(1f)
                 )
 
-                Spacer(Modifier.height(4.dp))
-
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = "${product.currencySymbol}${product.price}",
-                        style = textB14,
-                        color = tay_green_600,
-                    )
-
-                    Surface(
-                        onClick = onClick,
-                        color = Color.White,
-                        shape = RoundedCornerShape(10.dp),
-                        border = BorderStroke(1.dp, tay_green_600),
-                        modifier = Modifier.size(28.dp)
-                    ) {
-                        Box(contentAlignment = Alignment.Center) {
-                            Icon(
-                                Icons.Default.Add,
-                                contentDescription = null,
-                                tint = tay_green_600,
-                                modifier = Modifier.size(18.dp)
-                            )
-                        }
-                    }
-                }
+                Text(
+                    text = "${product.currencySymbol}${product.price}",
+                    style = textB12,
+                    color = tay_green_600,
+                )
             }
         }
     }

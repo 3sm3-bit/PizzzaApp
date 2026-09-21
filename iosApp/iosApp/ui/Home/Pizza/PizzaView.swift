@@ -12,6 +12,7 @@ import TaySwitfUILibrary
 struct PizzaView: View {
     
     @ObservedObject var viewModel: HomeViewModel
+    @ObservedObject var cartManager = CartManager.shared
     @State private var selectedSize = "GRANDE"
     @State private var product   : ProductModel? = nil
     let sizes = ["GRANDE", "MEDIANO", "CHICO"]
@@ -19,7 +20,7 @@ struct PizzaView: View {
     var onLogout: () -> Void
     
     var filteredPizzas: [ProductModel] {
-        CartManager.shared.pizzaProducts.filter { product in
+        cartManager.pizzaProducts.filter { product in
             product.tamanio.uppercased() == selectedSize ||
             (selectedSize == "CHICO" && product.tamanio.uppercased() == "CHICA") ||
             (selectedSize == "MEDIANO" && product.tamanio.uppercased() == "MEDIANA")
@@ -28,59 +29,57 @@ struct PizzaView: View {
     
     public var body: some View {
         VStack(spacing: 16) {
-            HStack(spacing: 12) {
-                VStack(alignment: .leading) {
-                    Text("Bienvenido a la pizzeria")
-                        .font(PizzaFonts.medium14)
-                        .foregroundColor(Color.uiTayRed600)
-                    Text("Has tu pedido ya!")
-                        .font(PizzaFonts.bold20)
-                }
-                Spacer()
-                Image(uiName: "ic_cart")
-                    .renderingMode(.template)
-                    .resizable()
-                    .foregroundColor(Color.uiTayRed600)
-                    .frame(width: 32, height: 32)
-                    .badge(CartManager.shared.cart.count > 0 ? String(CartManager.shared.cart.count) : nil)
-                Image(systemName: "rectangle.portrait.and.arrow.right")
-                    .foregroundColor(Color.uiTayRed600)
-                    .font(.system(size: 20, weight: .bold))
-                    .onTapGesture {
-                        onLogout()
-                    }
+            UiToolBarHome(typeFlow: true){
+                onLogout()
             }
-            .padding(.horizontal)
-            .padding(.top, 8)
-            
-            HStack(spacing: 12) {
-                ForEach(sizes, id: \.self) { size in
-                    UITaySelectedChip(
-                        text: size,
-                        isSelected: selectedSize == size
-                    ) {
-                        selectedSize = size
-                    }
-                }
-            }
-            .padding(.horizontal, 24)
-            .padding(.vertical, 8)
-            
             ScrollView(.vertical, showsIndicators: false) {
-                LazyVStack(spacing: 12) {
-                    ForEach(filteredPizzas, id: \.uid) { product in
-                        PizzaProductCard(product: product)
-                            .onTapGesture {
-                                self.product = product
-                                destiny = .uiNext
+                VStack(spacing: 12) {
+                    
+                    PromotionsBanner(promotions: CartManager.shared.promotionsProducts) { promoProduct in
+                        self.product = promoProduct
+                        destiny = .uiNext
+                    }
+                    
+                    HStack(spacing: 12) {
+                        ForEach(sizes, id: \.self) { size in
+                            UITaySelectedChip(
+                                text: size,
+                                isSelected: selectedSize == size
+                            ) {
+                                selectedSize = size
                             }
+                        }
+                    }
+                    .padding(.horizontal, 24)
+
+                    if !CartManager.shared.promotionsProducts.isEmpty {
+                        LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 16) {
+                            ForEach(filteredPizzas, id: \.uid) { product in
+                                PizzaGridCard(product: product)
+                                    .onTapGesture {
+                                        self.product = product
+                                        destiny = .uiNext
+                                    }
+                            }
+                        }
+                        .padding(.horizontal)
+                    } else {
+                        LazyVStack(spacing: 12) {
+                            ForEach(filteredPizzas, id: \.uid) { product in
+                                PizzaProductCard(product: product)
+                                    .onTapGesture {
+                                        self.product = product
+                                        destiny = .uiNext
+                                    }
+                            }
+                        }
+                        .padding(.horizontal)
                     }
                 }
-                .padding(.horizontal)
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(Color.uiTayGrey100.ignoresSafeArea())
+        .background(Color.uiTayGrey50.ignoresSafeArea())
         .uiTayHideToolbar()
         .uiTayNavigate(
             item: self.product,
@@ -125,6 +124,50 @@ struct PizzaView: View {
                 }
             }.uiTayBgShadowDark()
             
+        }
+    }
+
+    struct PizzaGridCard: View {
+        let product: ProductModel
+        
+        var body: some View {
+            VStack(alignment: .leading, spacing: 0) {
+                UiTayUrlImage(url: product.urlImg)
+                    .frame(height: 110)
+                    .clipped()
+                
+                HStack(alignment: .top, spacing: 8) {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text(product.nameProduct)
+                            .font(Font.uiMontB12)
+                            .foregroundColor(.black)
+                            .lineLimit(2)
+                        
+                        Text(product.description_)
+                            .font(Font.uiMontR8)
+                            .foregroundColor(.gray)
+                            .lineLimit(2)
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    
+                    VStack(alignment: .trailing, spacing: 4) {
+                        Text("\(product.currencySymbol)\(product.price)")
+                            .font(Font.uiMontB12)
+                            .foregroundColor(Color.uiTayGreen600)
+                        
+                        Spacer()
+                        
+                        Image(systemName: "plus.app.fill")
+                            .font(.system(size: 20))
+                            .foregroundColor(Color.uiTayGreen600)
+                    }
+                }
+                .padding(12)
+            }
+            .frame(height: 180)
+            .background(Color.white)
+            .cornerRadius(20)
+            .shadow(color: Color.black.opacity(0.1), radius: 4, x: 0, y: 2)
         }
     }
 }

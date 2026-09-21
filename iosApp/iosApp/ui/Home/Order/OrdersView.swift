@@ -10,11 +10,14 @@ import Shared
 
 struct OrdersView: View {
     @ObservedObject var viewModel: HomeViewModel
+    var onLogout: () -> Void
     @State private var selectedOrderForMonitoring: ParentOrderModel?
     
     var body: some View {
-        VStack(spacing: 0) {
-            PizzaToolbar(title: "Mis Pedidos", showBackButton: false)
+        VStack(spacing: 0) {            
+            UiToolBarHome(typeFlow: true,visibleCart: false,typeRefresh: true){
+                viewModel.getGeneralOrderList(forceLoading: true)
+            }
             
             if viewModel.orders.isEmpty {
                 Spacer()
@@ -23,12 +26,15 @@ struct OrdersView: View {
                     .foregroundColor(.gray)
                 Spacer()
             } else {
+                
+                
+                
                 ScrollView {
                     LazyVStack(spacing: 12) {
                         ForEach(viewModel.orders, id: \.uid) { order in
-                           // OrderItemCard(order: order, viewModel: viewModel) {
-                            //      selectedOrderForMonitoring = order
-                            //   }
+                            OrderItemCard(order: order, viewModel: viewModel) {
+                                selectedOrderForMonitoring = order
+                            }
                         }
                     }
                     .padding()
@@ -36,7 +42,8 @@ struct OrdersView: View {
             }
         }
         .onAppear {
-           // viewModel.getGeneralOrderList(forceLoading: true)
+            // Ya no forzamos el loading (forceLoading: false) para evitar el bloqueo al navegar
+            viewModel.getGeneralOrderList(forceLoading: false)
         }
         .background(PizzaColors.background)
         .fullScreenCover(item: $selectedOrderForMonitoring) { order in
@@ -47,7 +54,7 @@ struct OrdersView: View {
 
 struct OrderItemCard: View {
     let order: ParentOrderModel
-    @ObservedObject var viewModel: AppViewModel
+    @ObservedObject var viewModel: HomeViewModel
     var onMonitor: () -> Void
     
     var displayState: String {
@@ -72,52 +79,96 @@ struct OrderItemCard: View {
     
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
+            // Cabecera: ID Pedido y Estado
             HStack {
                 Text("Pedido #\(order.nameClient)")
-                    .font(PizzaFonts.bold16)
+                    .font(Font.uiMontB18)
                     .foregroundColor(.black)
                 Spacer()
                 Text(displayState)
                     .font(PizzaFonts.bold12)
-                    .padding(.horizontal, 8)
+                    .padding(.horizontal, 10)
                     .padding(.vertical, 4)
                     .background(statusColors.bg)
                     .foregroundColor(statusColors.text)
-                    .cornerRadius(8)
+                    .cornerRadius(12)
             }
             
-            Text(order.description)
-                .font(PizzaFonts.medium12)
-                .foregroundColor(.gray)
-            
-            HStack {
-                VStack(alignment: .leading) {
-                    Text(order.date)
-                        .font(PizzaFonts.medium12)
-                        .foregroundColor(.gray)
-                    Text("\(order.symbol)\(order.price)")
-                        .font(PizzaFonts.bold14)
-                        .foregroundColor(PizzaColors.red600)
-                }
-                Spacer()
-                
-                if order.state.uppercased() == "INICIADO" && order.reception.uppercased() == "DELIVERY" {
-                    Button(action: onMonitor) {
-                        Text("VER")
-                            .font(PizzaFonts.bold12)
-                            .foregroundColor(.white)
-                            .padding(.horizontal, 16)
-                            .padding(.vertical, 8)
-                            .background(PizzaColors.red600)
-                            .cornerRadius(8)
+            // Lista de Productos
+            VStack(alignment: .leading, spacing: 6) {
+                ForEach(order.orders, id: \.ui) { item in
+                    HStack {
+                        let sizeText = item.type == "1" ? "(\(item.tamanio)) - " : ""
+                        let doughText = item.type == "1" ? "\(item.typeDough)" : ""
+                        
+                        Text("\(item.quantity)x \(item.nameProduct) \(sizeText)\(doughText)")
+                            .font(PizzaFonts.medium12)
+                            .foregroundColor(.black)
+                        
+                        Spacer()
+                        
+                        Text("\(item.symbol)\(item.priceTotal)")
+                            .font(PizzaFonts.bold14)
+                            .foregroundColor(.black)
                     }
                 }
             }
+            
+            // Costo de Envío (Si existe)
+            if let deliveryPrice = Double(order.orders.first?.priceDelivery ?? "0"), deliveryPrice > 0 {
+                HStack {
+                    Text("Costo de Envío")
+                        .font(PizzaFonts.medium12)
+                        .foregroundColor(Color.uiTayGreen600)
+                    Spacer()
+                    Text("\(order.symbol)\(Int(deliveryPrice))")
+                        .font(PizzaFonts.bold14)
+                        .foregroundColor(Color.uiTayGreen600)
+                }
+            }
+            
+            Divider()
+            
+            // Pie de tarjeta: Modo, Fecha y Total
+            HStack(alignment: .bottom) {
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(order.reception.uppercased())
+                        .font(PizzaFonts.bold12)
+                        .foregroundColor(Color.uiTayGreen600)
+                    Text(order.date)
+                        .font(PizzaFonts.medium10)
+                        .foregroundColor(.gray)
+                }
+                
+                Spacer()
+                
+                VStack(alignment: .trailing, spacing: 0) {
+                    Text("TOTAL")
+                        .font(PizzaFonts.medium10)
+                        .foregroundColor(.gray)
+                    Text("\(order.symbol)\(order.price)")
+                        .font(PizzaFonts.bold20)
+                        .foregroundColor(PizzaColors.red600)
+                }
+            }
+            
+            // Botón de Seguimiento si está en camino
+            if order.state.uppercased() == "INICIADO" && order.reception.uppercased() == "DELIVERY" {
+                Button(action: onMonitor) {
+                    Text("VER UBICACIÓN EN VIVO")
+                        .font(PizzaFonts.bold12)
+                        .foregroundColor(.white)
+                        .frame(maxWidth: .infinity)
+                        .frame(height: 36)
+                        .background(PizzaColors.red600)
+                        .cornerRadius(8)
+                }
+                .padding(.top, 4)
+            }
         }
-        .padding()
+        .padding(16)
         .background(Color.white)
-        .cornerRadius(16)
-        .shadow(color: Color.black.opacity(0.05), radius: 2, x: 0, y: 1)
-        .overlay(RoundedRectangle(cornerRadius: 16).stroke(Color(hex: 0xF0F2F5), lineWidth: 1))
+        .cornerRadius(20)
+        .shadow(color: Color.black.opacity(0.08), radius: 6, x: 0, y: 3)
     }
 }

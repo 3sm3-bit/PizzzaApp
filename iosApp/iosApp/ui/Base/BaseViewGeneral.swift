@@ -58,6 +58,7 @@ struct BaseViewGeneral<ViewModel: BaseViewModel, Content: View>: View {
         .onTapGesture {
             isTextFielFicudedd = false
         }
+        
         .uiTayHideToolbar()
     }
     

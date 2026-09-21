@@ -34,6 +34,13 @@ class AuthViewModel: BaseViewModel {
             await self.execute(){
                 let request = LoginRequest(nameUser: self.userLolin, password: self.passLogin)
                 let response = try await self.dataUseCase.login(data: request)
+                let userRole = response.userValid.rol?.uppercased() ?? ""
+                
+                if userRole != "CLIENTE" && userRole != "ADMIN" {
+                    // Simular error de autorización si no es cliente ni admin
+                    throw NSError(domain: "Auth", code: 401, userInfo: [NSLocalizedDescriptionKey: "Usuario no autorizado para esta aplicación"])
+                }
+
                 let entity = UserModel(
                         uid: response.userValid.uid ?? "",
                         nameUser: response.userValid.nameUser ?? "",

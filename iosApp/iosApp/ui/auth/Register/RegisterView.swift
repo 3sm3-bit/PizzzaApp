@@ -93,12 +93,16 @@ struct RegisterView: View {
                 }
                 .padding(.horizontal, 24)
                 .padding(.top, 12)
-                .padding(.bottom, 8) // Espacio de resguardo para la barra inferior del iPhone
-                .background(Color.white) // Fondo opcional para que no se mezcle si el scroll pasa por detrás
+                .padding(.bottom, 8)
+                .background(Color.white)
             }
         }
         .sheet(isPresented: $showAddressSelection) {
-            AddressSelectionView { address, lat, lng in
+            AddressSelectionView(
+                initialLat: viewModel.latitude,
+                initialLng: viewModel.longitude,
+                initialAddress: viewModel.address
+            ) { address, lat, lng in
                 viewModel.address = address
                 viewModel.latitude = lat
                 viewModel.longitude = lng

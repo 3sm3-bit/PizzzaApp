@@ -1,6 +1,5 @@
-import UIKit
-import UserNotifications
 import Shared
+import UIKit
 
 class AppDelegate: NSObject, UIApplicationDelegate {
     

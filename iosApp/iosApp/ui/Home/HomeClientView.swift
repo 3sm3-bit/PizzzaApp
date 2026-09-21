@@ -11,7 +11,8 @@ import TaySwitfUILibrary
 struct HomeClientView: View {
     
     @ObservedObject private var viewModel: HomeViewModel = Resolver.shared.resolve(HomeViewModel.self)
-    @State var selectedTab = 0
+    @ObservedObject var cartManager = CartManager.shared
+    @State private var badgeInfo: (Int, Int) = (2, 0)
     @State var tabs : [UITayTabItem] = []
     @State private var showLogoutAlert = false
     @EnvironmentObject var managerAPP: PizzaManagerAPP
@@ -20,16 +21,24 @@ struct HomeClientView: View {
     var views: [AnyView] {[
         AnyView(PizzaView(viewModel: viewModel, onLogout: { showLogoutAlert = true })),
         AnyView(ExtraView(viewModel: viewModel, onLogout: { showLogoutAlert = true })),
-        AnyView(CartView(viewModel: viewModel,)),
-        AnyView(OrdersView(viewModel: viewModel,)),
+        AnyView(CartView(viewModel: viewModel,onLogout: { showLogoutAlert = true })),
+        AnyView(OrdersView(viewModel: viewModel,onLogout: { showLogoutAlert = true })),
         AnyView(EmptyView())
     ]
     }
     
     var body: some View {
         BaseViewGeneral(viewModel: viewModel){
-            UITayNavigationBotton(selectedTab:$selectedTab,
-                               tabs: tabs,tayView:views)
+            UITayNavigationBotton(selectedTab: $cartManager.selectedTab,
+                               tabs: tabs,
+                               tayView:views,
+                               uiBadge: $badgeInfo,
+                               uiTypeBadge: cartManager.cart.count > 0)
+            .onChange(of: cartManager.cart.count) { oldValue, newValue in
+                badgeInfo = (2, newValue)
+            }
+
+
             .onAppear{
                 self.tabs = [
                     UITayTabItem(id : 0,iconName: "ic_pizza",title: "Pizza"),
