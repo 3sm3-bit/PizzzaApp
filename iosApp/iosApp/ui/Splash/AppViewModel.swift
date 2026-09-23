@@ -1,0 +1,97 @@
+import Foundation
+import Shared
+internal import Combine
+import Shared
+
+@MainActor
+class AppViewModel: BaseViewModel {
+    @Published var extraProducts: [ProductModel] = []
+    @Published var deliveryProducts: [ProductModel] = []
+    @Published var orders: [ParentOrderModel] = []
+    @Published var selectedProduct: ProductModel? = nil
+    @Published var selectedOrder: ParentOrderModel? = nil
+    @Published var isLoading: Bool = false
+    @Published var ordersLoaded: Bool = false
+    
+    private let dataUseCase = KoinHelper.shared.getDataUseCase()
+    @Published var successLogin : Bool? = nil
+    
+    
+    func getGeneralOrderList(forceLoading: Bool = false) {
+        if ordersLoaded && !forceLoading { return }
+        
+        isLoading = forceLoading
+        dataUseCase.getUserLocal { [weak self] user, error in
+            guard let uid = user?.uid else {
+                DispatchQueue.main.async {
+                    self?.isLoading = false
+                    self?.orders = []
+                }
+                return
+            }
+            
+            self?.dataUseCase.loadParentOrder(userId: uid) { response, error in
+                DispatchQueue.main.async {
+                    self?.isLoading = false
+                    if let orders = response {
+                        self?.updateStateWithOrders(orders: orders)
+                    }
+                }
+            }
+        }
+    }
+    
+    private func updateStateWithOrders(orders: [ParentOrderModel]) {
+        self.orders = orders.sorted { o1, o2 in
+            func priority(_ s: String) -> Int {
+                switch s.trimmingCharacters(in: .whitespacesAndNewlines).uppercased() {
+                case "CONFIRMADO": return 1
+                case "LISTO": return 2
+                default: return 3
+                }
+            }
+            return priority(o1.state) < priority(o2.state)
+        }
+        self.ordersLoaded = true
+    }
+    
+    func selectProduct(_ product: ProductModel?) {
+        self.selectedProduct = product
+    }
+    
+    func selectOrder(_ order: ParentOrderModel?) {
+        self.selectedOrder = order
+    }
+    
+    
+    func loadValidData(){
+        Task{
+            await self.execute(loading: false) {
+                let response = try await self.dataUseCase.syncProducts()
+                let branches = try await self.dataUseCase.getBranch()
+                
+                CartManager.shared.pizzaProducts = response.filter { $0.type == "1" }
+                CartManager.shared.extraProducts = response.filter { $0.type == "2" || $0.type == "3" }
+                CartManager.shared.promotionsProducts = response.filter { $0.type == "4" }
+                CartManager.shared.deliveryProducts = response.filter { $0.type == "5" }
+                CartManager.shared.branches = branches
+                
+                if let firstBranch = branches.first {
+                    CartManager.shared.branchId = firstBranch.identifier
+                } else {
+                    CartManager.shared.branchId = "1"
+                }
+
+                let user = try await self.dataUseCase.getUserLocal()
+                
+                if let safeUser = user {
+                    let userRole = safeUser.rol.uppercased()
+                    self.successLogin = (userRole == "CLIENTE" || userRole == "ADMIN")
+                } else {
+                    self.successLogin = false
+                }
+            }
+        }
+    }
+    
+}
