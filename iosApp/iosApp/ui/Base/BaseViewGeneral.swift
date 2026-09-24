@@ -51,7 +51,7 @@ struct BaseViewGeneral<ViewModel: BaseViewModel, Content: View>: View {
                     
                 }
             }
-            Color.red.frame(height: 56).ignoresSafeArea(edges: .top)
+            Color.uiTayRed1200.frame(height: 56).ignoresSafeArea(edges: .top)
         }
         .focused($isTextFielFicudedd)
         .uiTayOptimizeKeyBoard(optimizeKeyBoard)

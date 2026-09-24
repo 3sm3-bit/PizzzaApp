@@ -144,8 +144,10 @@ fun OrderItemCard(
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         val details = buildString {
-                            if (item.tamanio.isNotEmpty()) append(" (${item.tamanio})")
-                            if (item.typeDough.isNotEmpty()) append(" - ${item.typeDough}")
+                            if (item.type == "1") {
+                                if (item.tamanio.isNotEmpty()) append(" (${item.tamanio})")
+                                if (item.typeDough.isNotEmpty()) append(" - ${item.typeDough}")
+                            }
                         }
                         Text(
                             text = "${item.quantity}x ${item.nameProduct}$details",
@@ -159,7 +161,7 @@ fun OrderItemCard(
                             color = Color.DarkGray
                         )
                     }
-                    if (item.cheeseFilledCrust == "SI") {
+                    if (item.type == "1" && item.cheeseFilledCrust == "SI") {
                         Row(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.SpaceBetween

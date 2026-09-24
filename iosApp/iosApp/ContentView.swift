@@ -185,7 +185,8 @@ struct OrderCardView: View {
                         ForEach(order.orders, id: \.ui) { item in
                             VStack(alignment: .leading, spacing: 0) {
                                 HStack {
-                                    Text("\(item.quantity) \(item.nameProduct) \(item.typeDough)")
+                                    let doughText = (item.type == "1" && !item.typeDough.isEmpty) ? " \(item.typeDough)" : ""
+                                    Text("\(item.quantity) \(item.nameProduct)\(doughText)")
                                         .font(.system(size: 14, weight: .medium))
                                         .foregroundColor(Color(hex: 0x1C1E21))
                                     Spacer()
@@ -194,7 +195,7 @@ struct OrderCardView: View {
                                         .font(.system(size: 14, weight: .bold))
                                 }
                                 
-                                if item.cheeseFilledCrust.uppercased() == "SI" {
+                                if item.type == "1" && item.cheeseFilledCrust.uppercased() == "SI" {
                                     HStack {
                                         Text("con orilla de queso")
                                             .font(.system(size: 12))
@@ -333,13 +334,15 @@ struct OrderDetailView: View {
                                 VStack(alignment: .leading, spacing: 2) {
                                     Text(item.nameProduct)
                                         .font(.system(size: 16, weight: .bold))
-                                    Text("\(item.tamanio) • \(item.typeDough)")
-                                        .font(.system(size: 12))
-                                        .foregroundColor(Color(hex: 0x65676B))
-                                    if item.cheeseFilledCrust.uppercased() == "SI" {
-                                        Text("🧀 Con orilla de queso")
-                                            .font(.system(size: 10, weight: .bold))
-                                            .foregroundColor(Color(hex: 0x10B981))
+                                    if item.type == "1" {
+                                        Text("\(item.tamanio) • \(item.typeDough)")
+                                            .font(.system(size: 12))
+                                            .foregroundColor(Color(hex: 0x65676B))
+                                        if item.cheeseFilledCrust.uppercased() == "SI" {
+                                            Text("🧀 Con orilla de queso")
+                                                .font(.system(size: 10, weight: .bold))
+                                                .foregroundColor(Color(hex: 0x10B981))
+                                        }
                                     }
                                 }
                                 Spacer()
