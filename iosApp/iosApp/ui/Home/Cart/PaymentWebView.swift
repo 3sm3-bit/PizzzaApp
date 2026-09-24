@@ -10,7 +10,15 @@ struct PaymentWebView: View {
 
     var body: some View {
         ZStack {
-            WebView(url: url, isLoading: $isLoading, onSuccess: onSuccess, onCancel: onCancel)
+            WebView(url: url, isLoading: $isLoading, onSuccess: {
+                dismiss()
+                onSuccess()
+                
+            }, onCancel: {
+                dismiss()
+                onCancel()
+             }
+            )
             if isLoading {
                 ProgressView()
                     .scaleEffect(1.5)

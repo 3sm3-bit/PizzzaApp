@@ -15,7 +15,7 @@ struct iOSApp: App {
     var body: some Scene {
         WindowGroup {
             UiTayPrivacyGuard{
-                AppContentView().environmentObject(managerApp)
+                AppContentView().environmentObject(managerApp).preferredColorScheme(.light)
             }
         }
     }
