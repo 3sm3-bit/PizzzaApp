@@ -6,8 +6,6 @@ class CartManager: ObservableObject {
     
     static let shared = CartManager()
     
-    
-    
     @Published var cart: [OrderItemSwift] = []
     @Published var selectedTab: Int = 0
     @Published var ordersLoaded: Bool = false
@@ -15,7 +13,6 @@ class CartManager: ObservableObject {
     @Published var latitude: String = ""
     @Published var longitude: String = ""
     @Published var receptionMode: String = "DELIVERY"
-    
     @Published var pizzaProducts: [ProductModel] = []
     @Published var extraProducts: [ProductModel] = []
     @Published var promotionsProducts: [ProductModel] = []
@@ -95,8 +92,7 @@ class CartManager: ObservableObject {
         
         self.dataUseCase.getUserLocal { [weak self] user, error in
             guard let self = self, let user = user else { return }
-            let orderId = UUID().uuidString
-            
+            let orderId = String(UUID().uuidString.prefix(12))
             self.dataUseCase.createPaymentSession(amount: self.finalTotal, email: user.email, orderId: orderId) { url, error in
                 if let paymentUrl = url, !paymentUrl.isEmpty {
                     DispatchQueue.main.async {

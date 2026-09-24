@@ -45,7 +45,8 @@ struct AddressSelectionView: View {
                 .allowsHitTesting(false)
         }
         .overlay(alignment: .top) {
-            UiTayCToolBar(uiTayText: "Seleccionar Ubicación") { _ in
+            UiTayCToolBar(uiTayText: "Seleccionar Ubicación",
+                          uiTayModifier: UiToolBarModel().showStartIcon(false) ) { _ in
                 presentationMode.wrappedValue.dismiss()
             }
             .background(Color.white.opacity(0.9))

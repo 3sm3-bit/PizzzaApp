@@ -11,23 +11,12 @@ struct PaymentWebView: View {
     var body: some View {
         ZStack {
             WebView(url: url, isLoading: $isLoading, onSuccess: onSuccess, onCancel: onCancel)
-            
             if isLoading {
                 ProgressView()
                     .scaleEffect(1.5)
                     .progressViewStyle(CircularProgressViewStyle(tint: .uiTayRed600))
             }
-        }
-        .navigationTitle("Pago Seguro")
-        .navigationBarTitleDisplayMode(.inline)
-        .toolbar {
-            ToolbarItem(placement: .navigationBarLeading) {
-                Button(action: { dismiss() }) {
-                    Image(systemName: "chevron.left")
-                        .foregroundColor(.uiTayRed600)
-                }
-            }
-        }
+        }.uiTayHideToolbar()
     }
 }
 
