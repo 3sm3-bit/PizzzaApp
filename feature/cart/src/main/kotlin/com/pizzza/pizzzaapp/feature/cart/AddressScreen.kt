@@ -20,6 +20,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
@@ -51,6 +52,7 @@ fun AddressScreen(
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
+    val keyboardController = LocalSoftwareKeyboardController.current
 
     val initialLatLng = remember {
         val lat = initialLat?.toDoubleOrNull()
@@ -68,6 +70,7 @@ fun AddressScreen(
 
     var searchQuery by remember { mutableStateOf("") }
     var searchResults by remember { mutableStateOf<List<android.location.Address>>(emptyList()) }
+    var isSelectingSearch by remember { mutableStateOf(false) }
 
     fun searchAddress(query: String) {
         if (query.isBlank()) {
@@ -151,7 +154,9 @@ fun AddressScreen(
 
     LaunchedEffect(cameraPositionState.isMoving) {
         if (!cameraPositionState.isMoving) {
-            updateAddress(cameraPositionState.position.target)
+            if (!isSelectingSearch) {
+                updateAddress(cameraPositionState.position.target)
+            }
         }
     }
 
@@ -246,6 +251,8 @@ fun AddressScreen(
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .clickable {
+                                            keyboardController?.hide()
+                                            isSelectingSearch = true
                                             currentAddress = addressText
                                             val latLng = LatLng(address.latitude, address.longitude)
                                             currentLatLng = latLng
@@ -255,6 +262,7 @@ fun AddressScreen(
                                                 cameraPositionState.animate(
                                                     update = CameraUpdateFactory.newLatLngZoom(latLng, 16f)
                                                 )
+                                                isSelectingSearch = false
                                             }
                                         }
                                 )
