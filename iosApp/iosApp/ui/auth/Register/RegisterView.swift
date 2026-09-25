@@ -104,6 +104,7 @@ struct RegisterView: View {
                 viewModel.address = address
                 viewModel.latitude = lat
                 viewModel.longitude = lng
+                validButton()
             }
         }, when: $destiny.cmToBool(.uiNext))
         .onChange(of: viewModel.isRegisterSuccessful) { oldValue, newValue in
@@ -111,13 +112,19 @@ struct RegisterView: View {
                 dismiss()
             }
         }
+        .onChange(of: viewModel.address) { _ in
+            validButton()
+        }
+        .onAppear {
+            validButton()
+        }
     }
     
-     func validButton(){
+    func validButton() {
         enableButton = viewModel.nameUser.isNotEmpty() &&
         viewModel.names.isNotEmpty() &&
         viewModel.lastName.isNotEmpty() &&
-        viewModel.lastName.uiTayValidEmail() &&
+        viewModel.email.uiTayValidEmail() &&
         viewModel.pass.isNotEmpty() &&
         viewModel.phone.uiTayValidNumberPhone() &&
         viewModel.address.isNotEmpty() &&
