@@ -1,9 +1,12 @@
 package com.pizzza.pizzzaapp.feature.auth.register
 
+import android.location.Geocoder
+import android.util.Log
 import android.util.Patterns
 import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -12,6 +15,7 @@ import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -30,6 +34,10 @@ import org.koin.compose.viewmodel.koinViewModel
 import com.valu.uitaycompose.label.UiTayEditLayout
 import com.valu.uitaycompose.model.*
 import com.valu.uitaycompose.utils.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -39,6 +47,7 @@ fun RegisterScreen(
     val  viewModel: AuthViewModel = koinViewModel()
     val uiState by viewModel.authUiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
+    val scope = rememberCoroutineScope()
     val isEmailValid = Patterns.EMAIL_ADDRESS.matcher(uiState.email).matches()
     val isPhoneValid = uiState.phone.length == 10 && uiState.phone.all { it.isDigit() }
 
@@ -183,34 +192,63 @@ fun RegisterScreen(
                     )
                 }
                 item {
-                    Surface(
-                        onClick = {onNavigateTo(ScreenInitNav.AddressSelection(fromRegister = true))},
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(42.dp),
-                        shape = RoundedCornerShape(12.dp),
-                        border = BorderStroke(1.dp, tay_green_600),
-                        color = Color.White
+                    Column(
+                        modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)
                     ) {
                         Row(
-                            modifier = Modifier.padding(horizontal = 16.dp),
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.SpaceBetween
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(bottom = 6.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
                         ) {
                             Text(
-                                text = uiState.address.ifBlank { "Selecciona dirección en el mapa" },
+                                text = "Dirección de domicilio",
                                 style = textM12,
-                                color = if (uiState.address.isBlank()) Color.Gray else tay_red_600,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis,
-                                modifier = Modifier.weight(1f)
+                                color = tay_red_600
                             )
-                            Icon(
-                                imageVector = Icons.Default.LocationOn,
-                                contentDescription = null,
-                                tint = tay_green_600
-                            )
+                            Row(
+                                modifier = Modifier
+                                    .clickable { onNavigateTo(ScreenInitNav.AddressSelection(fromRegister = true)) }
+                                    .padding(vertical = 2.dp, horizontal = 4.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(4.dp)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.LocationOn,
+                                    contentDescription = "Seleccionar en mapa",
+                                    tint = tay_green_600,
+                                    modifier = Modifier.size(16.dp)
+                                )
+                                Text(
+                                    text = "Elegir en mapa",
+                                    style = textM12,
+                                    color = tay_green_600
+                                )
+                            }
                         }
+
+                        UiTayEditLayout(
+                            value = uiState.address,
+                            onValueChange = { newAddress ->
+                                viewModel.onRegisterFieldChange(
+                                    address = newAddress,
+                                    latitude = "0",
+                                    longitude = "0"
+                                )
+                            },
+                            hint = "Ejemplo: Calle : numero,Ciudad",
+                            imeAction = ImeAction.Done,
+                            model = UiEditLayoutModel(
+                                uiStrokeActiveColor = tay_red_600,
+                                uiTextColor = tay_red_600,
+                                uiTextActiveColor = tay_red_600,
+                                uiTitleActiveColor = tay_red_600,
+                                uiHintColor = tay_grey_300,
+                                uiTextFont = textM14,
+                                uiTitleFont = textM12
+                            )
+                        )
                     }
                 }
             }
@@ -225,9 +263,33 @@ fun RegisterScreen(
                     uiTayText = "Registrarse",
                     uiTayEnable = isButtonEnabled,
                     uiTayClick = {
-                        viewModel.register { _ ->
-                            Toast.makeText(context, "Registro exitoso", Toast.LENGTH_LONG).show()
-                            onNavigateTo(ScreenInitNav.Login)
+                        scope.launch(Dispatchers.IO) {
+                            val currentUiState = viewModel.authUiState.value
+                            if (currentUiState.latitude.isBlank() || currentUiState.longitude.isBlank() || currentUiState.latitude == "0" || currentUiState.longitude == "0") {
+                                try {
+                                    val geocoder = Geocoder(context, Locale.getDefault())
+                                    val addressLower = currentUiState.address.lowercase()
+                                    val addressQuery = if (!addressLower.contains("mexico") && !addressLower.contains("méxico") && !addressLower.contains("argentina") && !addressLower.contains("peru")) {
+                                        "${currentUiState.address}, ${getCurrentCountryName()}"
+                                    } else {
+                                        currentUiState.address
+                                    }
+                                    val addresses = geocoder.getFromLocationName(addressQuery, 1)
+                                    if (!addresses.isNullOrEmpty()) {
+                                        val lat = addresses[0].latitude.toString()
+                                        val lng = addresses[0].longitude.toString()
+                                        viewModel.onRegisterFieldChange(latitude = lat, longitude = lng)
+                                    }
+                                } catch (e: Exception) {
+                                    Log.e("RegisterScreen", "Error geocodificando dirección: ${e.message}")
+                                }
+                            }
+                            withContext(Dispatchers.Main) {
+                                viewModel.register { _ ->
+                                    Toast.makeText(context, "Registro exitoso", Toast.LENGTH_LONG).show()
+                                    onNavigateTo(ScreenInitNav.Login)
+                                }
+                            }
                         }
                     },
                     uiTayBtnModifier = UiTayButtonModel(
@@ -239,5 +301,21 @@ fun RegisterScreen(
                 )
             }
         }
+    }
+}
+
+private fun getCurrentCountryName(): String {
+    return try {
+        val countryCode = Locale.getDefault().country
+        when (countryCode.uppercase()) {
+            "MX" -> "Mexico"
+            "AR" -> "Argentina"
+            "PE" -> "Peru"
+            "CO" -> "Colombia"
+            "CL" -> "Chile"
+            else -> "Mexico"
+        }
+    } catch (e: Exception) {
+        "Mexico"
     }
 }
