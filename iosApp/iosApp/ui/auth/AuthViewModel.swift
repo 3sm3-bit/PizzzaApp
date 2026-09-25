@@ -15,7 +15,14 @@ class AuthViewModel: BaseViewModel {
     
     private let dataUseCase = KoinHelper.shared.getDataUseCase()
     
-    @Published var nameUser: String = ""
+    @Published var nameUser: String = "" {
+        didSet {
+            let filtered = nameUser.replacingOccurrences(of: " ", with: "")
+            if filtered != nameUser {
+                nameUser = filtered
+            }
+        }
+    }
     @Published var names: String = ""
     @Published var lastName: String = ""
     @Published var email: String = ""

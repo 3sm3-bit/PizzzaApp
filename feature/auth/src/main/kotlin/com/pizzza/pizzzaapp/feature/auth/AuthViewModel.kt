@@ -46,7 +46,7 @@ class AuthViewModel(
     ) {
         _authUiState.update { 
             it.copy(
-                nameUser = nameUser,
+                nameUser = nameUser.replace(" ", ""),
                 names = names,
                 lastName = lastName,
                 document = document,
