@@ -88,7 +88,6 @@ struct PizzaView: View {
         )
     }
 
-
     struct PizzaProductCard: View {
         let product: ProductModel
         
@@ -171,4 +170,3 @@ struct PizzaView: View {
         }
     }
 }
-

@@ -4,15 +4,14 @@ import TaySwitfUILibrary
 struct RegisterView: View {
 
     @ObservedObject private var viewModel: AuthViewModel = Resolver.shared.resolve(AuthViewModel.self)
-    @Environment(\.presentationMode) var presentationMode
-    @State private var showAddressSelection = false
     @State var enableButton: Bool = false
     @Environment(\.dismiss) var dismiss
+    @State var destiny: ActionNav?
+
 
     var body: some View {
         BaseViewGeneral(viewModel: viewModel) {
             VStack(spacing: 0) {
-                
                 Image("ic_logo_pizzzeria")
                     .resizable()
                     .frame(width: 250, height: 100)
@@ -78,7 +77,7 @@ struct RegisterView: View {
                             )
                         }
                         .onTapGesture {
-                            showAddressSelection = true
+                            destiny =  .uiNext
                         }
                         
                     }
@@ -96,8 +95,7 @@ struct RegisterView: View {
                 .padding(.bottom, 8)
                 .background(Color.white)
             }
-        }
-        .sheet(isPresented: $showAddressSelection) {
+        }.uiTayNavigate(to: {
             AddressSelectionView(
                 initialLat: viewModel.latitude,
                 initialLng: viewModel.longitude,
@@ -107,7 +105,7 @@ struct RegisterView: View {
                 viewModel.latitude = lat
                 viewModel.longitude = lng
             }
-        }
+        }, when: $destiny.cmToBool(.uiNext))
         .onChange(of: viewModel.isRegisterSuccessful) { oldValue, newValue in
             if newValue {
                 dismiss()

@@ -48,7 +48,6 @@ struct BaseViewGeneral<ViewModel: BaseViewModel, Content: View>: View {
                     )
                 ) { _ in
                     onDetectedError(self.viewModel.uiTayErrorAction)
-                    
                 }
             }
             Color.uiTayRed1200.frame(height: 56).ignoresSafeArea(edges: .top)
@@ -58,8 +57,6 @@ struct BaseViewGeneral<ViewModel: BaseViewModel, Content: View>: View {
         .onTapGesture {
             isTextFielFicudedd = false
         }
-        
         .uiTayHideToolbar()
     }
-    
 }

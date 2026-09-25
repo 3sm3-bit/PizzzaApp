@@ -7,6 +7,7 @@
 
 enum ActionNav: Sendable{
     case uiNext
+    case uiNextAlter
     case uimBack
     case uiDefalut
     
@@ -18,6 +19,7 @@ extension ActionNav: Equatable {
         switch (typeGeneric, currentGeneric) {
         case (.uiNext, .uiNext): return true
         case (.uimBack, .uimBack): return true
+        case (.uiNextAlter, .uiNextAlter): return true
         default: return false
         }
     }

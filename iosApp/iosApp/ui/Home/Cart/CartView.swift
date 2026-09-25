@@ -61,7 +61,8 @@ struct CartView: View {
                                 Text("Cambiar dirección de entrega")
                                     .font(PizzaFonts.bold14)
                                 Button(action: {
-                                    showAddressSelection = true
+                                    destiny = .uiNextAlter
+                                    //showAddressSelection = true
                                 }) {
                                     HStack {
                                         Text(cartManager.deliveryAddress.isEmpty ? "Selecciona dirección en el mapa" : cartManager.deliveryAddress)
@@ -117,8 +118,7 @@ struct CartView: View {
         .navigationBarHidden(true)
         .onAppear {
             cartManager.loadUserAddress()
-        }
-        .sheet(isPresented: $showAddressSelection) {
+        }.uiTayNavigate(to: {
             AddressSelectionView(
                 initialLat: cartManager.latitude,
                 initialLng: cartManager.longitude,
@@ -128,7 +128,7 @@ struct CartView: View {
                 cartManager.latitude = lat
                 cartManager.longitude = lng
             }
-        }
+        }, when: $destiny.cmToBool(.uiNextAlter))
         .uiTayNavigate(to: {
             OrderSummaryView(onConfirm: {
                 DispatchQueue.main.async {
