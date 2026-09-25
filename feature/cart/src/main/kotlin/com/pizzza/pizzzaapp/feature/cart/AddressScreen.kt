@@ -5,16 +5,22 @@ import android.content.pm.PackageManager
 import android.location.Geocoder
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import com.google.android.gms.location.LocationServices
@@ -28,7 +34,10 @@ import com.valu.uitaycompose.model.UiTayButtonModel
 import com.valu.uitaycompose.model.UiToolBarModel
 import com.valu.uitaycompose.utils.tay_red_50
 import com.valu.uitaycompose.utils.tay_red_600
+import com.valu.uitaycompose.utils.textM12
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -56,6 +65,28 @@ fun AddressScreen(
 
     var currentAddress by remember { mutableStateOf(initialAddress ?: "Obteniendo dirección...") }
     var currentLatLng by remember { mutableStateOf(initialLatLng ?: defaultLocation) }
+
+    var searchQuery by remember { mutableStateOf("") }
+    var searchResults by remember { mutableStateOf<List<android.location.Address>>(emptyList()) }
+
+    fun searchAddress(query: String) {
+        if (query.isBlank()) {
+            searchResults = emptyList()
+            return
+        }
+        scope.launch(Dispatchers.IO) {
+            try {
+                val geocoder = Geocoder(context, Locale.getDefault())
+                @Suppress("DEPRECATION")
+                val addresses = geocoder.getFromLocationName(query, 5)
+                withContext(Dispatchers.Main) {
+                    searchResults = addresses ?: emptyList()
+                }
+            } catch (_: Exception) {
+                searchResults = emptyList()
+            }
+        }
+    }
 
     val fusedLocationClient = remember { LocationServices.getFusedLocationProviderClient(context) }
 
@@ -126,7 +157,6 @@ fun AddressScreen(
 
     Scaffold(
         topBar = {
-
             Surface(color = tay_red_50) {
                 Box(modifier = Modifier.statusBarsPadding()) {
                     UiTayCToolBar(
@@ -160,10 +190,86 @@ fun AddressScreen(
                     .offset(y = (-24).dp)
             )
 
+            // Search Bar & Results at the top
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
+                    .align(Alignment.TopCenter)
+            ) {
+                OutlinedTextField(
+                    value = searchQuery,
+                    onValueChange = {
+                        searchQuery = it
+                        searchAddress(it)
+                    },
+                    placeholder = { Text("Buscar dirección...", style = textM12, color = Color.Gray) },
+                    leadingIcon = { Icon(Icons.Default.Search, contentDescription = null, tint = tay_red_600) },
+                    trailingIcon = {
+                        if (searchQuery.isNotBlank()) {
+                            IconButton(onClick = {
+                                searchQuery = ""
+                                searchResults = emptyList()
+                            }) {
+                                Icon(Icons.Default.Close, contentDescription = null, tint = Color.Gray)
+                            }
+                        }
+                    },
+                    singleLine = true,
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedContainerColor = Color.White,
+                        unfocusedContainerColor = Color.White,
+                        focusedBorderColor = tay_red_600,
+                        unfocusedBorderColor = Color.LightGray
+                    ),
+                    shape = RoundedCornerShape(12.dp),
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                if (searchResults.isNotEmpty()) {
+                    Spacer(Modifier.height(4.dp))
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(12.dp),
+                        colors = CardDefaults.cardColors(containerColor = Color.White),
+                        elevation = CardDefaults.cardElevation(defaultElevation = 6.dp)
+                    ) {
+                        LazyColumn(
+                            modifier = Modifier.fillMaxWidth().heightIn(max = 200.dp)
+                        ) {
+                            items(searchResults) { address ->
+                                val addressText = address.getAddressLine(0) ?: "Dirección"
+                                ListItem(
+                                    headlineContent = {
+                                        Text(text = addressText, style = textM12, color = Color.Black, maxLines = 2, overflow = TextOverflow.Ellipsis)
+                                    },
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .clickable {
+                                            currentAddress = addressText
+                                            val latLng = LatLng(address.latitude, address.longitude)
+                                            currentLatLng = latLng
+                                            searchResults = emptyList()
+                                            searchQuery = ""
+                                            scope.launch {
+                                                cameraPositionState.animate(
+                                                    update = CameraUpdateFactory.newLatLngZoom(latLng, 16f)
+                                                )
+                                            }
+                                        }
+                                )
+                                HorizontalDivider(color = Color(0xFFF0F2F5), thickness = 0.5.dp)
+                            }
+                        }
+                    }
+                }
+            }
+
             // Info and confirm button at the bottom
             Card(
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
+                    .imePadding()
                     .padding(16.dp)
                     .fillMaxWidth(),
                 shape = RoundedCornerShape(16.dp),

@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -237,9 +238,7 @@ fun ScreenDetailOrder(
                             value = note,
                             onValueChange = { note = it },
                             modifier = Modifier.fillMaxWidth(),
-                            label = { Text("Nota(Especificacion o sabor)", style = textB14, color = tay_red_600) },
-                            placeholder = { Text("Instrucciones especiales (opcional)", style =
-                                textM12.copy(color = Color.Gray)) },
+                            placeholder = { Text("Nota (Especificación o sabor)", style = textM12.copy(color = Color.Gray)) },
                             minLines = 4,
                             maxLines = 4,
                             shape = RoundedCornerShape(12.dp),
@@ -333,7 +332,7 @@ fun ScreenDetailOrder(
 
                 Spacer(Modifier.height(24.dp))
 
-                Spacer(Modifier.fillMaxHeight())
+                Spacer(Modifier.imePadding())
             }
         }
     }

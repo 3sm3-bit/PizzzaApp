@@ -1,10 +1,6 @@
 package com.pizzza.pizzzaapp.feature.home.cart
 
-import android.location.Geocoder
-import android.util.Log
-import java.text.Normalizer
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
@@ -17,26 +13,18 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.pizzza.pizzzaapp.feature.cart.CartViewModel
 import com.pizzza.pizzzaapp.feature.cart.CartItemCard
 import com.pizzza.pizzzaapp.core.ui.singleton.LocalAppDataOrder
-import com.valu.uitaycompose.label.UiTayEditLayout
-import com.valu.uitaycompose.model.UiEditLayoutModel
 import com.valu.uitaycompose.utils.*
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import org.koin.compose.viewmodel.koinViewModel
-import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -45,8 +33,6 @@ fun ScreenCart(
     onNavigateToSummary: () -> Unit,
 ) {
     val cartViewModel: CartViewModel = koinViewModel()
-    val context = LocalContext.current
-    val scope = rememberCoroutineScope()
     val uiState by LocalAppDataOrder.current.state.collectAsStateWithLifecycle()
     val isButtonEnabled = if (uiState.receptionMode == "RECOJO") {
         uiState.cart.isNotEmpty()
@@ -109,63 +95,34 @@ fun ScreenCart(
 
                             if (uiState.receptionMode == "DELIVERY") {
                                 Spacer(Modifier.height(16.dp))
-                                Column(
-                                    modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)
+                                Text("Cambiar dirección de entrega", style = textS16, color = Color.Black)
+                                Spacer(Modifier.height(4.dp))
+                                Surface(
+                                    onClick = onNavigateToAddressSelection,
+                                    modifier = Modifier.fillMaxWidth().height(48.dp),
+                                    shape = RoundedCornerShape(12.dp),
+                                    border = BorderStroke(1.dp, Color.Black),
+                                    color = Color.White
                                 ) {
                                     Row(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .padding(bottom = 6.dp),
-                                        horizontalArrangement = Arrangement.SpaceBetween,
-                                        verticalAlignment = Alignment.CenterVertically
+                                        modifier = Modifier.padding(horizontal = 16.dp),
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        horizontalArrangement = Arrangement.SpaceBetween
                                     ) {
                                         Text(
-                                            text = "Dirección de domicilio",
+                                            text = uiState.deliveryAddress.ifBlank { "Selecciona dirección en el mapa" },
                                             style = textM12,
-                                            color = tay_red_600
+                                            color = if (uiState.deliveryAddress.isBlank()) Color.Gray else Color.Black,
+                                            maxLines = 1,
+                                            overflow = TextOverflow.Ellipsis,
+                                            modifier = Modifier.weight(1f)
                                         )
-                                        Row(
-                                            modifier = Modifier
-                                                .clickable { onNavigateToAddressSelection() }
-                                                .padding(vertical = 2.dp, horizontal = 4.dp),
-                                            verticalAlignment = Alignment.CenterVertically,
-                                            horizontalArrangement = Arrangement.spacedBy(4.dp)
-                                        ) {
-                                            Icon(
-                                                imageVector = Icons.Default.LocationOn,
-                                                contentDescription = "Seleccionar en mapa",
-                                                tint = tay_green_600,
-                                                modifier = Modifier.size(16.dp)
-                                            )
-                                            Text(
-                                                text = "Elegir en mapa",
-                                                style = textM12,
-                                                color = tay_green_600
-                                            )
-                                        }
+                                        Icon(
+                                            imageVector = Icons.Default.LocationOn,
+                                            contentDescription = null,
+                                            tint = Color.Black
+                                        )
                                     }
-
-                                    UiTayEditLayout(
-                                        value = uiState.deliveryAddress,
-                                        onValueChange = { newAddress ->
-                                            cartViewModel.updateDeliveryAddress(
-                                                address = newAddress,
-                                                lat = "0",
-                                                lng = "0"
-                                            )
-                                        },
-                                        hint = "Ejemplo: Calle : numero,Ciudad",
-                                        imeAction = androidx.compose.ui.text.input.ImeAction.Done,
-                                        model = UiEditLayoutModel(
-                                            uiStrokeActiveColor = tay_red_600,
-                                            uiTextColor = tay_red_600,
-                                            uiTextActiveColor = tay_red_600,
-                                            uiTitleActiveColor = tay_red_600,
-                                            uiHintColor = tay_grey_300,
-                                            uiTextFont = textM14,
-                                            uiTitleFont = textM12
-                                        )
-                                    )
                                 }
                             }
                             if (uiState.branches.size >= 2) {
@@ -223,36 +180,7 @@ fun ScreenCart(
                     .padding(12.dp)
             ) {
                 Surface(
-                    onClick = { 
-                        if (isButtonEnabled) {
-                            scope.launch(Dispatchers.IO) {
-                                val currentState = uiState
-                                if (currentState.receptionMode == "DELIVERY" && (currentState.latitude.isBlank() || currentState.longitude.isBlank() || currentState.latitude == "0" || currentState.longitude == "0")) {
-                                    try {
-                                        val geocoder = Geocoder(context, Locale.getDefault())
-                                        val addressLower = currentState.deliveryAddress.lowercase()
-                                        val cleanCountry = getCleanCountryName().lowercase()
-                                        val addressQuery = if (addressLower.contains(cleanCountry) == false) {
-                                            "${currentState.deliveryAddress}, ${getCleanCountryName()}"
-                                        } else {
-                                            currentState.deliveryAddress
-                                        }
-                                        val addresses = geocoder.getFromLocationName(addressQuery, 1)
-                                        if (!addresses.isNullOrEmpty()) {
-                                            val lat = addresses[0].latitude.toString()
-                                            val lng = addresses[0].longitude.toString()
-                                            cartViewModel.updateDeliveryAddress(currentState.deliveryAddress, lat, lng)
-                                        }
-                                    } catch (e: Exception) {
-                                        Log.e("ScreenCart", "Error geocodificando dirección: ${e.message}")
-                                    }
-                                }
-                                withContext(Dispatchers.Main) {
-                                    onNavigateToSummary()
-                                }
-                            }
-                        }
-                    },
+                    onClick = { if (isButtonEnabled) onNavigateToSummary() },
                     color = if (isButtonEnabled) tay_green_600 else Color.LightGray,
                     shape = RoundedCornerShape(16.dp),
                     modifier = Modifier
@@ -271,19 +199,5 @@ fun ScreenCart(
                 }
             }
         }
-    }
-}
-
-private fun getCleanCountryName(): String {
-    return try {
-        val country = Locale.getDefault().displayCountry
-        if (country.isNotBlank()) {
-            val normalized = Normalizer.normalize(country, Normalizer.Form.NFD)
-            Regex("\\p{InCombiningDiacriticalMarks}+").replace(normalized, "")
-        } else {
-            "Mexico"
-        }
-    } catch (_: Exception) {
-        "Mexico"
     }
 }
