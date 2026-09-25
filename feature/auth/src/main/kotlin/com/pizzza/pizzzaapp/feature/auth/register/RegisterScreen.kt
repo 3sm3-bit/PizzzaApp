@@ -4,6 +4,7 @@ import android.location.Geocoder
 import android.util.Log
 import android.util.Patterns
 import android.widget.Toast
+import java.text.Normalizer
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -269,8 +270,9 @@ fun RegisterScreen(
                                 try {
                                     val geocoder = Geocoder(context, Locale.getDefault())
                                     val addressLower = currentUiState.address.lowercase()
-                                    val addressQuery = if (!addressLower.contains("mexico") && !addressLower.contains("méxico") && !addressLower.contains("argentina") && !addressLower.contains("peru")) {
-                                        "${currentUiState.address}, ${getCurrentCountryName()}"
+                                    val cleanCountry = getCleanCountryName().lowercase()
+                                    val addressQuery = if (addressLower.contains(cleanCountry) == false) {
+                                        "${currentUiState.address}, ${getCleanCountryName()}"
                                     } else {
                                         currentUiState.address
                                     }
@@ -304,18 +306,16 @@ fun RegisterScreen(
     }
 }
 
-private fun getCurrentCountryName(): String {
+private fun getCleanCountryName(): String {
     return try {
-        val countryCode = Locale.getDefault().country
-        when (countryCode.uppercase()) {
-            "MX" -> "Mexico"
-            "AR" -> "Argentina"
-            "PE" -> "Peru"
-            "CO" -> "Colombia"
-            "CL" -> "Chile"
-            else -> "Mexico"
+        val country = Locale.getDefault().displayCountry
+        if (country.isNotBlank()) {
+            val normalized = Normalizer.normalize(country, Normalizer.Form.NFD)
+            Regex("\\p{InCombiningDiacriticalMarks}+").replace(normalized, "")
+        } else {
+            "Mexico"
         }
-    } catch (e: Exception) {
+    } catch (_: Exception) {
         "Mexico"
     }
 }

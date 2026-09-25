@@ -2,6 +2,7 @@ package com.pizzza.pizzzaapp.feature.home.cart
 
 import android.location.Geocoder
 import android.util.Log
+import java.text.Normalizer
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -230,8 +231,9 @@ fun ScreenCart(
                                     try {
                                         val geocoder = Geocoder(context, Locale.getDefault())
                                         val addressLower = currentState.deliveryAddress.lowercase()
-                                        val addressQuery = if (!addressLower.contains("mexico") && !addressLower.contains("méxico") && !addressLower.contains("argentina") && !addressLower.contains("peru")) {
-                                            "${currentState.deliveryAddress}, ${getCurrentCountryName()}"
+                                        val cleanCountry = getCleanCountryName().lowercase()
+                                        val addressQuery = if (addressLower.contains(cleanCountry) == false) {
+                                            "${currentState.deliveryAddress}, ${getCleanCountryName()}"
                                         } else {
                                             currentState.deliveryAddress
                                         }
@@ -272,16 +274,14 @@ fun ScreenCart(
     }
 }
 
-private fun getCurrentCountryName(): String {
+private fun getCleanCountryName(): String {
     return try {
-        val countryCode = Locale.getDefault().country
-        when (countryCode.uppercase()) {
-            "MX" -> "Mexico"
-            "AR" -> "Argentina"
-            "PE" -> "Peru"
-            "CO" -> "Colombia"
-            "CL" -> "Chile"
-            else -> "Mexico"
+        val country = Locale.getDefault().displayCountry
+        if (country.isNotBlank()) {
+            val normalized = Normalizer.normalize(country, Normalizer.Form.NFD)
+            Regex("\\p{InCombiningDiacriticalMarks}+").replace(normalized, "")
+        } else {
+            "Mexico"
         }
     } catch (_: Exception) {
         "Mexico"
