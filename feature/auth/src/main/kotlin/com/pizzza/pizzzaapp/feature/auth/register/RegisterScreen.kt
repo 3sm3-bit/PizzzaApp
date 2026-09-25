@@ -49,7 +49,8 @@ fun RegisterScreen(
             uiState.pass.isNotBlank() &&
             isPhoneValid &&
             uiState.address.isNotBlank() &&
-            uiState.address != "Selecciona dirección en el mapa"
+            uiState.address != "Selecciona dirección en el mapa" &&
+            uiState.address != "Obteniendo dirección..."
 
     Scaffold(
         containerColor = Color(0xFFF0F2F5)
