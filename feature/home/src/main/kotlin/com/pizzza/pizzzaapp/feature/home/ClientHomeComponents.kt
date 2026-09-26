@@ -151,7 +151,7 @@ fun ExtraProductCard(product: ProductModel, onClick: () -> Unit) {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(130.dp)
+                    .height(110.dp)
             ) {
                 UiTayUrlImage(
                     url = product.urlImg, drawable = R.drawable.peperoni
@@ -161,7 +161,7 @@ fun ExtraProductCard(product: ProductModel, onClick: () -> Unit) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(12.dp),
+                    .padding(horizontal = 12.dp, vertical = 8.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                 verticalAlignment = Alignment.Top
             ) {
