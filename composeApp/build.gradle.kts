@@ -97,6 +97,23 @@ android {
         manifestPlaceholders["MAPS_API_KEY"] = mapsApiKey
     }
 
+    flavorDimensions += "environment"
+
+    productFlavors {
+        create("dev") {
+            dimension = "environment"
+            resValue("string", "app_name", "Pizzza (Dev)")
+            buildConfigField("String", "BASE_URL", "\"http://10.0.2.2:3000\"")
+            buildConfigField("Boolean", "IS_DEV", "true")
+        }
+        create("pro") {
+            dimension = "environment"
+            resValue("string", "app_name", "Pizzza")
+            buildConfigField("String", "BASE_URL", "\"https://app.lapizzzeria.lol\"")
+            buildConfigField("Boolean", "IS_DEV", "false")
+        }
+    }
+
     signingConfigs {
         create("release") {
             storeFile = file("../pizzza-app-key.jks")
@@ -127,6 +144,7 @@ android {
 
     buildFeatures {
         buildConfig = true
+        resValues = true
         compose = true
     }
 
@@ -134,7 +152,7 @@ android {
         val variant = this
         outputs.all {
             val output = this as com.android.build.gradle.internal.api.BaseVariantOutputImpl
-            output.outputFileName = "pizzeria-${variant.buildType.name}.apk"
+            output.outputFileName = "pizzeria-${variant.flavorName}-${variant.buildType.name}.apk"
         }
     }
 }

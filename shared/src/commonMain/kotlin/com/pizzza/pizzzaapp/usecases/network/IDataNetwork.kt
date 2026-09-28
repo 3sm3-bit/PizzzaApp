@@ -8,6 +8,7 @@ import com.pizzza.pizzzaapp.repository.network.model.LoginRequest
 import com.pizzza.pizzzaapp.repository.network.model.LoginResponse
 import com.pizzza.pizzzaapp.repository.network.model.OrderResponse
 import com.pizzza.pizzzaapp.repository.network.model.UserResponse
+import com.pizzza.pizzzaapp.repository.network.model.RefreshTokenResponse
 
 interface IDataNetwork {
 
@@ -22,6 +23,8 @@ interface IDataNetwork {
     suspend fun registerUser(data: UserResponse): String
 
     suspend fun login(data: LoginRequest): LoginResponse
+
+    suspend fun refreshToken(refreshToken: String): RefreshTokenResponse
 
     suspend fun createPaymentSession(amount: Double, email: String, orderId: String): String
 

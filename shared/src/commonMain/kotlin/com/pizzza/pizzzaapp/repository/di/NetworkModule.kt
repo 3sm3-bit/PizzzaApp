@@ -45,7 +45,6 @@ val networkModule = module {
 
             defaultRequest {
                 if (!connectivityManager.isConnected()) throw ErrorNetwork()
-                headers.append("ngrok-skip-browser-warning", "true")
             }
 
             HttpResponseValidator {
@@ -59,19 +58,27 @@ val networkModule = module {
                             ""
                         }
 
-                        when (statusCode) {
-                            //401 -> throw UnAuthorizedException()
-                            in 400..599 -> {
-                                val errorModel = try {
-                                    jsonLenient.decodeFromString<CompleteErrorModel>(errorText)
-                                } catch (e: Exception) {
-                                    null
-                                }
+                        val errorModel = try {
+                            jsonLenient.decodeFromString<CompleteErrorModel>(errorText)
+                        } catch (e: Exception) {
+                            null
+                        }
+
+                        val finalTitle = errorModel?.title?.takeIf { it.isNotBlank() } ?: "Error $statusCode"
+                        val finalMessage = errorModel?.errorMessage?.takeIf { it.isNotBlank() }
+                            ?: errorText.takeIf { it.isNotBlank() }
+                            ?: "Ocurrió un error inesperado"
+                        val finalCode = errorModel?.effectiveCode?.takeIf { it != 0 } ?: statusCode
+
+                        when {
+                            statusCode == 401 || (finalCode == 17 && (finalTitle.contains("token", ignoreCase = true) || finalMessage.contains("token", ignoreCase = true))) -> {
+                                throw com.pizzza.pizzzaapp.repository.network.exception.UnAuthorizedException()
+                            }
+                            else -> {
                                 throw UiTayApiException(
-                                    code = statusCode,
-                                    title = errorModel?.title ?: "Error $statusCode",
-                                    messageApi = errorModel?.errorMessage ?: errorText.takeIf { it.isNotBlank() }
-                                    ?: "Ocurrió un error inesperado"
+                                    code = finalCode,
+                                    title = finalTitle,
+                                    messageApi = finalMessage
                                 )
                             }
                         }
@@ -85,6 +92,7 @@ val networkModule = module {
             }
 
             install(HttpTimeout) {
+                connectTimeoutMillis = 15_000
                 socketTimeoutMillis = 60_000
                 requestTimeoutMillis = 60_000
             }

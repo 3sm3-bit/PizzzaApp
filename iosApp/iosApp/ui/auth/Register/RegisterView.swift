@@ -121,16 +121,19 @@ struct RegisterView: View {
     }
     
     func validButton() {
-        let isPhoneValid = viewModel.phone.count == 10 && viewModel.phone.allSatisfy { $0.isNumber }
-        let isAddressValid = !viewModel.address.isEmpty &&
-                             viewModel.address != "Selecciona dirección en el mapa" &&
-                             viewModel.address != "Cargando dirección..."
+        let cleanEmail = viewModel.email.trimmingCharacters(in: .whitespacesAndNewlines)
+        let cleanPhone = viewModel.phone.trimmingCharacters(in: .whitespacesAndNewlines)
+        let isPhoneValid = cleanPhone.count == 10 && cleanPhone.allSatisfy { $0.isNumber }
+        let cleanAddress = viewModel.address.trimmingCharacters(in: .whitespacesAndNewlines)
+        let isAddressValid = !cleanAddress.isEmpty &&
+                             cleanAddress != "Selecciona dirección en el mapa" &&
+                             cleanAddress != "Cargando dirección..."
 
-        enableButton = viewModel.nameUser.isNotEmpty() &&
-        viewModel.names.isNotEmpty() &&
-        viewModel.lastName.isNotEmpty() &&
-        viewModel.email.uiTayValidEmail() &&
-        viewModel.pass.isNotEmpty() &&
+        enableButton = viewModel.nameUser.trimmingCharacters(in: .whitespacesAndNewlines).isNotEmpty() &&
+        viewModel.names.trimmingCharacters(in: .whitespacesAndNewlines).isNotEmpty() &&
+        viewModel.lastName.trimmingCharacters(in: .whitespacesAndNewlines).isNotEmpty() &&
+        cleanEmail.uiTayValidEmail() &&
+        viewModel.pass.trimmingCharacters(in: .whitespacesAndNewlines).isNotEmpty() &&
         isPhoneValid &&
         isAddressValid
     }

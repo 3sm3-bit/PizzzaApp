@@ -9,10 +9,14 @@ import com.pizzza.pizzzaapp.repository.network.model.OrderResponse
 import com.pizzza.pizzzaapp.repository.network.model.UserResponse
 import com.pizzza.pizzzaapp.repository.network.model.loadParentOrder
 import com.pizzza.pizzzaapp.repository.network.model.toModelList
+import com.pizzza.pizzzaapp.usecases.network.IDataDataBase
 import com.pizzza.pizzzaapp.usecases.network.IDataNetwork
 
+import com.pizzza.pizzzaapp.repository.network.model.RefreshTokenResponse
+
 class DataNetwork(
-    private val apiService: KmmService
+    private val apiService: KmmService,
+    private val dataBase: IDataDataBase
 ) : IDataNetwork {
 
     override suspend fun syncProducts(): List<ProductModel> = apiCall({
@@ -22,12 +26,14 @@ class DataNetwork(
     }) { it }
 
     override suspend fun createOrder(data: List<OrderResponse>): String = apiCall {
-        apiService.createOrder(data)
+        val token = dataBase.getUserLocal()?.token
+        apiService.createOrder(data, token = token)
     }
 
     override suspend fun loadParentOrder(userId: String): List<ParentOrderModel> {
         return apiCall({
-            val response = apiService.getParentOrder(userId)
+            val token = dataBase.getUserLocal()?.token
+            val response = apiService.getParentOrder(userId, token = token)
             response
         }) { response ->
             response.loadParentOrder()
@@ -35,7 +41,8 @@ class DataNetwork(
     }
 
     override suspend fun getOrderById(orderId: String): ParentOrderModel = apiCall({
-        apiService.getOrderById(orderId)
+        val token = dataBase.getUserLocal()?.token
+        apiService.getOrderById(orderId, token = token)
     }) { response ->
         listOf(response).loadParentOrder().first()
     }
@@ -46,6 +53,10 @@ class DataNetwork(
 
     override suspend fun login(data: LoginRequest): LoginResponse = apiCall {
         apiService.login(data)
+    }
+
+    override suspend fun refreshToken(refreshToken: String): RefreshTokenResponse = apiCall {
+        apiService.refreshToken(refreshToken)
     }
 
     override suspend fun createPaymentSession(amount: Double, email: String, orderId: String): String {
@@ -59,7 +70,8 @@ class DataNetwork(
             appSuccessUrl = "pizzitas://payment/success",
             appCancelUrl = "pizzitas://payment/cancel"
         )
-        val response = apiService.createPaymentSession(request)
+        val token = dataBase.getUserLocal()?.token
+        val response = apiService.createPaymentSession(request, token = token)
         return response.url ?: ""
     }
 

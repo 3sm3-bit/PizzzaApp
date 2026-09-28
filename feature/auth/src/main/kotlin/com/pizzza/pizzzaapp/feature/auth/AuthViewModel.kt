@@ -74,11 +74,11 @@ class AuthViewModel(
     fun login(onSuccess: () -> Unit) {
         execute(globalUiStateManager = globalUiStateManager) {
             val request = LoginRequest(
-                nameUser = _authUiState.value.user,
-                password = _authUiState.value.pass
+                nameUser = _authUiState.value.user.trim(),
+                password = _authUiState.value.pass.trim()
             )
             val response = io { dataUseCase.login(request) }
-            val userValid = response.userValid
+            val userValid = response.finalUser
             val userRole = userValid.rol?.uppercase() ?: ""
             if (userRole != "CLIENTE" && userRole != "ADMIN") {
                 throw UiTayApiException(
@@ -88,25 +88,9 @@ class AuthViewModel(
                 )
             }
 
-            val userModel = UserModel(
-                uid = userValid.uid ?: "",
-                nameUser = userValid.nameUser ?: "",
-                names = userValid.names ?: "",
-                lastName = userValid.lastName ?: "",
-                document = userValid.document ?: "",
-                email = userValid.email ?: "",
-                phone = userValid.phone ?: "",
-                address = userValid.address ?: "",
-                rol = userValid.rol ?: "CLIENTE",
-                area = userValid.area ?: "1",
-                longitude = userValid.longitude ?: "",
-                latitude = userValid.latitude ?: "",
-                token = response.token
-            )
-
+            val userModel = response.toUserModel()
             io { dataUseCase.saveUserLocal(userModel) }
 
-            // Update global data
             appDataOrder.update {
                 it.copy(
                     deliveryAddress = userModel.address,
@@ -120,20 +104,19 @@ class AuthViewModel(
         }
     }
 
-
     fun checkExistingUser(onResult: (String?) -> Unit) {
         execute(loading = false, globalUiStateManager = globalUiStateManager) {
-            val localUser = io { dataUseCase.getUserLocal() }
-            if (localUser != null) {
+            val user = io { dataUseCase.checkSessionAndRefreshToken() }
+            if (user != null) {
                 appDataOrder.update {
                     it.copy(
-                        deliveryAddress = localUser.address,
-                        latitude = localUser.latitude,
-                        longitude = localUser.longitude
+                        deliveryAddress = user.address,
+                        latitude = user.latitude,
+                        longitude = user.longitude
                     )
                 }
             }
-            onResult(localUser?.rol)
+            onResult(user?.rol)
         }
     }
 
@@ -141,18 +124,18 @@ class AuthViewModel(
         execute(globalUiStateManager = globalUiStateManager) {
             val state = _authUiState.value
             val request = UserResponse(
-                nameUser = state.nameUser,
-                names = state.names,
-                lastName = state.lastName,
-                document = state.document,
-                email = state.email,
-                password = state.pass,
-                phone = "+52${state.phone}",
-                address = state.address,
-                rol = state.rol,
-                area = state.area,
-                longitude = state.longitude,
-                latitude = state.latitude
+                nameUser = state.nameUser.trim(),
+                names = state.names.trim(),
+                lastName = state.lastName.trim(),
+                document = state.document.trim(),
+                email = state.email.trim(),
+                password = state.pass.trim(),
+                phone = "+52${state.phone.trim()}",
+                address = state.address.trim(),
+                rol = state.rol.trim(),
+                area = state.area.trim(),
+                longitude = state.longitude.trim(),
+                latitude = state.latitude.trim()
             )
             val response = io { dataUseCase.registerUser(request) }
             onSuccess(response)
@@ -162,7 +145,18 @@ class AuthViewModel(
     fun logout(onSuccess: () -> Unit) {
         execute(globalUiStateManager = globalUiStateManager) {
             io { dataUseCase.logout() }
-            appDataOrder.reset()
+            appDataOrder.update { state ->
+                state.copy(
+                    cart = emptyList(),
+                    deliveryAddress = "",
+                    latitude = "",
+                    longitude = "",
+                    selectedOrder = null,
+                    selectedProduct = null,
+                    orders = emptyList(),
+                    ordersLoaded = false
+                )
+            }
             onSuccess()
         }
     }

@@ -129,7 +129,7 @@ class CartViewModel(
                                 (if (item.cheeseFilledCrust) item.product.priceChosse.toDoubleOrNull() ?: 0.0 else 0.0)
 
                         OrderResponse(
-                            uid = UUID.randomUUID().toString(),
+                            uid = UUID.randomUUID().toString().replace("-", "").substring(0, 16),
                             nameClient = "${user?.names}",
                             quantity = item.quantity.toString(),
                             type = item.product.type,
@@ -152,7 +152,8 @@ class CartViewModel(
                             userId = user?.uid ?: "",
                             latitude = if (isDelivery) state.latitude else "0",
                             longitude = if (isDelivery) state.longitude else "0",
-                            statePay = statePay
+                            statePay = statePay,
+                            canal = "A1P9X2"
                         )
                     }
 

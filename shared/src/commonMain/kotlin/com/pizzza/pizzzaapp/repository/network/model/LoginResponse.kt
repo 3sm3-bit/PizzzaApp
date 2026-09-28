@@ -1,30 +1,42 @@
 package com.pizzza.pizzzaapp.repository.network.model
 
 import com.pizzza.pizzzaapp.model.UserModel
-import com.pizzza.pizzzaapp.repository.db.entity.UserEntity
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
 data class LoginResponse(
+    @SerialName("user")
+    val user: UserResponse? = null,
     @SerialName("userValid")
-    val userValid: UserResponse,
+    val userValid: UserResponse? = null,
+    @SerialName("accessToken")
+    val accessToken: String? = "",
     @SerialName("token")
-    val token: String
+    val token: String? = "",
+    @SerialName("refreshToken")
+    val refreshToken: String? = ""
 ){
+    val finalUser: UserResponse
+        get() = user ?: userValid ?: UserResponse()
+
+    val finalToken: String
+        get() = accessToken?.takeIf { it.isNotBlank() } ?: token ?: ""
+
     fun toUserModel() = UserModel(
-        uid = userValid.uid ?: "",
-        nameUser = userValid.nameUser ?: "",
-        names = userValid.names ?: "",
-        lastName = userValid.lastName ?: "",
-        document = userValid.document ?: "",
-        email = userValid.email ?: "",
-        phone = userValid.phone ?: "",
-        address = userValid.address ?: "",
-        rol = userValid.rol ?: "CLIENTE",
-        area = userValid.area ?: "1",
-        longitude = userValid.longitude ?: "",
-        latitude = userValid.latitude ?: "",
-        token = token
+        uid = finalUser.uid ?: "",
+        nameUser = finalUser.nameUser ?: "",
+        names = finalUser.names ?: "",
+        lastName = finalUser.lastName ?: "",
+        document = finalUser.document ?: "",
+        email = finalUser.email ?: "",
+        phone = finalUser.phone ?: "",
+        address = finalUser.address ?: "",
+        rol = finalUser.rol ?: "CLIENTE",
+        area = finalUser.area ?: "1",
+        longitude = finalUser.longitude ?: "",
+        latitude = finalUser.latitude ?: "",
+        token = finalToken,
+        refreshToken = refreshToken ?: ""
     )
 }

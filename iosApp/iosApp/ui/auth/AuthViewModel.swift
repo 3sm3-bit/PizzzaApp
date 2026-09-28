@@ -39,33 +39,22 @@ class AuthViewModel: BaseViewModel {
     func login() {
         Task{
             await self.execute(){
-                let request = LoginRequest(nameUser: self.userLolin, password: self.passLogin)
+                try? await self.dataUseCase.logout()
+                let request = LoginRequest(
+                    nameUser: self.userLolin.trimmingCharacters(in: .whitespacesAndNewlines),
+                    password: self.passLogin.trimmingCharacters(in: .whitespacesAndNewlines)
+                )
                 let response = try await self.dataUseCase.login(data: request)
-                let userRole = response.userValid.rol?.uppercased() ?? ""
+                let userRole = response.finalUser.rol?.uppercased() ?? ""
                 
                 if userRole != "CLIENTE" && userRole != "ADMIN" {
                     // Simular error de autorización si no es cliente ni admin
                     throw NSError(domain: "Auth", code: 401, userInfo: [NSLocalizedDescriptionKey: "Usuario no autorizado para esta aplicación"])
                 }
 
-                let entity = UserModel(
-                        uid: response.userValid.uid ?? "",
-                        nameUser: response.userValid.nameUser ?? "",
-                        names: response.userValid.names ?? "",
-                        lastName: response.userValid.lastName ?? "",
-                        document: response.userValid.document ?? "",
-                        email: response.userValid.email ?? "",
-                        phone: response.userValid.phone ?? "",
-                        address: response.userValid.address ?? "",
-                        rol: response.userValid.rol ?? "CLIENTE",
-                        area: response.userValid.area ?? "1",
-                        longitude: response.userValid.longitude ?? "",
-                        latitude: response.userValid.latitude ?? "",
-                        token: response.token
-                    )
-                    try await self.dataUseCase.saveUserLocal(user: entity)
-                    self.isLoginSuccessful = true
-               
+                let entity = response.toUserModel()
+                try await self.dataUseCase.saveUserLocal(user: entity)
+                self.isLoginSuccessful = true
             }
         }
     }
@@ -73,19 +62,21 @@ class AuthViewModel: BaseViewModel {
     func register() {
         Task{
             await self.execute(){
+                try? await self.dataUseCase.logout()
+                let cleanPhone = self.phone.trimmingCharacters(in: .whitespacesAndNewlines)
                 let request = UserResponse(
-                    nameUser: self.nameUser,
-                    names: self.names,
-                    lastName: self.lastName,
+                    nameUser: self.nameUser.trimmingCharacters(in: .whitespacesAndNewlines),
+                    names: self.names.trimmingCharacters(in: .whitespacesAndNewlines),
+                    lastName: self.lastName.trimmingCharacters(in: .whitespacesAndNewlines),
                     document: "11111111",
-                    email: self.email,
-                    password: self.pass,
-                    phone: "+52\(self.phone)",
-                    address: self.address,
+                    email: self.email.trimmingCharacters(in: .whitespacesAndNewlines),
+                    password: self.pass.trimmingCharacters(in: .whitespacesAndNewlines),
+                    phone: "+52\(cleanPhone)",
+                    address: self.address.trimmingCharacters(in: .whitespacesAndNewlines),
                     rol: "CLIENTE",
                     area: "1",
-                    longitude: self.longitude,
-                    latitude: self.latitude,
+                    longitude: self.longitude.trimmingCharacters(in: .whitespacesAndNewlines),
+                    latitude: self.latitude.trimmingCharacters(in: .whitespacesAndNewlines),
                     uid: ""
                 )
                 

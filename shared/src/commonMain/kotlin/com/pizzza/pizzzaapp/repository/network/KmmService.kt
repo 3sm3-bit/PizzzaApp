@@ -8,6 +8,8 @@ import com.pizzza.pizzzaapp.repository.network.model.BranchResponse
 import com.pizzza.pizzzaapp.repository.network.model.UserResponse
 import com.pizzza.pizzzaapp.repository.network.model.LoginRequest
 import com.pizzza.pizzzaapp.repository.network.model.LoginResponse
+import com.pizzza.pizzzaapp.repository.network.model.RefreshTokenRequest
+import com.pizzza.pizzzaapp.repository.network.model.RefreshTokenResponse
 import com.pizzza.pizzzaapp.shared.BuildConfig
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
@@ -35,20 +37,32 @@ class KmmService(private val client: HttpClient) {
         }
     }
 
-    suspend fun getParentOrder(userId: String): List<ParentOrderResponse> {
-        return client.get("${BASE_URL}/pizzzeria/order/generalOrder/user/hoy/$userId").body()
+    private fun io.ktor.client.request.HttpRequestBuilder.addAuthToken(token: String?) {
+        if (!token.isNullOrBlank()) {
+            headers.append("x-token", token)
+            headers.append("Authorization", "Bearer $token")
+        }
     }
 
-    suspend fun getOrderById(orderId: String): ParentOrderResponse {
-        return client.get("${BASE_URL}/pizzzeria/order/generalOrder/$orderId").body()
+    suspend fun getParentOrder(userId: String, token: String? = null): List<ParentOrderResponse> {
+        return client.get("${BASE_URL}/pizzzeria/order/generalOrder/user/hoy/$userId") {
+            addAuthToken(token)
+        }.body()
+    }
+
+    suspend fun getOrderById(orderId: String, token: String? = null): ParentOrderResponse {
+        return client.get("${BASE_URL}/pizzzeria/order/generalOrder/$orderId") {
+            addAuthToken(token)
+        }.body()
     }
 
     suspend fun getProducts(): List<ProductResponse> {
         return client.get("${BASE_URL}/pizzzeria/products").body()
     }
 
-    suspend fun createOrder(request: List<OrderResponse>): String {
+    suspend fun createOrder(request: List<OrderResponse>, token: String? = null): String {
         return client.post("${BASE_URL}/pizzzeria/order") {
+            addAuthToken(token)
             contentType(ContentType.Application.Json)
             setBody(request)
         }.body()
@@ -72,8 +86,16 @@ class KmmService(private val client: HttpClient) {
         }.body()
     }
 
-    suspend fun createPaymentSession(request: PaymentRequest): PaymentResponse {
+    suspend fun refreshToken(refreshToken: String): RefreshTokenResponse {
+        return client.post("${BASE_URL}/services/user/refresh") {
+            contentType(ContentType.Application.Json)
+            setBody(RefreshTokenRequest(refreshToken))
+        }.body()
+    }
+
+    suspend fun createPaymentSession(request: PaymentRequest, token: String? = null): PaymentResponse {
         return client.post("${BASE_URL}/services/payment/create") {
+            addAuthToken(token)
             contentType(ContentType.Application.Json)
             setBody(request)
         }.body()

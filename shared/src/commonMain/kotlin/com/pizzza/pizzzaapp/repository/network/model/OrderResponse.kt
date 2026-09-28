@@ -63,7 +63,9 @@ class OrderResponse (
     @SerialName("currentLongitude")
     val currentLongitude: String? = "0",
     @SerialName("statePay")
-    val statePay: String? = "PENDIENTE"
+    val statePay: String? = "PENDIENTE",
+    @SerialName("canal")
+    val canal: String? = "A1P9X2"
 )
 
 fun List<OrderResponse>.loadOrder() = this.map {

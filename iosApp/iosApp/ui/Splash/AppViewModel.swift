@@ -82,8 +82,7 @@ class AppViewModel: BaseViewModel {
                     CartManager.shared.branchId = "1"
                 }
 
-                let user = try await self.dataUseCase.getUserLocal()
-                
+                let user = try await self.dataUseCase.checkSessionAndRefreshToken()
                 if let safeUser = user {
                     let userRole = safeUser.rol.uppercased()
                     self.successLogin = (userRole == "CLIENTE" || userRole == "ADMIN")

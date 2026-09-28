@@ -1,6 +1,5 @@
 package com.pizzza.pizzzaapp.model
 
-
 data class UserModel(
     val uid: String,
     val nameUser: String,
@@ -14,5 +13,6 @@ data class UserModel(
     val area: String,
     val longitude: String,
     val latitude: String,
-    val token: String
+    val token: String,
+    val refreshToken: String = ""
 )

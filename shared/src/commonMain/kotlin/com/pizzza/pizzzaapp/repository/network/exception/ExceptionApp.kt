@@ -5,13 +5,17 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class CompleteErrorModel(
+    @SerialName("errorCode")
+    val errorCode: Int? = null,
     @SerialName("code")
     val code: Int? = null,
     @SerialName("title")
     val title: String? = null,
     @SerialName("errorMessage")
     val errorMessage: String? = null
-)
+) {
+    val effectiveCode: Int get() = errorCode ?: code ?: 0
+}
 
 class UiTayApiException(
     val code: Int,

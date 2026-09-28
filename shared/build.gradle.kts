@@ -13,14 +13,17 @@ plugins {
 buildConfig {
     packageName.set("com.pizzza.pizzzaapp.shared")
     
-    // Detectar si es Debug en Android o iOS (Xcode pasa la variable CONFIGURATION)
+    // Detectar si es Debug o Dev en Android o iOS (Xcode pasa la variable CONFIGURATION)
     val isIosDebug = System.getenv("CONFIGURATION") == "Debug"
-    val isAndroidDebug = project.gradle.startParameter.taskNames.any { it.contains("Debug", ignoreCase = true) }
-    val isDebug = isAndroidDebug || isIosDebug || project.hasProperty("debug")
+    val isAndroidDebugOrDev = project.gradle.startParameter.taskNames.any { 
+        it.contains("Debug", ignoreCase = true) || it.contains("Dev", ignoreCase = true) 
+    }
+    val isDebug = isAndroidDebugOrDev || isIosDebug || project.hasProperty("debug")
+    val devUrl = "\"http://localhost:8082\""
     
     buildConfigField("Boolean", "IS_DEBUG", isDebug.toString())
     buildConfigField("String", "BASE_URL_SERVICE", "\"https://app.lapizzzeria.lol\"")
-    buildConfigField("String", "BASE_URL_SERVICE_DEV", "\"https://app.lapizzzeria.lol\"")
+    buildConfigField("String", "BASE_URL_SERVICE_DEV", devUrl)
 }
 
 kotlin {

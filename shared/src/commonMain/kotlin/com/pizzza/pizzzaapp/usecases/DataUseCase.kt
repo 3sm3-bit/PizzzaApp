@@ -1,6 +1,8 @@
 package com.pizzza.pizzzaapp.usecases
 
 import com.pizzza.pizzzaapp.model.ProductModel
+import com.pizzza.pizzzaapp.model.BranchModel
+import com.pizzza.pizzzaapp.model.HomeDataModel
 import com.pizzza.pizzzaapp.model.UserModel
 import com.pizzza.pizzzaapp.repository.network.model.LoginRequest
 import com.pizzza.pizzzaapp.repository.network.model.OrderResponse
@@ -19,20 +21,40 @@ class DataUseCase(private val iDataNetwork: IDataNetwork, private val iDataDBNet
     @Throws(Exception::class)
     suspend fun syncProducts(): List<ProductModel> {
         val response = iDataNetwork.syncProducts()
-        iDataDBNetwork.getProducts()
-        iDataDBNetwork.deleteAll()
-        iDataDBNetwork.insertAll(response)
+        if (response.isNotEmpty()) {
+            iDataDBNetwork.deleteAll()
+            iDataDBNetwork.insertAll(response)
+        }
         return response
     }
 
-
     @Throws(Exception::class)
     suspend fun getProducts(): List<ProductModel> {
-        return iDataNetwork.syncProducts()
+        return syncProducts()
     }
 
     @Throws(Exception::class)
     suspend fun getProductsLocal() = iDataDBNetwork.getProducts()
+
+    @Throws(Exception::class)
+    suspend fun loadHomeDataFromLocal(): HomeDataModel {
+        var products = iDataDBNetwork.getProducts()
+        if (products.isEmpty()) {
+            products = try { syncProducts() } catch (e: Exception) { emptyList() }
+        }
+        val branches = try { iDataNetwork.getBranches() } catch (e: Exception) { emptyList() }
+        val defaultBranchId = branches.firstOrNull()?.identifier ?: "1"
+
+        return HomeDataModel(
+            products = products,
+            pizzaProducts = products.filter { it.type == "1" },
+            extraProducts = products.filter { it.type == "2" || it.type == "3" },
+            promotionsProducts = products.filter { it.type == "4" },
+            deliveryProducts = products.filter { it.type == "5" },
+            branches = branches,
+            defaultBranchId = defaultBranchId
+        )
+    }
 
     @Throws(Exception::class)
     suspend fun createOrder(data: List<OrderResponse>) = iDataNetwork.createOrder(data)
@@ -44,10 +66,38 @@ class DataUseCase(private val iDataNetwork: IDataNetwork, private val iDataDBNet
     suspend fun login(data: LoginRequest) = iDataNetwork.login(data)
 
     @Throws(Exception::class)
+    suspend fun refreshToken(refreshToken: String) = iDataNetwork.refreshToken(refreshToken)
+
+    @Throws(Exception::class)
     suspend fun saveUserLocal(user: UserModel) = iDataDBNetwork.saveUserLocal(user)
 
     @Throws(Exception::class)
     suspend fun getUserLocal() = iDataDBNetwork.getUserLocal()
+
+    @Throws(Exception::class)
+    suspend fun checkSessionAndRefreshToken(): UserModel? {
+        val localUser = iDataDBNetwork.getUserLocal() ?: return null
+
+        if (localUser.refreshToken.isNotBlank()) {
+            return try {
+                val refreshResponse = iDataNetwork.refreshToken(localUser.refreshToken)
+                val newToken = refreshResponse.token?.takeIf { it.isNotBlank() } ?: localUser.token
+                val newRefreshToken = refreshResponse.refreshToken?.takeIf { it.isNotBlank() } ?: localUser.refreshToken
+
+                val updatedUser = localUser.copy(
+                    token = newToken,
+                    refreshToken = newRefreshToken
+                )
+                iDataDBNetwork.saveUserLocal(updatedUser)
+                updatedUser
+            } catch (e: Exception) {
+                // Si el refresh falla (refreshToken expirado/inválido), borramos sesión local
+                iDataDBNetwork.logout()
+                null
+            }
+        }
+        return localUser
+    }
 
     @Throws(Exception::class)
     suspend fun logout() {

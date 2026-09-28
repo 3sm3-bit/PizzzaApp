@@ -40,6 +40,15 @@ class HomeViewModel: BaseViewModel {
         }
     }
     
+    func loadProductsFromLocal() {
+        Task {
+            await self.execute(loading: false) {
+                let homeData = try await self.dataUseCase.loadHomeDataFromLocal()
+                CartManager.shared.updateWithHomeData(homeData)
+            }
+        }
+    }
+
     func logout() {
         Task{
             await self.execute() {

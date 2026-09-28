@@ -1,6 +1,7 @@
 package com.pizzza.pizzzaapp.core.ui.model
 
 import com.pizzza.pizzzaapp.model.BranchModel
+import com.pizzza.pizzzaapp.model.HomeDataModel
 import com.pizzza.pizzzaapp.model.ParentOrderModel
 import com.pizzza.pizzzaapp.model.ProductModel
 
@@ -23,4 +24,14 @@ data class OrderUiState(
     val initialTab: Int = 0,
     val branchId: String = "1",
     val ordersLoaded: Boolean = false
+)
+
+fun OrderUiState.withHomeData(homeData: HomeDataModel) = copy(
+    products = homeData.products,
+    pizzaProducts = homeData.pizzaProducts,
+    extraProducts = homeData.extraProducts,
+    promotionsProducts = homeData.promotionsProducts,
+    deliveryProducts = homeData.deliveryProducts,
+    branches = homeData.branches,
+    branchId = homeData.defaultBranchId
 )

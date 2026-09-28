@@ -36,19 +36,21 @@ import com.valu.uitaycompose.utils.*
 fun RegisterScreen(
     onNavigateTo: (ScreenInitNav) -> Unit
 ) {
-    val  viewModel: AuthViewModel = koinViewModel()
+    val viewModel: AuthViewModel = koinViewModel()
     val uiState by viewModel.authUiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
-    val isEmailValid = Patterns.EMAIL_ADDRESS.matcher(uiState.email).matches()
-    val isPhoneValid = uiState.phone.length == 10 && uiState.phone.all { it.isDigit() }
+    val cleanEmail = uiState.email.trim()
+    val cleanPhone = uiState.phone.trim()
+    val isEmailValid = Patterns.EMAIL_ADDRESS.matcher(cleanEmail).matches()
+    val isPhoneValid = cleanPhone.length == 10 && cleanPhone.all { it.isDigit() }
 
-    val isButtonEnabled = uiState.nameUser.isNotBlank() &&
-            uiState.names.isNotBlank() &&
-            uiState.lastName.isNotBlank() &&
+    val isButtonEnabled = uiState.nameUser.trim().isNotBlank() &&
+            uiState.names.trim().isNotBlank() &&
+            uiState.lastName.trim().isNotBlank() &&
             isEmailValid &&
-            uiState.pass.isNotBlank() &&
+            uiState.pass.trim().isNotBlank() &&
             isPhoneValid &&
-            uiState.address.isNotBlank() &&
+            uiState.address.trim().isNotBlank() &&
             uiState.address != "Selecciona dirección en el mapa" &&
             uiState.address != "Obteniendo dirección..."
 

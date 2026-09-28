@@ -73,6 +73,15 @@ class CartManager: ObservableObject {
         cart = []
     }
 
+    func updateWithHomeData(_ homeData: HomeDataModel) {
+        self.pizzaProducts = homeData.pizzaProducts
+        self.extraProducts = homeData.extraProducts
+        self.promotionsProducts = homeData.promotionsProducts
+        self.deliveryProducts = homeData.deliveryProducts
+        self.branches = homeData.branches
+        self.branchId = homeData.defaultBranchId
+    }
+
     func loadUserAddress() {
         dataUseCase.getUserLocal { user, error in
             if let localUser = user {
@@ -153,7 +162,8 @@ class CartManager: ObservableObject {
                     longitude: self.receptionMode == "DELIVERY" ? (self.longitude.isEmpty ? user.longitude : self.longitude) : "0",
                     currentLatitude: "0",
                     currentLongitude: "0",
-                    statePay: statePay
+                    statePay: statePay,
+                    canal: "I7K4M3"
                 )
             }
             

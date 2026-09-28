@@ -18,7 +18,8 @@ data class UserEntity(
     val area: String,
     val longitude: String,
     val latitude: String,
-    val token: String
+    val token: String,
+    val refreshToken: String = ""
 ){
 
     fun toModel() = UserModel(
@@ -34,7 +35,8 @@ data class UserEntity(
         area,
         longitude,
         latitude,
-        token
+        token,
+        refreshToken
     )
     companion object{
         fun toEntity(user : UserModel) = UserEntity(
@@ -50,7 +52,8 @@ data class UserEntity(
             user.area,
             user.longitude,
             user.latitude,
-            user.token
+            user.token,
+            user.refreshToken
         )
     }
 }

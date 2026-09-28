@@ -41,9 +41,9 @@ import org.koin.compose.viewmodel.koinViewModel
 fun LoginScreen(
     onNavigateTo: (ScreenInitNav) -> Unit,
 ) {
-    val  viewModel: AuthViewModel = koinViewModel()
+    val viewModel: AuthViewModel = koinViewModel()
     val uiState by viewModel.authUiState.collectAsStateWithLifecycle()
-    val isButtonEnabled = uiState.user.length > 2 && uiState.pass.length > 2
+    val isButtonEnabled = uiState.user.trim().length > 2 && uiState.pass.trim().length > 2
 
     Scaffold(
         containerColor = Color(0xFFF0F2F5)

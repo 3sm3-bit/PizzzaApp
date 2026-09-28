@@ -86,6 +86,10 @@ fun ScreenClientHome(
     var selectedTab by rememberSaveable { mutableIntStateOf(cartState.initialTab) }
     var showLogoutDialog by remember { mutableStateOf(false) }
 
+    LaunchedEffect(Unit) {
+        ordersViewModel.loadProductsFromLocal()
+    }
+
     LaunchedEffect(cartState.initialTab) {
         if (cartState.initialTab != 0) {
             selectedTab = cartState.initialTab

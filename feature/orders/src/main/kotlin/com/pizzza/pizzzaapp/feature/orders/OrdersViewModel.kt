@@ -2,16 +2,13 @@ package com.pizzza.pizzzaapp.feature.orders
 
 import com.pizzza.pizzzaapp.TAG_PIZZZA
 import com.pizzza.pizzzaapp.core.ui.base.BaseViewModel
-import com.pizzza.pizzzaapp.core.ui.singleton.GlobalUiStateManager
-import com.pizzza.pizzzaapp.core.ui.model.OrderUiState
-import com.pizzza.pizzzaapp.core.ui.singleton.AppDataOrder
 import com.pizzza.pizzzaapp.core.ui.model.OrderItem
+import com.pizzza.pizzzaapp.core.ui.model.withHomeData
+import com.pizzza.pizzzaapp.core.ui.singleton.AppDataOrder
+import com.pizzza.pizzzaapp.core.ui.singleton.GlobalUiStateManager
 import com.pizzza.pizzzaapp.model.ParentOrderModel
 import com.pizzza.pizzzaapp.model.ProductModel
 import com.pizzza.pizzzaapp.usecases.DataUseCase
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.StateFlow
 
 class OrdersViewModel(
     private val dataUseCase: DataUseCase,
@@ -19,7 +16,16 @@ class OrdersViewModel(
     private val appDataOrder: AppDataOrder
 ) : BaseViewModel() {
 
-    val orderUiState: StateFlow<OrderUiState> = appDataOrder.state
+    fun loadProductsFromLocal() {
+        execute(loading = false, globalUiStateManager = globalUiStateManager) {
+            try {
+                val homeData = io { dataUseCase.loadHomeDataFromLocal() }
+                appDataOrder.update { it.withHomeData(homeData) }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+    }
 
     fun getGeneralOrderList(forceLoading: Boolean = false) {
         val isAlreadyLoaded = appDataOrder.state.value.ordersLoaded

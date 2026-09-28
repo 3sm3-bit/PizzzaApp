@@ -40,13 +40,13 @@ struct HomeClientView: View {
 
 
             .onAppear{
+                viewModel.loadProductsFromLocal()
                 self.tabs = [
                     UITayTabItem(id : 0,iconName: "ic_pizza",title: "Pizza"),
                     UITayTabItem(id : 1,iconName: "ic_extra", title: "Extra"),
                     UITayTabItem(id : 2,iconName: "ic_cart", title: "Cart"),
                     UITayTabItem(id : 3,iconName: "ic_orden", title: "Orden")
                 ]
-                
             }
             
         }.alert(isPresented: $showLogoutAlert) {
