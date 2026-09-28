@@ -20,6 +20,7 @@ class CartManager: ObservableObject {
     @Published var branches: [BranchModel] = []
     @Published var branchId: String = "1"
     @Published var selectedProduct: ProductModel? = nil
+    @Published var pendingOrderUid: String = ""
     
     private let dataUseCase = KoinHelper.shared.getDataUseCase()
     
@@ -99,41 +100,18 @@ class CartManager: ObservableObject {
     }
     
     func startPayment(onUrlReady: @escaping (String) -> Void) {
-        let total = self.finalTotal
+        guard !cart.isEmpty else { return }
         
         self.dataUseCase.getUserLocal { [weak self] user, error in
             guard let self = self, let user = user else { return }
-            let orderId = String(UUID().uuidString.prefix(12))
-            self.dataUseCase.createPaymentSession(amount: self.finalTotal, email: user.email, orderId: orderId) { url, error in
-                if let paymentUrl = url, !paymentUrl.isEmpty {
-                    DispatchQueue.main.async {
-                        onUrlReady(paymentUrl)
-                    }
-                }
-            }
-        }
-    }
-
-    private var isConfirmingOrder = false
-    
-    func confirmOrder(statePay: String = "PENDIENTE", onSuccess: @escaping () -> Void) {
-        guard !isConfirmingOrder else { return }
-        isConfirmingOrder = true
-        
-        dataUseCase.getUserLocal { user, error in
-            defer { self.isConfirmingOrder = false }
-            guard let user = user else { return }
-            
             let idOrder = UUID().uuidString
             let cartTotal = self.totalPrice
-            let deliveryPrice = self.receptionMode == "DELIVERY" ? String(format: "%.0f", round(cartTotal * 0.20)) : "0"
+            let deliveryPriceStr = self.receptionMode == "DELIVERY" ? String(format: "%.0f", round(cartTotal * 0.20)) : "0"
             
             let orders = self.cart.map { item in
                 let basePrice = Double(item.product.price) ?? 0.0
                 let crustPrice = item.cheeseFilledCrust ? (Double(item.product.priceChosse) ?? 0.0) : 0.0
                 let totalItemPrice = (basePrice + crustPrice) * Double(item.quantity)
-                
-                let deliveryPrice = self.receptionMode == "DELIVERY" ? String(format: "%.0f", round(cartTotal * 0.20)) : "0"
                 
                 return OrderResponse(
                     uid: UUID().uuidString,
@@ -149,11 +127,11 @@ class CartManager: ObservableObject {
                     phone: user.phone,
                     price: item.product.price,
                     priceTotal: String(format: "%.2f", totalItemPrice),
-                    state: "CONFIRMADO",
+                    state: "PENDIENTE",
                     date: "",
                     address: self.receptionMode == "DELIVERY" ? self.deliveryAddress : "",
                     reception: self.receptionMode,
-                    priceDelivery: deliveryPrice,
+                    priceDelivery: deliveryPriceStr,
                     priceChosse: item.product.priceChosse,
                     idOrden: idOrder,
                     branchId: self.branchId,
@@ -164,27 +142,122 @@ class CartManager: ObservableObject {
                     longitude: self.receptionMode == "DELIVERY" ? (self.longitude.isEmpty ? user.longitude : self.longitude) : "0",
                     currentLatitude: "0",
                     currentLongitude: "0",
-                    statePay: statePay,
+                    statePay: "PENDIENTE",
                     canal: "I7K4M3"
                 )
             }
             
+            // 1. POST /pizzzeria/order/mobile -> crea la orden
             self.dataUseCase.createOrderMobile(data: orders) { mobileResponse, error in
-                if error == nil, let generalUid = mobileResponse?.ordenGeneral?.uid, !generalUid.isEmpty {
-                    self.dataUseCase.confirmOrderMobile(ordenGeneralUid: generalUid, request: ConfirmOrderRequest(state: "CONFIRMADO", statePay: "PAGADO")) { _, _ in
+                let generalUid = mobileResponse?.ordenGeneral?.uid ?? ""
+                if !generalUid.isEmpty {
+                    DispatchQueue.main.async {
+                        self.pendingOrderUid = generalUid
+                    }
+                }
+                
+                let orderId = !generalUid.isEmpty ? generalUid : String(UUID().uuidString.prefix(12))
+                
+                // 2. POST /services/payment/create -> devuelve Stripe checkout URL
+                self.dataUseCase.createPaymentSession(amount: self.finalTotal, email: user.email, orderId: orderId) { url, error in
+                    if let paymentUrl = url, !paymentUrl.isEmpty {
+                        DispatchQueue.main.async {
+                            onUrlReady(paymentUrl)
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private var isConfirmingOrder = false
+    
+    func confirmOrder(statePay: String = "PENDIENTE", onSuccess: @escaping () -> Void) {
+        guard !isConfirmingOrder else { return }
+        isConfirmingOrder = true
+        
+        defer { self.isConfirmingOrder = false }
+        
+        let pendingUid = self.pendingOrderUid
+        
+        if !pendingUid.isEmpty {
+            // 3. PUT /pizzzeria/order/mobile/:id/confirm -> marca la orden como pagada/confirmada
+            self.dataUseCase.confirmOrderMobile(ordenGeneralUid: pendingUid, request: ConfirmOrderRequest(state: "CONFIRMADO", statePay: statePay)) { _, _ in
+                DispatchQueue.main.async {
+                    self.clearCart()
+                    self.pendingOrderUid = ""
+                    self.ordersLoaded = false
+                    self.selectedTab = 3
+                    onSuccess()
+                }
+            }
+        } else {
+            // Fallback si no había pendingOrderUid
+            dataUseCase.getUserLocal { user, error in
+                guard let user = user else { return }
+                
+                let idOrder = UUID().uuidString
+                let cartTotal = self.totalPrice
+                
+                let orders = self.cart.map { item in
+                    let basePrice = Double(item.product.price) ?? 0.0
+                    let crustPrice = item.cheeseFilledCrust ? (Double(item.product.priceChosse) ?? 0.0) : 0.0
+                    let totalItemPrice = (basePrice + crustPrice) * Double(item.quantity)
+                    let deliveryPrice = self.receptionMode == "DELIVERY" ? String(format: "%.0f", round(cartTotal * 0.20)) : "0"
+                    
+                    return OrderResponse(
+                        uid: UUID().uuidString,
+                        nameClient: user.names,
+                        quantity: String(item.quantity),
+                        type: item.product.type,
+                        symbol: item.product.currencySymbol,
+                        nameProduct: item.product.nameProduct,
+                        tamanio: item.product.tamanio,
+                        typeDough: item.typeDough,
+                        cheeseFilledCrust: item.cheeseFilledCrust ? "SI" : "NO",
+                        note: item.note,
+                        phone: user.phone,
+                        price: item.product.price,
+                        priceTotal: String(format: "%.2f", totalItemPrice),
+                        state: "CONFIRMADO",
+                        date: "",
+                        address: self.receptionMode == "DELIVERY" ? self.deliveryAddress : "",
+                        reception: self.receptionMode,
+                        priceDelivery: deliveryPrice,
+                        priceChosse: item.product.priceChosse,
+                        idOrden: idOrder,
+                        branchId: self.branchId,
+                        stage: "1",
+                        userId: user.uid,
+                        driverId: "0",
+                        latitude: self.receptionMode == "DELIVERY" ? (self.latitude.isEmpty ? user.latitude : self.latitude) : "0",
+                        longitude: self.receptionMode == "DELIVERY" ? (self.longitude.isEmpty ? user.longitude : self.longitude) : "0",
+                        currentLatitude: "0",
+                        currentLongitude: "0",
+                        statePay: statePay,
+                        canal: "I7K4M3"
+                    )
+                }
+                
+                self.dataUseCase.createOrderMobile(data: orders) { mobileResponse, error in
+                    if let generalUid = mobileResponse?.ordenGeneral?.uid, !generalUid.isEmpty {
+                        self.dataUseCase.confirmOrderMobile(ordenGeneralUid: generalUid, request: ConfirmOrderRequest(state: "CONFIRMADO", statePay: statePay)) { _, _ in
+                            DispatchQueue.main.async {
+                                self.clearCart()
+                                self.pendingOrderUid = ""
+                                self.ordersLoaded = false
+                                self.selectedTab = 3
+                                onSuccess()
+                            }
+                        }
+                    } else {
                         DispatchQueue.main.async {
                             self.clearCart()
+                            self.pendingOrderUid = ""
                             self.ordersLoaded = false
                             self.selectedTab = 3
                             onSuccess()
                         }
-                    }
-                } else if error == nil {
-                    DispatchQueue.main.async {
-                        self.clearCart()
-                        self.ordersLoaded = false
-                        self.selectedTab = 3
-                        onSuccess()
                     }
                 }
             }

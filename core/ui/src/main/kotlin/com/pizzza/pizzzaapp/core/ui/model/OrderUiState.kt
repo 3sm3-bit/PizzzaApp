@@ -23,7 +23,8 @@ data class OrderUiState(
     val longitude: String = "",
     val initialTab: Int = 0,
     val branchId: String = "1",
-    val ordersLoaded: Boolean = false
+    val ordersLoaded: Boolean = false,
+    val pendingOrderUid: String = ""
 )
 
 fun OrderUiState.withHomeData(homeData: HomeDataModel) = copy(

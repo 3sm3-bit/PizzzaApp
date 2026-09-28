@@ -7,6 +7,7 @@ import com.pizzza.pizzzaapp.core.ui.model.OrderItem
 import com.pizzza.pizzzaapp.core.ui.model.OrderUiState
 import com.pizzza.pizzzaapp.core.ui.singleton.AppDataOrder
 import com.pizzza.pizzzaapp.usecases.DataUseCase
+import com.pizzza.pizzzaapp.repository.network.model.ConfirmOrderRequest
 import com.pizzza.pizzzaapp.repository.network.model.OrderResponse
 import kotlinx.coroutines.flow.StateFlow
 import java.util.UUID
@@ -79,12 +80,55 @@ class CartViewModel(
                 val crustPrice = if (item.cheeseFilledCrust) item.product.priceChosse.toDoubleOrNull() ?: 0.0 else 0.0
                 (basePrice + crustPrice) * item.quantity
             }
-            val deliveryPrice = if (state.receptionMode == "DELIVERY") kotlin.math.round(cartProductsTotal * 0.20) else 0.0
-            val total = cartProductsTotal + deliveryPrice
+            val deliveryPriceDouble = if (state.receptionMode == "DELIVERY") kotlin.math.round(cartProductsTotal * 0.20) else 0.0
+            val deliveryPriceStr = if (state.receptionMode == "DELIVERY") deliveryPriceDouble.toLong().toString() else "0"
+            val total = cartProductsTotal + deliveryPriceDouble
 
             val user = io { dataUseCase.getUserLocal() }
-            val orderId = UUID.randomUUID().toString() // Generamos ID de orden para el pago
-            
+
+            val orderRequest = state.cart.map { item ->
+                val isDelivery = state.receptionMode == "DELIVERY"
+                val itemPrice = (item.product.price.toDoubleOrNull() ?: 0.0) +
+                        (if (item.cheeseFilledCrust) item.product.priceChosse.toDoubleOrNull() ?: 0.0 else 0.0)
+
+                OrderResponse(
+                    uid = UUID.randomUUID().toString().replace("-", "").substring(0, 16),
+                    nameClient = "${user?.names}",
+                    quantity = item.quantity.toString(),
+                    type = item.product.type,
+                    symbol = item.product.currencySymbol,
+                    nameProduct = item.product.nameProduct,
+                    tamanio = item.product.tamanio,
+                    typeDough = item.typeDough,
+                    cheeseFilledCrust = if (item.cheeseFilledCrust) "SI" else "NO",
+                    note = item.note,
+                    phone = user?.phone ?: "",
+                    price = item.product.price,
+                    priceTotal = (itemPrice * item.quantity).toString(),
+                    state = "PENDIENTE",
+                    address = if (isDelivery) state.deliveryAddress else "RECOJO EN LOCAL",
+                    reception = state.receptionMode,
+                    priceDelivery = deliveryPriceStr,
+                    priceChosse = item.product.priceChosse,
+                    idOrden = "",
+                    branchId = state.branchId,
+                    userId = user?.uid ?: "",
+                    latitude = if (isDelivery) state.latitude else "0",
+                    longitude = if (isDelivery) state.longitude else "0",
+                    statePay = "PENDIENTE",
+                    canal = "A1P9X2"
+                )
+            }
+
+            // 1. POST /pizzzeria/order/mobile -> crea la orden y devuelve ordenGeneralId
+            val mobileResponse = io { dataUseCase.createOrderMobile(orderRequest) }
+            val generalUid = mobileResponse.ordenGeneral?.uid ?: ""
+            if (generalUid.isNotBlank()) {
+                appDataOrder.update { it.copy(pendingOrderUid = generalUid) }
+            }
+
+            // 2. POST /services/payment/create con ordenGeneralId como orderId -> devuelve Stripe checkout URL
+            val orderId = generalUid.ifBlank { UUID.randomUUID().toString() }
             val paymentUrl = io { 
                 dataUseCase.createPaymentSession(
                     amount = total,
@@ -104,63 +148,72 @@ class CartViewModel(
     fun confirmOrder(statePay: String = "PENDIENTE", onComplete: () -> Unit) {
         if (isConfirmingOrder) return
         val state = cartUiState.value
-        if (state.cart.isEmpty()) return
 
         isConfirmingOrder = true
         execute(globalUiStateManager = globalUiStateManager) {
             try {
-                val cartProductsTotal = state.cart.sumOf { item ->
-                    val basePrice = item.product.price.toDoubleOrNull() ?: 0.0
-                    val crustPrice = if (item.cheeseFilledCrust) item.product.priceChosse.toDoubleOrNull() ?: 0.0 else 0.0
-                    (basePrice + crustPrice) * item.quantity
-                }
-
-                val deliveryPrice = if (state.receptionMode == "DELIVERY") {
-                    kotlin.math.round(cartProductsTotal * 0.20).toLong().toString()
-                } else "0"
+                val pendingUid = state.pendingOrderUid
 
                 io {
-                    val user = dataUseCase.getUserLocal()
-
-                    val orderRequest = state.cart.map { item ->
-                        val isDelivery = state.receptionMode == "DELIVERY"
-
-                        val itemPrice = (item.product.price.toDoubleOrNull() ?: 0.0) +
-                                (if (item.cheeseFilledCrust) item.product.priceChosse.toDoubleOrNull() ?: 0.0 else 0.0)
-
-                        OrderResponse(
-                            uid = UUID.randomUUID().toString().replace("-", "").substring(0, 16),
-                            nameClient = "${user?.names}",
-                            quantity = item.quantity.toString(),
-                            type = item.product.type,
-                            symbol = item.product.currencySymbol,
-                            nameProduct = item.product.nameProduct,
-                            tamanio = item.product.tamanio,
-                            typeDough = item.typeDough,
-                            cheeseFilledCrust = if (item.cheeseFilledCrust) "SI" else "NO",
-                            note = item.note,
-                            phone = user?.phone ?: "",
-                            price = item.product.price,
-                            priceTotal = (itemPrice * item.quantity).toString(),
-                            state = "CONFIRMADO",
-                            address = if (isDelivery) state.deliveryAddress else "RECOJO EN LOCAL",
-                            reception = state.receptionMode,
-                            priceDelivery = deliveryPrice,
-                            priceChosse = item.product.priceChosse,
-                            idOrden = "",
-                            branchId = state.branchId,
-                            userId = user?.uid ?: "",
-                            latitude = if (isDelivery) state.latitude else "0",
-                            longitude = if (isDelivery) state.longitude else "0",
-                            statePay = statePay,
-                            canal = "A1P9X2"
+                    if (pendingUid.isNotBlank()) {
+                        // 3. PUT /pizzzeria/order/mobile/:id/confirm -> marca la orden como pagada/confirmada
+                        dataUseCase.confirmOrderMobile(
+                            ordenGeneralUid = pendingUid,
+                            request = ConfirmOrderRequest(state = "CONFIRMADO", statePay = statePay)
                         )
-                    }
+                    } else if (state.cart.isNotEmpty()) {
+                        val user = dataUseCase.getUserLocal()
+                        val cartProductsTotal = state.cart.sumOf { item ->
+                            val basePrice = item.product.price.toDoubleOrNull() ?: 0.0
+                            val crustPrice = if (item.cheeseFilledCrust) item.product.priceChosse.toDoubleOrNull() ?: 0.0 else 0.0
+                            (basePrice + crustPrice) * item.quantity
+                        }
+                        val deliveryPrice = if (state.receptionMode == "DELIVERY") {
+                            kotlin.math.round(cartProductsTotal * 0.20).toLong().toString()
+                        } else "0"
 
-                    val mobileResponse = dataUseCase.createOrderMobile(orderRequest)
-                    val generalUid = mobileResponse.ordenGeneral?.uid ?: ""
-                    if (generalUid.isNotBlank()) {
-                        dataUseCase.confirmOrderMobile(generalUid)
+                        val orderRequest = state.cart.map { item ->
+                            val isDelivery = state.receptionMode == "DELIVERY"
+                            val itemPrice = (item.product.price.toDoubleOrNull() ?: 0.0) +
+                                    (if (item.cheeseFilledCrust) item.product.priceChosse.toDoubleOrNull() ?: 0.0 else 0.0)
+
+                            OrderResponse(
+                                uid = UUID.randomUUID().toString().replace("-", "").substring(0, 16),
+                                nameClient = "${user?.names}",
+                                quantity = item.quantity.toString(),
+                                type = item.product.type,
+                                symbol = item.product.currencySymbol,
+                                nameProduct = item.product.nameProduct,
+                                tamanio = item.product.tamanio,
+                                typeDough = item.typeDough,
+                                cheeseFilledCrust = if (item.cheeseFilledCrust) "SI" else "NO",
+                                note = item.note,
+                                phone = user?.phone ?: "",
+                                price = item.product.price,
+                                priceTotal = (itemPrice * item.quantity).toString(),
+                                state = "CONFIRMADO",
+                                address = if (isDelivery) state.deliveryAddress else "RECOJO EN LOCAL",
+                                reception = state.receptionMode,
+                                priceDelivery = deliveryPrice,
+                                priceChosse = item.product.priceChosse,
+                                idOrden = "",
+                                branchId = state.branchId,
+                                userId = user?.uid ?: "",
+                                latitude = if (isDelivery) state.latitude else "0",
+                                longitude = if (isDelivery) state.longitude else "0",
+                                statePay = statePay,
+                                canal = "A1P9X2"
+                            )
+                        }
+
+                        val mobileResponse = dataUseCase.createOrderMobile(orderRequest)
+                        val generalUid = mobileResponse.ordenGeneral?.uid ?: ""
+                        if (generalUid.isNotBlank()) {
+                            dataUseCase.confirmOrderMobile(
+                                ordenGeneralUid = generalUid,
+                                request = ConfirmOrderRequest(state = "CONFIRMADO", statePay = statePay)
+                            )
+                        }
                     }
                 }
 
@@ -168,7 +221,8 @@ class CartViewModel(
                     it.copy(
                         cart = emptyList(),
                         initialTab = 3,
-                        ordersLoaded = false
+                        ordersLoaded = false,
+                        pendingOrderUid = ""
                     )
                 }
                 onComplete()

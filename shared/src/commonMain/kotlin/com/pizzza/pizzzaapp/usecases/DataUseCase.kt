@@ -84,25 +84,7 @@ class DataUseCase(private val iDataNetwork: IDataNetwork, private val iDataDBNet
     @Throws(Exception::class)
     suspend fun checkSessionAndRefreshToken(): UserModel? {
         val localUser = iDataDBNetwork.getUserLocal() ?: return null
-
-        if (localUser.refreshToken.isNotBlank()) {
-            return try {
-                val refreshResponse = iDataNetwork.refreshToken(localUser.refreshToken)
-                val newToken = refreshResponse.token?.takeIf { it.isNotBlank() } ?: localUser.token
-                val newRefreshToken = refreshResponse.refreshToken?.takeIf { it.isNotBlank() } ?: localUser.refreshToken
-
-                val updatedUser = localUser.copy(
-                    token = newToken,
-                    refreshToken = newRefreshToken
-                )
-                iDataDBNetwork.saveUserLocal(updatedUser)
-                updatedUser
-            } catch (e: Exception) {
-                // Si el refresh falla (refreshToken expirado/inválido), borramos sesión local
-                iDataDBNetwork.logout()
-                null
-            }
-        }
+        if (localUser.token.isBlank()) return null
         return localUser
     }
 

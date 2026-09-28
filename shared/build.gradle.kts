@@ -15,11 +15,11 @@ buildConfig {
     
     // Detectar si es Debug o Dev en Android o iOS (Xcode pasa la variable CONFIGURATION)
     val isIosDebug = System.getenv("CONFIGURATION") == "Debug"
-    val isAndroidDebugOrDev = project.gradle.startParameter.taskNames.any { 
-        it.contains("Debug", ignoreCase = true) || it.contains("Dev", ignoreCase = true) 
+    val isAndroidDebugOrDev = project.gradle.startParameter.taskNames.any {
+        it.contains("Debug", ignoreCase = true) || it.contains("Dev", ignoreCase = true)
     }
     val isDebug = isAndroidDebugOrDev || isIosDebug || project.hasProperty("debug")
-    val devUrl = "\"https://devapp.lapizzzeria.lol\""
+    val devUrl = "\"https://unexpired-culpable-eldercare.ngrok-free.dev\""
     
     buildConfigField("Boolean", "IS_DEBUG", isDebug.toString())
     buildConfigField("String", "BASE_URL_SERVICE", "\"https://app.lapizzzeria.lol\"")
