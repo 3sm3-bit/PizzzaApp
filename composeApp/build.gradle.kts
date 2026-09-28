@@ -102,13 +102,13 @@ android {
     productFlavors {
         create("dev") {
             dimension = "environment"
-            resValue("string", "app_name", "Pizzza (Dev)")
+            resValue("string", "app_name", "Pizzzeria")
             buildConfigField("String", "BASE_URL", "\"http://10.0.2.2:3000\"")
             buildConfigField("Boolean", "IS_DEV", "true")
         }
         create("pro") {
             dimension = "environment"
-            resValue("string", "app_name", "Pizzza")
+            resValue("string", "app_name", "Pizzzeria")
             buildConfigField("String", "BASE_URL", "\"https://app.lapizzzeria.lol\"")
             buildConfigField("Boolean", "IS_DEV", "false")
         }
