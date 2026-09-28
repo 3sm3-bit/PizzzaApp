@@ -157,7 +157,11 @@ class CartViewModel(
                         )
                     }
 
-                    dataUseCase.createOrder(orderRequest)
+                    val mobileResponse = dataUseCase.createOrderMobile(orderRequest)
+                    val generalUid = mobileResponse.ordenGeneral?.uid ?: ""
+                    if (generalUid.isNotBlank()) {
+                        dataUseCase.confirmOrderMobile(generalUid)
+                    }
                 }
 
                 appDataOrder.update {

@@ -9,6 +9,8 @@ import com.pizzza.pizzzaapp.repository.network.model.LoginResponse
 import com.pizzza.pizzzaapp.repository.network.model.OrderResponse
 import com.pizzza.pizzzaapp.repository.network.model.UserResponse
 import com.pizzza.pizzzaapp.repository.network.model.RefreshTokenResponse
+import com.pizzza.pizzzaapp.repository.network.model.ConfirmOrderRequest
+import com.pizzza.pizzzaapp.repository.network.model.CreateOrderMobileResponse
 
 interface IDataNetwork {
 
@@ -19,6 +21,10 @@ interface IDataNetwork {
     suspend fun syncProducts(): List<ProductModel>
 
     suspend fun createOrder(data: List<OrderResponse>): String
+
+    suspend fun createOrderMobile(data: List<OrderResponse>): CreateOrderMobileResponse
+
+    suspend fun confirmOrderMobile(ordenGeneralUid: String, request: ConfirmOrderRequest = ConfirmOrderRequest()): CreateOrderMobileResponse
 
     suspend fun registerUser(data: UserResponse): String
 

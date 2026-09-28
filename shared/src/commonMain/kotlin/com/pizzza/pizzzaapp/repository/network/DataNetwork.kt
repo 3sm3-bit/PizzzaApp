@@ -13,6 +13,8 @@ import com.pizzza.pizzzaapp.usecases.network.IDataDataBase
 import com.pizzza.pizzzaapp.usecases.network.IDataNetwork
 
 import com.pizzza.pizzzaapp.repository.network.model.RefreshTokenResponse
+import com.pizzza.pizzzaapp.repository.network.model.ConfirmOrderRequest
+import com.pizzza.pizzzaapp.repository.network.model.CreateOrderMobileResponse
 
 class DataNetwork(
     private val apiService: KmmService,
@@ -28,6 +30,16 @@ class DataNetwork(
     override suspend fun createOrder(data: List<OrderResponse>): String = apiCall {
         val token = dataBase.getUserLocal()?.token
         apiService.createOrder(data, token = token)
+    }
+
+    override suspend fun createOrderMobile(data: List<OrderResponse>): CreateOrderMobileResponse = apiCall {
+        val token = dataBase.getUserLocal()?.token
+        apiService.createOrderMobile(data, token = token)
+    }
+
+    override suspend fun confirmOrderMobile(ordenGeneralUid: String, request: ConfirmOrderRequest): CreateOrderMobileResponse = apiCall {
+        val token = dataBase.getUserLocal()?.token
+        apiService.confirmOrderMobile(ordenGeneralUid, request = request, token = token)
     }
 
     override suspend fun loadParentOrder(userId: String): List<ParentOrderModel> {

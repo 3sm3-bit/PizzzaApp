@@ -78,8 +78,10 @@ class CartManager: ObservableObject {
         self.extraProducts = homeData.extraProducts
         self.promotionsProducts = homeData.promotionsProducts
         self.deliveryProducts = homeData.deliveryProducts
-        self.branches = homeData.branches
-        self.branchId = homeData.defaultBranchId
+        if !homeData.branches.isEmpty {
+            self.branches = homeData.branches
+            self.branchId = homeData.defaultBranchId
+        }
     }
 
     func loadUserAddress() {
@@ -167,8 +169,17 @@ class CartManager: ObservableObject {
                 )
             }
             
-            self.dataUseCase.createOrder(data: orders) { _, error in
-                if error == nil {
+            self.dataUseCase.createOrderMobile(data: orders) { mobileResponse, error in
+                if error == nil, let generalUid = mobileResponse?.ordenGeneral?.uid, !generalUid.isEmpty {
+                    self.dataUseCase.confirmOrderMobile(ordenGeneralUid: generalUid, request: ConfirmOrderRequest(state: "CONFIRMADO", statePay: "PAGADO")) { _, _ in
+                        DispatchQueue.main.async {
+                            self.clearCart()
+                            self.ordersLoaded = false
+                            self.selectedTab = 3
+                            onSuccess()
+                        }
+                    }
+                } else if error == nil {
                     DispatchQueue.main.async {
                         self.clearCart()
                         self.ordersLoaded = false

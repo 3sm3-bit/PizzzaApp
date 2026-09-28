@@ -32,6 +32,6 @@ fun OrderUiState.withHomeData(homeData: HomeDataModel) = copy(
     extraProducts = homeData.extraProducts,
     promotionsProducts = homeData.promotionsProducts,
     deliveryProducts = homeData.deliveryProducts,
-    branches = homeData.branches,
-    branchId = homeData.defaultBranchId
+    branches = if (homeData.branches.isNotEmpty()) homeData.branches else branches,
+    branchId = if (homeData.branches.isNotEmpty()) homeData.defaultBranchId else branchId
 )

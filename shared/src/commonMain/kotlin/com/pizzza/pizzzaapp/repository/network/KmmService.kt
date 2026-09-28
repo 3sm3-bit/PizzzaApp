@@ -10,6 +10,8 @@ import com.pizzza.pizzzaapp.repository.network.model.LoginRequest
 import com.pizzza.pizzzaapp.repository.network.model.LoginResponse
 import com.pizzza.pizzzaapp.repository.network.model.RefreshTokenRequest
 import com.pizzza.pizzzaapp.repository.network.model.RefreshTokenResponse
+import com.pizzza.pizzzaapp.repository.network.model.ConfirmOrderRequest
+import com.pizzza.pizzzaapp.repository.network.model.CreateOrderMobileResponse
 import com.pizzza.pizzzaapp.shared.BuildConfig
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
@@ -62,6 +64,22 @@ class KmmService(private val client: HttpClient) {
 
     suspend fun createOrder(request: List<OrderResponse>, token: String? = null): String {
         return client.post("${BASE_URL}/pizzzeria/order") {
+            addAuthToken(token)
+            contentType(ContentType.Application.Json)
+            setBody(request)
+        }.body()
+    }
+
+    suspend fun createOrderMobile(request: List<OrderResponse>, token: String? = null): CreateOrderMobileResponse {
+        return client.post("${BASE_URL}/pizzzeria/order/mobile") {
+            addAuthToken(token)
+            contentType(ContentType.Application.Json)
+            setBody(request)
+        }.body()
+    }
+
+    suspend fun confirmOrderMobile(ordenGeneralUid: String, request: ConfirmOrderRequest = ConfirmOrderRequest(), token: String? = null): CreateOrderMobileResponse {
+        return client.put("${BASE_URL}/pizzzeria/order/mobile/$ordenGeneralUid/confirm") {
             addAuthToken(token)
             contentType(ContentType.Application.Json)
             setBody(request)

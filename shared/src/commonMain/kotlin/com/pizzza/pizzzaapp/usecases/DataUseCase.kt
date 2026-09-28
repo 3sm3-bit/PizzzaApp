@@ -1,12 +1,12 @@
 package com.pizzza.pizzzaapp.usecases
 
 import com.pizzza.pizzzaapp.model.ProductModel
-import com.pizzza.pizzzaapp.model.BranchModel
 import com.pizzza.pizzzaapp.model.HomeDataModel
 import com.pizzza.pizzzaapp.model.UserModel
 import com.pizzza.pizzzaapp.repository.network.model.LoginRequest
 import com.pizzza.pizzzaapp.repository.network.model.OrderResponse
 import com.pizzza.pizzzaapp.repository.network.model.UserResponse
+import com.pizzza.pizzzaapp.repository.network.model.ConfirmOrderRequest
 import com.pizzza.pizzzaapp.usecases.network.IDataDataBase
 import com.pizzza.pizzzaapp.usecases.network.IDataNetwork
 
@@ -58,6 +58,13 @@ class DataUseCase(private val iDataNetwork: IDataNetwork, private val iDataDBNet
 
     @Throws(Exception::class)
     suspend fun createOrder(data: List<OrderResponse>) = iDataNetwork.createOrder(data)
+
+    @Throws(Exception::class)
+    suspend fun createOrderMobile(data: List<OrderResponse>) = iDataNetwork.createOrderMobile(data)
+
+    @Throws(Exception::class)
+    suspend fun confirmOrderMobile(ordenGeneralUid: String, request: ConfirmOrderRequest = ConfirmOrderRequest()) =
+        iDataNetwork.confirmOrderMobile(ordenGeneralUid, request)
 
     @Throws(Exception::class)
     suspend fun registerUser(data: UserResponse) = iDataNetwork.registerUser(data)
