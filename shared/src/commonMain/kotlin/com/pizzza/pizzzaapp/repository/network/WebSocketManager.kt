@@ -60,14 +60,12 @@ class WebSocketManager(private val client: HttpClient) {
         scope.launch {
             while (true) {
                 try {
-                    // La URL base ya contiene /pizzzeria, el servidor WS suele estar en la raíz del host
-                    val baseUrl = BuildConfig.BASE_URL_SERVICE
-                    val wsUrl = if (baseUrl.contains("ngrok")) {
-                        // Para ngrok, conectamos a la raíz wss://...
-                        baseUrl.substringBefore("/pizzzeria").replace("https://", "wss://").replace("http://", "ws://")
+                    val baseUrl = if (BuildConfig.IS_DEBUG) {
+                        BuildConfig.BASE_URL_SERVICE_DEV
                     } else {
-                        baseUrl.replace("https://", "wss://").replace("http://", "ws://")
+                        BuildConfig.BASE_URL_SERVICE
                     }
+                    val wsUrl = baseUrl.replace("https://", "wss://").replace("http://", "ws://")
                     
                     println("$TAG_PIZZZA: WS - Intentando conectar a: $wsUrl")
                     
