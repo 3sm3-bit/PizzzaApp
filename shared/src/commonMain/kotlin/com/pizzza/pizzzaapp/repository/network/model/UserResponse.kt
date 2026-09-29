@@ -30,5 +30,9 @@ data class UserResponse(
     @SerialName("latitude")
     val latitude: String? = "",
     @SerialName("uid")
-    val uid: String? = ""
+    val uid: String? = "",
+    @SerialName("branchId")
+    val branchId: String? = "0",
+    @SerialName("createdAt")
+    val createdAt: String? = ""
 )
