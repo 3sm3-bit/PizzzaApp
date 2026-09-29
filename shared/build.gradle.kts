@@ -19,7 +19,7 @@ buildConfig {
         it.contains("Debug", ignoreCase = true) || it.contains("Dev", ignoreCase = true)
     }
     val isDebug = isAndroidDebugOrDev || isIosDebug || project.hasProperty("debug")
-    val devUrl = "\"https://unexpired-culpable-eldercare.ngrok-free.dev\""
+    val devUrl = "\"https://devapp.lapizzzeria.lol\""
     
     buildConfigField("Boolean", "IS_DEBUG", isDebug.toString())
     buildConfigField("String", "BASE_URL_SERVICE", "\"https://app.lapizzzeria.lol\"")
