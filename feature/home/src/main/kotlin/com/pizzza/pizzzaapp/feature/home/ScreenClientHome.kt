@@ -83,11 +83,13 @@ fun ScreenClientHome(
     val cartViewModel: CartViewModel = koinViewModel()
     val authViewModel: AuthViewModel = koinViewModel()
     val cartState by cartViewModel.cartUiState.collectAsStateWithLifecycle()
+    val authUiState by authViewModel.authUiState.collectAsStateWithLifecycle()
     var selectedTab by rememberSaveable { mutableIntStateOf(cartState.initialTab) }
     var showLogoutDialog by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         ordersViewModel.loadProductsFromLocal()
+        authViewModel.loadUserLocal()
     }
 
     LaunchedEffect(cartState.initialTab) {
@@ -187,10 +189,12 @@ fun ScreenClientHome(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Column {
+                    val firstName = authUiState.names.trim().split("\\s+".toRegex()).firstOrNull { it.isNotBlank() }
+                    val welcomeText = if (!firstName.isNullOrBlank()) "Bienvenid@ $firstName" else "Bienvenido a la"
                     Text(
                         modifier = Modifier
                             .padding(start = 8.dp),
-                        text = "Bienvenido a la",
+                        text = welcomeText,
                         style = textSe14,
                         color = tay_red_600
                     )
@@ -207,10 +211,10 @@ fun ScreenClientHome(
                     if (selectedTab == 0 || selectedTab == 1) {
                         IconButton(
                             onClick = { selectedTab = 2 },
-                            modifier = Modifier.size(32.dp) // Compacta la caja de toque invisible para juntar los íconos
+                            modifier = Modifier.size(32.dp)
                         ) {
                             BadgedBox(
-                                modifier = Modifier.padding(end = 2.dp, top = 2.dp), // Ajustado al nuevo tamaño compacto
+                                modifier = Modifier.padding(end = 2.dp, top = 2.dp),
                                 badge = {
                                     if (cartState.cart.isNotEmpty()) {
                                         Badge(containerColor = tay_green_600) {
@@ -294,8 +298,8 @@ fun ScreenClientHome(
             }
 
             when (selectedTab) {
-                0 -> ScreenPizza({ onNavigateTo(ScreenInitNav.OrderDetail) })
-                1 -> ScreenExtra({ onNavigateTo(ScreenInitNav.OrderDetail) })
+                0 -> ScreenPizza { onNavigateTo(ScreenInitNav.OrderDetail) }
+                1 -> ScreenExtra { onNavigateTo(ScreenInitNav.OrderDetail) }
                 2 -> ScreenCart(
                     onNavigateToAddressSelection = { onNavigateTo(ScreenInitNav.AddressSelection()) },
                     onNavigateToSummary = { onNavigateTo(ScreenInitNav.OrderSummary) }

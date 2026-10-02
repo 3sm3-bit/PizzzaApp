@@ -18,5 +18,4 @@ fun initKoin(appDeclaration: KoinAppDeclaration = {}) =
         )
     }
 
-// Llamada desde iOS
 fun initKoin() = initKoin {}

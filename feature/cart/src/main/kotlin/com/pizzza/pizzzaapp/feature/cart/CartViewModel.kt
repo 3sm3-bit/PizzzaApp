@@ -120,14 +120,12 @@ class CartViewModel(
                 )
             }
 
-            // 1. POST /pizzzeria/order/mobile -> crea la orden y devuelve ordenGeneralId
             val mobileResponse = io { dataUseCase.createOrderMobile(orderRequest) }
             val generalUid = mobileResponse.ordenGeneral?.uid ?: ""
             if (generalUid.isNotBlank()) {
                 appDataOrder.update { it.copy(pendingOrderUid = generalUid) }
             }
 
-            // 2. POST /services/payment/create con ordenGeneralId como orderId -> devuelve Stripe checkout URL
             val orderId = generalUid.ifBlank { UUID.randomUUID().toString() }
             val paymentUrl = io { 
                 dataUseCase.createPaymentSession(
@@ -156,7 +154,6 @@ class CartViewModel(
 
                 io {
                     if (pendingUid.isNotBlank()) {
-                        // 3. PUT /pizzzeria/order/mobile/:id/confirm -> marca la orden como pagada/confirmada
                         dataUseCase.confirmOrderMobile(
                             ordenGeneralUid = pendingUid,
                             request = ConfirmOrderRequest(state = "CONFIRMADO", statePay = statePay)

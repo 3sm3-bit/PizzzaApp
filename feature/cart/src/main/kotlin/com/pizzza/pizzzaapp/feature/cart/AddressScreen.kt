@@ -184,7 +184,6 @@ fun AddressScreen(
                 uiSettings = MapUiSettings(zoomControlsEnabled = false)
             )
 
-            // Fixed Pin in the center
             Icon(
                 imageVector = Icons.Default.LocationOn,
                 contentDescription = null,
@@ -195,7 +194,6 @@ fun AddressScreen(
                     .offset(y = (-24).dp)
             )
 
-            // Search Bar & Results at the top
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -273,7 +271,6 @@ fun AddressScreen(
                 }
             }
 
-            // Info and confirm button at the bottom
             Card(
                 modifier = Modifier
                     .align(Alignment.BottomCenter)

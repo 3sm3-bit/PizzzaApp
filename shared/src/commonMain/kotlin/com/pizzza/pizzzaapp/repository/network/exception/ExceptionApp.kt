@@ -2,6 +2,10 @@ package com.pizzza.pizzzaapp.repository.network.exception
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonArray
+import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.JsonPrimitive
 
 @Serializable
 data class CompleteErrorModel(
@@ -12,9 +16,41 @@ data class CompleteErrorModel(
     @SerialName("title")
     val title: String? = null,
     @SerialName("errorMessage")
-    val errorMessage: String? = null
+    val errorMessage: String? = null,
+    @SerialName("errorMessageDetail")
+    val errorMessageDetail: JsonElement? = null
 ) {
-    val effectiveCode: Int get() = errorCode ?: code ?: 0
+    fun extractMainMessage(): String? {
+        return errorMessage?.takeIf { it.isNotBlank() }
+    }
+
+    fun extractDetails(): List<String> {
+        return parseJsonElementToList(errorMessageDetail)
+    }
+
+    private fun parseJsonElementToList(element: JsonElement?): List<String> {
+        if (element == null) return emptyList()
+        return try {
+            when (element) {
+                is JsonArray -> element.mapNotNull {
+                    if (it is JsonPrimitive) it.content else it.toString()
+                }.filter { it.isNotBlank() && it != "null" }
+
+                is JsonPrimitive -> {
+                    val content = element.content
+                    if (content.isNotBlank() && content != "null") listOf(content) else emptyList()
+                }
+
+                is JsonObject -> {
+                    element.values.mapNotNull {
+                        if (it is JsonPrimitive) it.content else null
+                    }.filter { it.isNotBlank() && it != "null" }
+                }
+            }
+        } catch (_: Exception) {
+            emptyList()
+        }
+    }
 }
 
 class UiTayApiException(
@@ -24,14 +60,11 @@ class UiTayApiException(
 ) : Exception(messageApi)
 
 class UnAuthorizedException : Exception("Sesión expirada")
-class GenericException : Exception("Ocurrió un error inesperado")
 class ErrorNetwork : Exception("No hay conexión a internet")
 
 fun Throwable.toAppException(): Exception {
     val message = this.message ?: "Error desconocido"
-    
-    // Mapeo de errores de red comunes de Ktor/Plataforma
-    if (message.contains("UnresolvedAddressException", ignoreCase = true) || 
+    if (message.contains("UnresolvedAddressException", ignoreCase = true) ||
         message.contains("ConnectException", ignoreCase = true) ||
         message.contains("socket timeout", ignoreCase = true)) {
         return ErrorNetwork()

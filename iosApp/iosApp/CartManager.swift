@@ -21,6 +21,7 @@ class CartManager: ObservableObject {
     @Published var branchId: String = "1"
     @Published var selectedProduct: ProductModel? = nil
     @Published var pendingOrderUid: String = ""
+    @Published var userName: String = ""
     
     private let dataUseCase = KoinHelper.shared.getDataUseCase()
     
@@ -89,6 +90,7 @@ class CartManager: ObservableObject {
         dataUseCase.getUserLocal { user, error in
             if let localUser = user {
                 DispatchQueue.main.async {
+                    self.userName = localUser.names
                     if self.deliveryAddress.isEmpty || self.deliveryAddress == "Selecciona dirección en el mapa" {
                         self.deliveryAddress = localUser.address
                         self.latitude = localUser.latitude

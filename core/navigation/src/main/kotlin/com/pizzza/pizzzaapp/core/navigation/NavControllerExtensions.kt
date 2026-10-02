@@ -3,9 +3,6 @@ package com.pizzza.pizzzaapp.core.navigation
 import androidx.navigation.NavController
 import androidx.navigation.NavOptionsBuilder
 
-/**
- * Gatekeeper para evitar múltiples navegaciones rápidas (double tap)
- */
 object NavGatekeeper {
     private var lastNavTime = 0L
     private const val NAV_DELAY = 500L
@@ -20,9 +17,6 @@ object NavGatekeeper {
     }
 }
 
-/**
- * Extensión para navegar de forma segura evitando duplicar pantallas
- */
 fun <T : Any> NavController.navigateSafe(
     route: T,
     builder: NavOptionsBuilder.() -> Unit = {}

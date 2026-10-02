@@ -1,6 +1,5 @@
 package com.pizzza.pizzzaapp.repository.network
 
-import com.pizzza.pizzzaapp.TAG_PIZZZA
 import com.pizzza.pizzzaapp.repository.network.model.ParentOrderResponse
 import com.pizzza.pizzzaapp.repository.network.model.ProductResponse
 import com.pizzza.pizzzaapp.repository.network.model.OrderResponse
@@ -83,14 +82,11 @@ class KmmService(private val client: HttpClient) {
     }
 
     suspend fun registerUser(request: UserResponse): String {
-        println("$TAG_PIZZZA: KmmService: Enviando registro para ${request.email}...")
         val response = client.post("${BASE_URL}/services/user") {
             contentType(ContentType.Application.Json)
             setBody(request)
         }
-        val result = response.bodyAsText()
-        println("$TAG_PIZZZA: KmmService: Respuesta recibida (Status: ${response.status}): $result")
-        return result
+        return response.bodyAsText()
     }
 
     suspend fun login(request: LoginRequest): LoginResponse {

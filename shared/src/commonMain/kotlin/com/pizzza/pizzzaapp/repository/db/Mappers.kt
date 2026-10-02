@@ -26,7 +26,7 @@ fun ParentOrderEntity.toModel() = ParentOrderModel(
     statePay = statePay,
     userId = userId,
     driverId = driverId,
-    orders = emptyList() // No orders stored in Entity for now
+    orders = emptyList()
 )
 
 fun ParentOrderModel.toEntity() = ParentOrderEntity(

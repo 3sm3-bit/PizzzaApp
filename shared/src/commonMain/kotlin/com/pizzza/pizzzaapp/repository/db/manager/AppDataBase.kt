@@ -11,7 +11,7 @@ import com.pizzza.pizzzaapp.repository.db.entity.ParentOrderEntity
 import com.pizzza.pizzzaapp.repository.db.entity.ProductEntity
 import com.pizzza.pizzzaapp.repository.db.entity.UserEntity
 
-@Database(entities = [ParentOrderEntity::class, ProductEntity::class, UserEntity::class], version = 6)
+@Database(entities = [ParentOrderEntity::class, ProductEntity::class, UserEntity::class], version = 1)
 @ConstructedBy(AppDataBaseConstructor::class)
 abstract class AppDataBase : RoomDatabase() {
     abstract fun parentOrderDao(): ParentOrderDao
@@ -19,7 +19,6 @@ abstract class AppDataBase : RoomDatabase() {
     abstract fun userDao(): UserDao
 }
 
-// Room KMP constructor
 @Suppress("NO_ACTUAL_FOR_EXPECT")
 expect object AppDataBaseConstructor : RoomDatabaseConstructor<AppDataBase> {
     override fun initialize(): AppDataBase

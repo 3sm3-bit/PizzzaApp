@@ -46,6 +46,6 @@ data class ParentOrderModel(
             statePay = statePay,
             userId = userId,
             driverId = driverId,
-            orders = emptyList() // Or map it back if needed, but usually for requests we might not need all orders
+            orders = emptyList()
         )
 }

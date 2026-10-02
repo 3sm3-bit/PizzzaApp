@@ -221,7 +221,6 @@ fun ScreenDetailOrder(
                     horizontalArrangement = Arrangement.spacedBy(16.dp),
                     verticalAlignment = Alignment.Top
                 ) {
-                    // Columna Izquierda: Descripción
                     Column(modifier = Modifier.weight(1.3f)) {
                         Text("Descripción", style = textB16,
                             color = tay_red_600)

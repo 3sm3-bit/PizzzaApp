@@ -49,7 +49,6 @@ fun ScreenOrder(
     val viewModel: OrdersViewModel = koinViewModel()
     val uiState by LocalAppDataOrder.current.state.collectAsStateWithLifecycle()
 
-    // Carga inicial solo si no se ha cargado antes
     LaunchedEffect(Unit) {
         viewModel.getGeneralOrderList()
     }

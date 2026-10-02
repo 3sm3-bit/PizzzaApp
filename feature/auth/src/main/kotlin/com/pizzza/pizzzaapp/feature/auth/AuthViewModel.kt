@@ -30,7 +30,6 @@ class AuthViewModel(
         _authUiState.update { it.copy(pass = newPass) }
     }
 
-    // Registration handlers
     fun onRegisterFieldChange(
         nameUser: String = _authUiState.value.nameUser,
         names: String = _authUiState.value.names,
@@ -99,7 +98,14 @@ class AuthViewModel(
                 )
             }
 
-            _authUiState.update { it.copy(isLoginSuccessful = true) }
+            _authUiState.update { 
+                it.copy(
+                    names = userModel.names,
+                    nameUser = userModel.nameUser,
+                    lastName = userModel.lastName,
+                    isLoginSuccessful = true
+                ) 
+            }
             onSuccess()
         }
     }
@@ -108,6 +114,16 @@ class AuthViewModel(
         execute(loading = false, globalUiStateManager = globalUiStateManager) {
             val user = io { dataUseCase.checkSessionAndRefreshToken() }
             if (user != null) {
+                _authUiState.update {
+                    it.copy(
+                        names = user.names,
+                        nameUser = user.nameUser,
+                        lastName = user.lastName,
+                        email = user.email,
+                        phone = user.phone,
+                        address = user.address
+                    )
+                }
                 appDataOrder.update {
                     it.copy(
                         deliveryAddress = user.address,
@@ -117,6 +133,24 @@ class AuthViewModel(
                 }
             }
             onResult(user?.rol)
+        }
+    }
+
+    fun loadUserLocal() {
+        execute(loading = false, globalUiStateManager = globalUiStateManager) {
+            val user = io { dataUseCase.getUserLocal() }
+            if (user != null) {
+                _authUiState.update {
+                    it.copy(
+                        names = user.names,
+                        nameUser = user.nameUser,
+                        lastName = user.lastName,
+                        email = user.email,
+                        phone = user.phone,
+                        address = user.address
+                    )
+                }
+            }
         }
     }
 

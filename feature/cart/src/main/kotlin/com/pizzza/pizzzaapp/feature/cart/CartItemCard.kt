@@ -27,7 +27,6 @@ fun CartItemCard(
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Column(modifier = Modifier.padding(14.dp)) {
-            // Cabecera: Cantidad, Nombre y Borrar
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -61,7 +60,6 @@ fun CartItemCard(
                 }
             }
 
-            // Resumen de personalización (Solo si aplica)
             if (item.product.type == "1" || item.note.isNotBlank()) {
                 Column {
                     if (item.product.type == "1") {

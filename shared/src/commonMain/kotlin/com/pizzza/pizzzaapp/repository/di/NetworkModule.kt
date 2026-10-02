@@ -1,7 +1,6 @@
 package com.pizzza.pizzzaapp.repository.di
 
 import com.pizzza.pizzzaapp.repository.network.KmmService
-import com.pizzza.pizzzaapp.repository.network.WebSocketManager
 import com.pizzza.pizzzaapp.repository.network.exception.CompleteErrorModel
 import com.pizzza.pizzzaapp.repository.network.exception.ErrorNetwork
 import com.pizzza.pizzzaapp.repository.network.exception.UiTayApiException
@@ -15,7 +14,6 @@ import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.defaultRequest
 import io.ktor.client.plugins.logging.LogLevel
 import io.ktor.client.plugins.logging.Logging
-import io.ktor.client.plugins.websocket.WebSockets
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.isSuccess
 import io.ktor.serialization.kotlinx.json.json
@@ -53,34 +51,90 @@ val networkModule = module {
                         val statusCode = response.status.value
                         val errorText = try {
                             response.bodyAsText()
-                        } catch (e: Exception) {
-                            e.printStackTrace()
+                        } catch (_: Exception) {
                             ""
                         }
 
                         val errorModel = try {
                             jsonLenient.decodeFromString<CompleteErrorModel>(errorText)
-                        } catch (e: Exception) {
+                        } catch (_: Exception) {
                             null
                         }
 
-                        val finalTitle = errorModel?.title?.takeIf { it.isNotBlank() } ?: "Error $statusCode"
-                        val finalMessage = errorModel?.errorMessage?.takeIf { it.isNotBlank() }
-                            ?: errorText.takeIf { it.isNotBlank() }
-                            ?: "Ocurrió un error inesperado"
-                        val finalCode = errorModel?.effectiveCode?.takeIf { it != 0 } ?: statusCode
+                        val titleFromApi = errorModel?.title?.takeIf { it.isNotBlank() }
+                        val mainMsgFromApi = errorModel?.extractMainMessage()
+                        val detailsListFromApi = errorModel?.extractDetails() ?: emptyList()
 
-                        when {
-                            statusCode == 401 || (finalCode == 17 && (finalTitle.contains("token", ignoreCase = true) || finalMessage.contains("token", ignoreCase = true))) -> {
-                                throw com.pizzza.pizzzaapp.repository.network.exception.UnAuthorizedException()
+                        val (finalTitle, finalMessage) = if (statusCode in 500..599) {
+                            "Ocurrió un error" to "Estamos sufriendo inconvenientes en los servicios, inténtelo más tarde."
+                        } else {
+                            val defaultTitleForStatus = when (statusCode) {
+                                400 -> "Solicitud Incorrecta"
+                                401 -> "Sesión Expirada"
+                                403 -> "Acceso Denegado"
+                                404 -> "Recurso no Encontrado"
+                                409 -> "Conflicto en la Solicitud"
+                                else -> "Error en la Solicitud"
                             }
-                            else -> {
-                                throw UiTayApiException(
-                                    code = finalCode,
-                                    title = finalTitle,
-                                    messageApi = finalMessage
-                                )
+
+                            val defaultMessageForStatus = when (statusCode) {
+                                400 -> "Los datos enviados son incorrectos."
+                                401 -> "Tu sesión ha expirado. Por favor, vuelve a iniciar sesión."
+                                403 -> "No tienes permisos para realizar esta acción."
+                                404 -> "No se encontró el recurso solicitado."
+                                409 -> "Ocurrió un conflicto al procesar la solicitud."
+                                else -> "Ocurrió un error inesperado."
                             }
+
+                            val title = titleFromApi ?: defaultTitleForStatus
+
+                            val uniqueDetails = detailsListFromApi
+                                .filter { it.isNotBlank() && it != mainMsgFromApi && it != title }
+                                .distinct()
+
+                            val detailsFormatted = if (uniqueDetails.isNotEmpty()) {
+                                uniqueDetails.joinToString("\n• ")
+                            } else {
+                                ""
+                            }
+
+                            val message = when {
+                                !mainMsgFromApi.isNullOrBlank() && detailsFormatted.isNotBlank() -> {
+                                    if (mainMsgFromApi in uniqueDetails) {
+                                        "• $detailsFormatted"
+                                    } else {
+                                        "$mainMsgFromApi:\n• $detailsFormatted"
+                                    }
+                                }
+                                !mainMsgFromApi.isNullOrBlank() -> mainMsgFromApi
+                                detailsFormatted.isNotBlank() -> "• $detailsFormatted"
+                                else -> defaultMessageForStatus
+                            }
+
+                            title to message
+                        }
+
+                        val isUnauthorized = statusCode == 401 ||
+                                (statusCode == 403 && (
+                                    finalMessage.contains("token", ignoreCase = true) ||
+                                    finalMessage.contains("expirad", ignoreCase = true) ||
+                                    finalMessage.contains("sesion", ignoreCase = true) ||
+                                    finalMessage.contains("sesión", ignoreCase = true)
+                                )) ||
+                                (errorModel?.errorCode == 17 && (
+                                    finalMessage.contains("token", ignoreCase = true) ||
+                                    finalTitle.contains("token", ignoreCase = true) ||
+                                    finalMessage.contains("expirad", ignoreCase = true)
+                                ))
+
+                        if (isUnauthorized) {
+                            throw com.pizzza.pizzzaapp.repository.network.exception.UnAuthorizedException()
+                        } else {
+                            throw UiTayApiException(
+                                code = statusCode,
+                                title = finalTitle,
+                                messageApi = finalMessage
+                            )
                         }
                     }
                 }
@@ -99,21 +153,6 @@ val networkModule = module {
         }
     }
 
-    single(named("wsClient")) {
-        val connectivityManager: ConnectivityManager = get()
-        HttpClient {
-            install(WebSockets)
-            install(Logging) {
-                logger = requestLogger
-                level = LogLevel.ALL
-            }
-            defaultRequest {
-                if (!connectivityManager.isConnected()) throw ErrorNetwork()
-            }
-        }
-    }
-
     single { KmmService(get(named("httpClient"))) }
-    single { WebSocketManager(get(named("wsClient"))) }
 }
 

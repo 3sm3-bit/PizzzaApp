@@ -1,6 +1,5 @@
 package com.pizzza.pizzzaapp.feature.orders
 
-import com.pizzza.pizzzaapp.TAG_PIZZZA
 import com.pizzza.pizzzaapp.core.ui.base.BaseViewModel
 import com.pizzza.pizzzaapp.core.ui.model.OrderItem
 import com.pizzza.pizzzaapp.core.ui.model.withHomeData
@@ -29,10 +28,7 @@ class OrdersViewModel(
 
     fun getGeneralOrderList(forceLoading: Boolean = false) {
         val isAlreadyLoaded = appDataOrder.state.value.ordersLoaded
-        println("$TAG_PIZZZA: OrdersViewModel: Solicitando lista (force=$forceLoading, yaCargado=$isAlreadyLoaded)")
-        
         if (isAlreadyLoaded && !forceLoading) {
-            println("$TAG_PIZZZA: OrdersViewModel: Ignorando carga, ya tenemos datos")
             return
         }
         

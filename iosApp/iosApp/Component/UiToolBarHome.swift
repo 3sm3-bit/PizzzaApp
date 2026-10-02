@@ -15,10 +15,20 @@ struct UiToolBarHome: View {
     var onClick: () -> Void = {}
     @ObservedObject var cartManager = CartManager.shared
     
+    var welcomeText: String {
+        let names = cartManager.userName.trimmingCharacters(in: .whitespacesAndNewlines)
+        let components = names.components(separatedBy: .whitespacesAndNewlines).filter { !$0.isEmpty }
+        if let firstName = components.first, !firstName.isEmpty {
+            return "Bienvenid@ \(firstName)"
+        } else {
+            return "Bienvenido a la"
+        }
+    }
+
     var body: some View {
         HStack{
             VStack(alignment: .leading) {
-                Text("Bienvenido a la")
+                Text(welcomeText)
                     .font(PizzaFonts.medium14)
                     .foregroundColor(Color.uiTayRed600)
                 Image(uiName: "ic_logo_pizzzeria")
@@ -52,8 +62,11 @@ struct UiToolBarHome: View {
                     onClick()
                 }
         }
-          .padding(.horizontal)
-          .padding(.top, 8).padding(.trailing,12)
+        .padding(.horizontal)
+        .padding(.top, 8).padding(.trailing,12)
+        .onAppear {
+            cartManager.loadUserAddress()
         }
+    }
 }
 

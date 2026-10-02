@@ -98,7 +98,6 @@ fun ScreenOrderSummary(
                             modifier = Modifier.padding(bottom = 16.dp)
                         )
 
-                        // Lista de Productos (Ya no necesita peso ni scroll propio)
                         uiState.cart.forEach { item ->
                             Row(
                                 modifier = Modifier
@@ -162,7 +161,6 @@ fun ScreenOrderSummary(
 
                         Spacer(Modifier.height(16.dp))
 
-                        // Información de Entrega
                         Surface(
                             color = Color(0xFFF0F2F5),
                             shape = RoundedCornerShape(12.dp),
@@ -188,7 +186,6 @@ fun ScreenOrderSummary(
 
                         Spacer(Modifier.height(20.dp))
 
-                        // Total
                         Row(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.SpaceBetween,

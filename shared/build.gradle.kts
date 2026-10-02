@@ -17,8 +17,8 @@ val localProperties = Properties().apply {
         localPropertiesFile.inputStream().use { load(it) }
     }
 }
-val urlDev: String = localProperties.getProperty("URL_DEV") ?: "https://devapp.lapizzzeria.lol"
-val urlPro: String = localProperties.getProperty("URL_PRO") ?: "https://app.lapizzzeria.lol"
+val urlDev: String = localProperties.getProperty("URL_DEV") ?: ""
+val urlPro: String = localProperties.getProperty("URL_PRO") ?: ""
 
 buildConfig {
     packageName.set("com.pizzza.pizzzaapp.shared")

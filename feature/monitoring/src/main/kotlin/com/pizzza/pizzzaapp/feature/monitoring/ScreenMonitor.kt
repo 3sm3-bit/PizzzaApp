@@ -1,35 +1,61 @@
 package com.pizzza.pizzzaapp.feature.monitoring
 
 import android.content.Context
-import android.graphics.Bitmap
 import android.graphics.Canvas
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
+import androidx.core.graphics.createBitmap
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.MapsInitializer
-import com.google.android.gms.maps.model.*
-import com.google.maps.android.compose.*
+import com.google.android.gms.maps.model.BitmapDescriptor
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
+import com.google.android.gms.maps.model.CameraPosition
+import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.LatLngBounds
+import com.google.maps.android.compose.GoogleMap
+import com.google.maps.android.compose.MapUiSettings
+import com.google.maps.android.compose.Marker
+import com.google.maps.android.compose.Polyline
+import com.google.maps.android.compose.rememberCameraPositionState
+import com.google.maps.android.compose.rememberMarkerState
 import com.pizzza.pizzzaapp.core.ui.R
-import com.pizzza.pizzzaapp.feature.orders.OrdersViewModel
 import com.pizzza.pizzzaapp.core.ui.singleton.LocalAppDataOrder
-import org.koin.compose.viewmodel.koinViewModel
+import com.pizzza.pizzzaapp.feature.orders.OrdersViewModel
 import com.valu.uitaycompose.utils.tay_green_800
 import com.valu.uitaycompose.utils.tay_red_600
 import com.valu.uitaycompose.utils.textB16
 import com.valu.uitaycompose.utils.textB20
 import com.valu.uitaycompose.utils.textM14
 import kotlinx.coroutines.delay
+import org.koin.compose.viewmodel.koinViewModel
 import kotlin.time.Duration.Companion.minutes
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -54,7 +80,6 @@ fun ScreenMonitor(
         bitmapDescriptorFromVector(context, R.drawable.ic_map_boy, sizeDp = 32)
     }
 
-    // Polling cada 1 minuto
     LaunchedEffect(Unit) {
         while (true) {
             viewModel.getOrderDetail(order.uid)
@@ -75,7 +100,6 @@ fun ScreenMonitor(
         )
     }
 
-    // Generar los puntos de la línea curva (Arco)
     val curvedPath = remember(deliveryLatLng, driverLatLng) {
         generateCurvedPath(driverLatLng, deliveryLatLng)
     }
@@ -84,7 +108,6 @@ fun ScreenMonitor(
         position = CameraPosition.fromLatLngZoom(driverLatLng, 15f)
     }
 
-    // Ajustar cámara para mostrar ambos marcadores
     LaunchedEffect(deliveryLatLng, driverLatLng) {
         val bounds = LatLngBounds.builder()
             .include(deliveryLatLng)
@@ -137,7 +160,6 @@ fun ScreenMonitor(
                     icon = houseIcon
                 )
 
-                // Marcador Repartidor (Moto)
                 Marker(
                     state = rememberMarkerState(position = driverLatLng),
                     title = "Repartidor",
@@ -146,7 +168,6 @@ fun ScreenMonitor(
                 )
             }
 
-            // Info Card at the bottom
             Card(
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
@@ -166,25 +187,17 @@ fun ScreenMonitor(
     }
 }
 
-/**
- * Genera una lista de puntos que forman un arco entre dos coordenadas LatLng
- */
 private fun generateCurvedPath(start: LatLng, end: LatLng): List<LatLng> {
     val points = mutableListOf<LatLng>()
-    val count = 50 // Precisión de la curva
+    val count = 50
     
-    // Calculamos el punto medio
     val midLat = (start.latitude + end.latitude) / 2
     val midLng = (start.longitude + end.longitude) / 2
-    
-    // Calculamos una desviación para crear el "arco" (efecto ovalado)
-    // Usamos una diferencia pequeña para que no sea exagerado
+
     val distLat = end.latitude - start.latitude
     val distLng = end.longitude - start.longitude
-    
-    // Punto de control para la curva Bezier cuadrática
-    // Desviamos el punto medio perpendicularmente a la línea recta
-    val offset = 0.2 // Factor de curvatura
+
+    val offset = 0.2
     val controlPoint = LatLng(
         midLat + (distLng * offset),
         midLng - (distLat * offset)
@@ -192,7 +205,6 @@ private fun generateCurvedPath(start: LatLng, end: LatLng): List<LatLng> {
 
     for (i in 0..count) {
         val t = i.toDouble() / count
-        // Fórmula de Bezier Cuadrática: (1-t)^2*P0 + 2(1-t)*t*P1 + t^2*P2
         val lat = ((1 - t) * (1 - t) * start.latitude) + (2 * (1 - t) * t * controlPoint.latitude) + (t * t * end.latitude)
         val lng = ((1 - t) * (1 - t) * start.longitude) + (2 * (1 - t) * t * controlPoint.longitude) + (t * t * end.longitude)
         points.add(LatLng(lat, lng))
@@ -211,15 +223,10 @@ fun bitmapDescriptorFromVector(
     val drawable = ContextCompat.getDrawable(context, vectorResId) ?: return null
     
     val density = context.resources.displayMetrics.density
-    // Si pasamos sizeDp, lo usamos. Si no, usamos el tamaño intrínseco del archivo.
     val width = sizeDp?.let { (it * density).toInt() } ?: drawable.intrinsicWidth
     val height = sizeDp?.let { (it * density).toInt() } ?: drawable.intrinsicHeight
 
-    val bitmap = Bitmap.createBitmap(
-        width,
-        height,
-        Bitmap.Config.ARGB_8888
-    )
+    val bitmap = createBitmap(width, height)
     val canvas = Canvas(bitmap)
     drawable.setBounds(0, 0, width, height)
     drawable.draw(canvas)

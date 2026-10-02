@@ -13,7 +13,6 @@ class AppViewModel(
 
     fun syncProducts(onComplete: (Boolean) -> Unit = {}) {
         execute(loading = false, globalUiStateManager = globalUiStateManager) {
-            try {
                 io {
                     val data  = dataUseCase.getProducts()
                     val branch  = dataUseCase.getBranch()
@@ -21,7 +20,6 @@ class AppViewModel(
                         branch.isEmpty() -> "1"
                         else -> branch.first().identifier
                     }
-
                     appDataOrder.update { state ->
                         state.copy(
                             products = data,
@@ -33,14 +31,8 @@ class AppViewModel(
                             branchId = defaultBranchId
                         )
                     }
-
                 }
                 onComplete(true)
-            } catch (e: Exception) {
-                e.printStackTrace()
-                onComplete(false)
-            }
         }
     }
-
 }

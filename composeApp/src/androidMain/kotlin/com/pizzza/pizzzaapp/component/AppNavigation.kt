@@ -73,7 +73,6 @@ fun AppNavigation() {
             val route: ScreenInitNav.AddressSelection = backStackEntry.toRoute()
             
             if (route.fromRegister) {
-                // Compartimos el ViewModel con la pantalla de Registro para que los datos coincidan
                 val registerEntry = remember(backStackEntry) {
                     navController.getBackStackEntry<ScreenInitNav.Register>()
                 }
