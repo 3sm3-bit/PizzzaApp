@@ -18,6 +18,8 @@ interface IDataNetwork {
 
     suspend fun getOrderById(orderId: String): ParentOrderModel
 
+    suspend fun deleteGeneralOrder(orderId: String): String
+
     suspend fun syncProducts(): List<ProductModel>
 
     suspend fun createOrder(data: List<OrderResponse>): String

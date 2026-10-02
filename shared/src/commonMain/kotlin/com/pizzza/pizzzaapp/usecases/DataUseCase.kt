@@ -19,6 +19,9 @@ class DataUseCase(private val iDataNetwork: IDataNetwork, private val iDataDBNet
     suspend fun getOrderById(orderId: String) = iDataNetwork.getOrderById(orderId)
 
     @Throws(Exception::class)
+    suspend fun deleteGeneralOrder(orderId: String) = iDataNetwork.deleteGeneralOrder(orderId)
+
+    @Throws(Exception::class)
     suspend fun syncProducts(): List<ProductModel> {
         val response = iDataNetwork.syncProducts()
         if (response.isNotEmpty()) {

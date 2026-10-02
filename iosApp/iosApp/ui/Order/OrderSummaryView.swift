@@ -42,7 +42,9 @@ struct OrderSummaryView: View {
                             }
                         },
                         onCancel: {
-                            dismiss()
+                            cartManager.cancelPendingOrder {
+                                dismiss()
+                            }
                         }
                     )
                 },

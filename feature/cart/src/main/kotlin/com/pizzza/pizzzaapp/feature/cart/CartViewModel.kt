@@ -229,6 +229,30 @@ class CartViewModel(
         }
     }
 
+    fun cancelPendingOrder(onComplete: () -> Unit = {}) {
+        val pendingUid = cartUiState.value.pendingOrderUid
+
+        appDataOrder.update {
+            it.copy(
+                cart = emptyList(),
+                pendingOrderUid = ""
+            )
+        }
+        onComplete()
+
+        if (pendingUid.isNotBlank()) {
+            execute(loading = false) {
+                io {
+                    try {
+                        dataUseCase.deleteGeneralOrder(pendingUid)
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    }
+                }
+            }
+        }
+    }
+
     fun resetState() {
         appDataOrder.reset()
     }

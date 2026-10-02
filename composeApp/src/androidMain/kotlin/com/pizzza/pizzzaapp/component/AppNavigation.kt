@@ -154,7 +154,13 @@ fun AppNavigation() {
                         }
                     }
                 },
-                onBack = onBack
+                onCancelOrder = {
+                    cartViewModel.cancelPendingOrder {
+                        navController.navigateSafe(ScreenInitNav.ClientHome) {
+                            popUpTo(ScreenInitNav.ClientHome) { inclusive = true }
+                        }
+                    }
+                }
             )
         }
     }

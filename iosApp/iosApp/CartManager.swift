@@ -265,6 +265,25 @@ class CartManager: ObservableObject {
             }
         }
     }
+
+    func cancelPendingOrder(onComplete: (() -> Void)? = nil) {
+        let pendingUid = self.pendingOrderUid
+
+        DispatchQueue.main.async {
+            self.clearCart()
+            self.pendingOrderUid = ""
+        }
+
+        onComplete?()
+
+        if !pendingUid.isEmpty {
+            self.dataUseCase.deleteGeneralOrder(orderId: pendingUid) { _, error in
+                if let error = error {
+                    print("⚠️ Error deleting pending order on iOS: \(error.localizedDescription)")
+                }
+            }
+        }
+    }
 }
 
 struct OrderItemSwift: Identifiable {

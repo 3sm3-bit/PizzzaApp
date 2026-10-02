@@ -59,6 +59,11 @@ class DataNetwork(
         listOf(response).loadParentOrder().first()
     }
 
+    override suspend fun deleteGeneralOrder(orderId: String): String = apiCall {
+        val token = dataBase.getUserLocal()?.token
+        apiService.deleteGeneralOrder(orderId, token = token)
+    }
+
     override suspend fun registerUser(data: UserResponse): String = apiCall {
         apiService.registerUser(data)
     }
