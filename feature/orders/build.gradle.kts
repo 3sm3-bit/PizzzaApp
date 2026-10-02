@@ -19,24 +19,16 @@ kotlin {
             implementation(project(":core:navigation"))
             implementation(project(":shared"))
             
-            implementation(compose.runtime)
-            implementation(compose.foundation)
-            implementation(compose.material3)
-            implementation(compose.ui)
-            implementation("androidx.compose.material:material-icons-extended:1.7.8")
+            implementation(libs.compose.runtime)
+            implementation(libs.compose.foundation)
+            implementation(libs.compose.material3)
+            implementation(libs.compose.ui)
+            implementation(libs.androidx.compose.material.icons.extended)
             implementation(libs.androidx.lifecycle.viewmodelCompose)
             implementation(libs.androidx.lifecycle.runtimeCompose)
             implementation(libs.koin.compose)
             implementation(libs.koin.compose.viewmodel)
             implementation(libs.tay.compose.library)
-            
-            if ("feature/orders" == "feature/monitoring" || "feature/orders" == "feature/cart") {
-                implementation(libs.google.maps.compose)
-                implementation(libs.play.services.maps)
-            }
-            if ("feature/orders" == "feature/cart") {
-                implementation(libs.play.services.location)
-            }
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
@@ -46,7 +38,7 @@ kotlin {
     }
 }
 
-android {
+configure<com.android.build.api.dsl.LibraryExtension> {
     namespace = "com.pizzza.pizzzaapp.feature.orders"
     compileSdk = libs.versions.android.compileSdk.get().toInt()
     defaultConfig {

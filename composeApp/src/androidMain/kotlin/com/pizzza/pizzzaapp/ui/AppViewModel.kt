@@ -4,8 +4,6 @@ import com.pizzza.pizzzaapp.core.ui.base.BaseViewModel
 import com.pizzza.pizzzaapp.core.ui.singleton.AppDataOrder
 import com.pizzza.pizzzaapp.core.ui.singleton.GlobalUiStateManager
 import com.pizzza.pizzzaapp.usecases.DataUseCase
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.Dispatchers
 
 class AppViewModel(
     private val dataUseCase: DataUseCase,
@@ -19,8 +17,6 @@ class AppViewModel(
                 io {
                     val data  = dataUseCase.getProducts()
                     val branch  = dataUseCase.getBranch()
-                    
-                    // Lógica para pre-seleccionar el branchId por defecto
                     val defaultBranchId = when {
                         branch.isEmpty() -> "1"
                         else -> branch.first().identifier

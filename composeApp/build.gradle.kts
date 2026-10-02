@@ -27,7 +27,6 @@ kotlin {
     }
     sourceSets {
         androidMain.dependencies {
-            implementation(compose.preview)
             implementation(libs.androidx.activity.compose)
             
             // Koin
@@ -38,11 +37,8 @@ kotlin {
             // Navigation
             implementation(libs.navigation.compose)
             
-            // Accompanist
-            implementation(libs.accompanist.systemuicontroller)
-            
             // Icons
-            implementation("androidx.compose.material:material-icons-extended:1.7.8")
+            implementation(libs.androidx.compose.material.icons.extended)
 
             // Google Maps
             implementation(libs.google.maps.compose)
@@ -53,12 +49,12 @@ kotlin {
             implementation(libs.tay.compose.library)
         }
         commonMain.dependencies {
-            implementation(compose.runtime)
-            implementation(compose.foundation)
-            implementation(compose.material3)
-            implementation(compose.ui)
-            implementation(compose.components.resources)
-            implementation(compose.components.uiToolingPreview)
+            implementation(libs.compose.runtime)
+            implementation(libs.compose.foundation)
+            implementation(libs.compose.material3)
+            implementation(libs.compose.ui)
+            implementation(libs.compose.components.resources)
+            implementation(libs.compose.uiToolingPreview)
             implementation(libs.androidx.lifecycle.viewmodelCompose)
             implementation(libs.androidx.lifecycle.runtimeCompose)
             implementation(project(":shared"))
@@ -83,7 +79,7 @@ kotlin {
     }
 }
 
-android {
+configure<com.android.build.api.dsl.ApplicationExtension> {
     namespace = "com.pizzza.pizzzaapp"
     compileSdk = libs.versions.android.compileSdk.get().toInt()
 
@@ -103,14 +99,10 @@ android {
         create("dev") {
             dimension = "environment"
             resValue("string", "app_name", "Pizzzeria")
-            buildConfigField("String", "BASE_URL", "\"http://10.0.2.2:3000\"")
-            buildConfigField("Boolean", "IS_DEV", "true")
         }
         create("pro") {
             dimension = "environment"
             resValue("string", "app_name", "Pizzzeria")
-            buildConfigField("String", "BASE_URL", "\"https://app.lapizzzeria.lol\"")
-            buildConfigField("Boolean", "IS_DEV", "false")
         }
     }
 
@@ -130,7 +122,12 @@ android {
     }
     buildTypes {
         getByName("release") {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
+            isShrinkResources = true
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
             signingConfig = signingConfigs.getByName("release")
         }
         getByName("debug") {
@@ -147,18 +144,22 @@ android {
         resValues = true
         compose = true
     }
+}
 
-    applicationVariants.all {
-        val variant = this
-        outputs.all {
-            val output = this as com.android.build.gradle.internal.api.BaseVariantOutputImpl
-            output.outputFileName = "pizzeria-${variant.flavorName}-${variant.buildType.name}.apk"
+androidComponents {
+    onVariants { variant ->
+        val flavor = variant.flavorName ?: ""
+        val buildType = variant.buildType ?: ""
+        variant.outputs.forEach { output ->
+            if (output is com.android.build.api.variant.impl.VariantOutputImpl) {
+                output.outputFileName.set("pizzeria-$flavor-$buildType.apk")
+            }
         }
     }
 }
 
 dependencies {
-    debugImplementation(compose.uiTooling)
+    debugImplementation(libs.compose.uiTooling)
     
     // Testing Android
     androidTestImplementation(libs.androidx.testExt.junit)

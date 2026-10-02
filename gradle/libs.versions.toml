@@ -4,23 +4,20 @@ android-compileSdk = "37"
 android-minSdk = "25"
 android-targetSdk = "37"
 androidx-activity = "1.13.0"
-androidx-appcompat = "1.7.1"
-androidx-core = "1.19.0"
 androidx-espresso = "3.7.0"
 androidx-lifecycle = "2.11.0-beta01"
 androidx-testExt = "1.3.0"
 composeMultiplatform = "1.11.1"
-junit = "4.13.2"
 kotlin = "2.4.10"
 material3 = "1.11.0-alpha07"
 google-maps = "6.1.0"
+materialIconsExtended = "1.7.8"
 play-services-maps = "19.0.0"
 play-services-location = "21.3.0"
 
 ksp = "2.3.11"
 room = "2.8.4"
 koin = "4.0.0"
-koin-core = "4.0.0"
 ktor = "3.1.1"
 kotlinx-coroutines = "1.10.1"
 kotlinx-serialization = "1.7.3"
@@ -28,7 +25,6 @@ kotlinx-datetime = "0.6.1"
 sqlite-bundled = "2.5.0-alpha13"
 datastore = "1.1.7"
 navigation-compose = "2.8.8"
-accompanist = "0.28.0"
 buildconfig = "5.6.8"
 mockk = "1.13.17"
 kotlinx-coroutines-test = "1.10.1"
@@ -38,9 +34,8 @@ androidx-compose-ui-test = "1.7.8"
 
 [libraries]
 # Testing
+androidx-compose-material-icons-extended = { module = "androidx.compose.material:material-icons-extended", version.ref = "materialIconsExtended" }
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
-kotlin-testJunit = { module = "org.jetbrains.kotlin:kotlin-test-junit", version.ref = "kotlin" }
-junit = { module = "junit:junit", version.ref = "junit" }
 mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
 kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlinx-coroutines-test" }
 turbine = { module = "app.cash.turbine:turbine", version.ref = "turbine" }
@@ -48,10 +43,10 @@ koin-test = { module = "io.insert-koin:koin-test", version.ref = "koin-test" }
 androidx-compose-ui-test-junit4 = { module = "androidx.compose.ui:ui-test-junit4", version.ref = "androidx-compose-ui-test" }
 androidx-compose-ui-test-manifest = { module = "androidx.compose.ui:ui-test-manifest", version.ref = "androidx-compose-ui-test" }
 androidx-test-runner = { module = "androidx.test:runner", version = "1.6.2" }
-androidx-core-ktx = { module = "androidx.core:core-ktx", version.ref = "androidx-core" }
 androidx-testExt-junit = { module = "androidx.test.ext:junit", version.ref = "androidx-testExt" }
 androidx-espresso-core = { module = "androidx.test.espresso:espresso-core", version.ref = "androidx-espresso" }
-androidx-appcompat = { module = "androidx.appcompat:appcompat", version.ref = "androidx-appcompat" }
+
+# Compose & Lifecycle
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activity" }
 compose-uiTooling = { module = "org.jetbrains.compose.ui:ui-tooling", version.ref = "composeMultiplatform" }
 androidx-lifecycle-viewmodelCompose = { module = "org.jetbrains.androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "androidx-lifecycle" }
@@ -94,7 +89,6 @@ datastore-preferences = { module = "androidx.datastore:datastore-preferences", v
 
 # Navigation & UI Helpers
 navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigation-compose" }
-accompanist-systemuicontroller = { module = "com.google.accompanist:accompanist-systemuicontroller", version.ref = "accompanist" }
 google-maps-compose = { module = "com.google.maps.android:maps-compose", version.ref = "google-maps" }
 play-services-maps = { module = "com.google.android.gms:play-services-maps", version.ref = "play-services-maps" }
 play-services-location = { module = "com.google.android.gms:play-services-location", version.ref = "play-services-location" }

@@ -24,10 +24,6 @@ import io.ktor.http.ContentType
 import io.ktor.http.contentType
 import com.pizzza.pizzzaapp.repository.network.model.PaymentRequest
 import com.pizzza.pizzzaapp.repository.network.model.PaymentResponse
-import io.ktor.client.request.forms.submitForm
-import io.ktor.http.Parameters
-import kotlinx.serialization.json.JsonObject
-import kotlinx.serialization.json.jsonPrimitive
 
 class KmmService(private val client: HttpClient) {
 

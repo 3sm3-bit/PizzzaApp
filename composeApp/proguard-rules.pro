@@ -30,6 +30,7 @@
 
 # --- Ktor ---
 -keep class io.ktor.** { *; }
+-dontwarn java.lang.management.**
 
 # --- Room ---
 -keep class * extends androidx.room.RoomDatabase

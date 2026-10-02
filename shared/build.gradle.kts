@@ -1,5 +1,6 @@
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import java.util.Properties
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
@@ -10,20 +11,26 @@ plugins {
     alias(libs.plugins.kotlinx.serialization)
 }
 
+val localProperties = Properties().apply {
+    val localPropertiesFile = rootProject.file("local.properties")
+    if (localPropertiesFile.exists()) {
+        localPropertiesFile.inputStream().use { load(it) }
+    }
+}
+val urlDev: String = localProperties.getProperty("URL_DEV") ?: "https://devapp.lapizzzeria.lol"
+val urlPro: String = localProperties.getProperty("URL_PRO") ?: "https://app.lapizzzeria.lol"
+
 buildConfig {
     packageName.set("com.pizzza.pizzzaapp.shared")
-    
-    // Detectar si es Debug o Dev en Android o iOS (Xcode pasa la variable CONFIGURATION)
     val isIosDebug = System.getenv("CONFIGURATION") == "Debug"
     val isAndroidDebugOrDev = project.gradle.startParameter.taskNames.any {
         it.contains("Debug", ignoreCase = true) || it.contains("Dev", ignoreCase = true)
     }
     val isDebug = isAndroidDebugOrDev || isIosDebug || project.hasProperty("debug")
-    val devUrl = "\"https://devapp.lapizzzeria.lol\""
     
     buildConfigField("Boolean", "IS_DEBUG", isDebug.toString())
-    buildConfigField("String", "BASE_URL_SERVICE", "\"https://app.lapizzzeria.lol\"")
-    buildConfigField("String", "BASE_URL_SERVICE_DEV", devUrl)
+    buildConfigField("String", "BASE_URL_SERVICE", "\"$urlPro\"")
+    buildConfigField("String", "BASE_URL_SERVICE_DEV", "\"$urlDev\"")
 }
 
 kotlin {
@@ -84,7 +91,7 @@ kotlin {
     }
 }
 
-android {
+configure<com.android.build.api.dsl.LibraryExtension> {
     namespace = "com.pizzza.pizzzaapp.shared"
     compileSdk = libs.versions.android.compileSdk.get().toInt()
     compileOptions {

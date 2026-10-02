@@ -19,7 +19,7 @@ kotlin {
     }
 }
 
-android {
+configure<com.android.build.api.dsl.LibraryExtension> {
     namespace = "com.pizzza.pizzzaapp.core.navigation"
     compileSdk = libs.versions.android.compileSdk.get().toInt()
     defaultConfig {

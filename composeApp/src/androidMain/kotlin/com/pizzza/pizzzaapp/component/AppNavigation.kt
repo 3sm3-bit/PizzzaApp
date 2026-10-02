@@ -90,7 +90,6 @@ fun AppNavigation() {
                     onBack = onBack
                 )
             } else {
-                // Compartimos el ViewModel con el Home/Carrito para no perder la sesión de compra
                 val homeEntry = remember(backStackEntry) {
                     navController.getBackStackEntry<ScreenInitNav.ClientHome>()
                 }
