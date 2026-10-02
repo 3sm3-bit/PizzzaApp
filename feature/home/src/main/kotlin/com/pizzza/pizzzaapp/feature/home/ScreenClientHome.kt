@@ -48,6 +48,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -192,11 +193,12 @@ fun ScreenClientHome(
                     val firstName = authUiState.names.trim().split("\\s+".toRegex()).firstOrNull { it.isNotBlank() }
                     val welcomeText = if (!firstName.isNullOrBlank()) "Bienvenid@ $firstName" else "Bienvenido a la"
                     Text(
-                        modifier = Modifier
-                            .padding(start = 8.dp),
+                        modifier = Modifier.padding(start = 8.dp),
                         text = welcomeText,
                         style = textSe14,
-                        color = tay_red_600
+                        color = tay_red_600,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
                     )
                     Image(painter = painterResource(R.drawable.ic_logo_pizzzeria),
                         contentDescription = "logo_ic",

@@ -27,10 +27,13 @@ struct UiToolBarHome: View {
 
     var body: some View {
         HStack{
-            VStack(alignment: .leading) {
+            VStack(alignment: .leading, spacing: 2) {
                 Text(welcomeText)
-                    .font(PizzaFonts.medium14)
+                    .font(Font.uiMontS16)
                     .foregroundColor(Color.uiTayRed600)
+                    .lineLimit(1)
+                    .fixedSize(horizontal: true, vertical: false)
+                
                 Image(uiName: "ic_logo_pizzzeria")
                     .resizable()
                     .frame(width: 120, height: 40)

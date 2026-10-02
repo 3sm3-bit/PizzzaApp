@@ -20,7 +20,7 @@ struct PromotionsBanner: View {
                             Button(action: { onProductClick(product) }) {
                                 CardView(product: product, cardWidth: cardWidth)
                             }
-                            .buttonStyle(PlainButtonStyle())
+                            .buttonStyle(BorderlessButtonStyle())
                         }
                     }
                     .padding(.horizontal, 16)
@@ -45,7 +45,7 @@ struct PromotionsBanner: View {
                 let scale = max(0.85, 1.0 - (distance / UIScreen.main.bounds.width) * 0.15)
                 
                 UiTayUrlImage(url: product.urlImg)
-                    .frame(width: cardWidth, height: 150)
+                    .frame(width: cardWidth, height: 145)
                     .cornerRadius(16)
                     .scaleEffect(scale)
                     .opacity(scale >= 0.9 ? 1.0 : 0.7)

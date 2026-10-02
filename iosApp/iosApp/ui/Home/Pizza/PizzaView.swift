@@ -55,22 +55,26 @@ struct PizzaView: View {
                     if !CartManager.shared.promotionsProducts.isEmpty {
                         LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 16) {
                             ForEach(filteredPizzas, id: \.uid) { product in
-                                PizzaGridCard(product: product)
-                                    .onTapGesture {
-                                        self.product = product
-                                        destiny = .uiNext
-                                    }
+                                Button(action: {
+                                    self.product = product
+                                    destiny = .uiNext
+                                }) {
+                                    PizzaGridCard(product: product)
+                                }
+                                .buttonStyle(BorderlessButtonStyle())
                             }
                         }
                         .padding(.horizontal)
                     } else {
                         LazyVStack(spacing: 12) {
                             ForEach(filteredPizzas, id: \.uid) { product in
-                                PizzaProductCard(product: product)
-                                    .onTapGesture {
-                                        self.product = product
-                                        destiny = .uiNext
-                                    }
+                                Button(action: {
+                                    self.product = product
+                                    destiny = .uiNext
+                                }) {
+                                    PizzaProductCard(product: product)
+                                }
+                                .buttonStyle(BorderlessButtonStyle())
                             }
                         }
                         .padding(.horizontal)

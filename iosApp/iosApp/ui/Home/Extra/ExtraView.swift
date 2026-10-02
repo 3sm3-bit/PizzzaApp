@@ -59,11 +59,13 @@ struct ExtraView: View {
 
                     LazyVGrid(columns: columns, spacing: 16) {
                         ForEach(filteredExtras, id: \.uid) { product in
-                            ExtraProductCard(product: product)
-                                .onTapGesture {
-                                    self.product = product
-                                    destiny = .uiNext
-                                }
+                            Button(action: {
+                                self.product = product
+                                destiny = .uiNext
+                            }) {
+                                ExtraProductCard(product: product)
+                            }
+                            .buttonStyle(BorderlessButtonStyle())
                         }
                     }
                     .padding(.horizontal)

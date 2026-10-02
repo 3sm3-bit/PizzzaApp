@@ -10,7 +10,6 @@ struct ContentView: View {
                 Color(hex: 0xF0F2F5).edgesIgnoringSafeArea(.all)
                 
                 VStack(spacing: 0) {
-                    // Cabecera Minimalista
                     HStack {
                         Text("Gestión de Pedidos")
                             .font(.system(size: 18, weight: .bold))
@@ -33,8 +32,6 @@ struct ContentView: View {
                     }
                     .padding(.horizontal)
                     .padding(.vertical, 12)
-                    
-                    // Indicadores CONFIRMADO / LISTO (50% cada uno)
                     HStack(spacing: 8) {
                         StatusIndicator(text: "CONFIRMADO", count: viewModel.countConfirmado, color: Color(hex: 0x3B82F6))
                         StatusIndicator(text: "LISTO", count: viewModel.countListo, color: Color(hex: 0x10B981))
@@ -47,7 +44,6 @@ struct ContentView: View {
                             .padding(.bottom, 8)
                     }
                     
-                    // Lista de Pedidos
                     ScrollView {
                         if viewModel.orders.isEmpty && !viewModel.isLoading {
                             VStack(spacing: 16) {
@@ -83,7 +79,6 @@ struct ContentView: View {
                     }
                 }
                 
-                // Botón Flotante para Productos (Navegación)
                 VStack {
                     Spacer()
                     HStack {
@@ -113,7 +108,6 @@ struct ContentView: View {
     }
 }
 
-// Identificable para el .sheet
 extension ParentOrderModel: Identifiable {
     public var id: String { uid }
 }
@@ -162,7 +156,6 @@ struct OrderCardView: View {
                     .frame(width: 4)
                 
                 VStack(alignment: .leading, spacing: 0) {
-                    // Fila 1: Cliente y Estado
                     HStack {
                         Text(order.nameClient)
                             .font(.system(size: 16, weight: .bold))
@@ -180,7 +173,6 @@ struct OrderCardView: View {
                     
                     Divider().padding(.vertical, 8)
                     
-                    // Desglose de Productos
                     VStack(alignment: .leading, spacing: 2) {
                         ForEach(order.orders, id: \.ui) { item in
                             VStack(alignment: .leading, spacing: 0) {
@@ -221,7 +213,6 @@ struct OrderCardView: View {
                     
                     Divider().padding(.top, 2).padding(.bottom, 8)
                     
-                    // Logística y Total
                     HStack(alignment: .bottom) {
                         VStack(alignment: .leading, spacing: 2) {
                             let isDelivery = order.reception.uppercased().contains("DELIVERY")
@@ -249,7 +240,6 @@ struct OrderCardView: View {
                     
                     Spacer().frame(height: 12)
                     
-                    // Botones
                     HStack(spacing: 8) {
                         Button(action: onDetail) {
                             Text("DETALLE")
@@ -293,7 +283,6 @@ struct OrderDetailView: View {
             Color(hex: 0xF0F2F5).edgesIgnoringSafeArea(.all)
             
             VStack(alignment: .leading, spacing: 16) {
-                // Header
                 HStack {
                     VStack(alignment: .leading, spacing: 4) {
                         Text("Detalle del Pedido")
@@ -356,7 +345,6 @@ struct OrderDetailView: View {
                     }
                 }
                 
-                // Total
                 HStack {
                     Text("Total del Pedido")
                         .font(.system(size: 16, weight: .bold))
@@ -434,7 +422,6 @@ struct ProductListView: View {
     }
 }
 
-// Extensión para colores Hex en SwiftUI
 extension Color {
     init(hex: UInt, alpha: Double = 1) {
         self.init(

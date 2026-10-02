@@ -86,14 +86,7 @@ class OrderViewModel: ObservableObject {
     
     func updateOrderState(order: ParentOrderModel, newState: String) {
         if order.state.trimmingCharacters(in: .whitespacesAndNewlines).uppercased() == newState.uppercased() { return }
-        
-        // 1. Rollback state
-        let previousOrders = self.orders
-        let previousConfirmado = self.countConfirmado
-        let previousListo = self.countListo
-        
-        // 2. Optimistic Update
-        let updatedOrders = self.orders.map { 
+        let updatedOrders = self.orders.map {
             if $0.uid == order.uid {
                 return $0.doCopy(
                     uid: $0.uid,
@@ -122,25 +115,7 @@ class OrderViewModel: ObservableObject {
         }
         
         self.updateStateWithOrders(orders: updatedOrders)
-        
-        /* 
-         TODO: updateOrder is not implemented in DataUseCase yet.
-         This would require a PUT endpoint in the backend and a new method in the shared module.
-        */
-        print("⚠️ updateOrder not implemented in shared module")
-        /*
-        dataUseCase.updateOrder(...) { response, error in
-            if error != nil {
-                DispatchQueue.main.async {
-                    self.orders = previousOrders
-                    self.countConfirmado = previousConfirmado
-                    self.countListo = previousListo
-                }
-            } else {
-                self.getGeneralOrderList()
-            }
-        }
-        */
+    
     }
     
     func avanzarEstado(order: ParentOrderModel) {
@@ -155,7 +130,6 @@ class OrderViewModel: ObservableObject {
     }
 }
 
-// Extensión para facilitar la copia del modelo (KMP models don't have direct copy in Swift usually)
 extension ParentOrderModel {
     func doCopy(
         uid: String,

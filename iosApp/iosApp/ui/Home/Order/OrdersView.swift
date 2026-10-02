@@ -21,9 +21,14 @@ struct OrdersView: View {
             
             if viewModel.orders.isEmpty {
                 Spacer()
-                Text("Aún no tienes pedidos")
-                    .font(PizzaFonts.medium14)
-                    .foregroundColor(.gray)
+                VStack(spacing: 16) {
+                    Image(systemName: "bag")
+                        .font(.system(size: 64))
+                        .foregroundColor(.gray)
+                    Text("Aún no tienes pedidos")
+                        .font(PizzaFonts.medium14)
+                        .foregroundColor(.gray)
+                }
                 Spacer()
             } else {
                 

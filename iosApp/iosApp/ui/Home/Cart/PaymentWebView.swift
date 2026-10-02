@@ -8,46 +8,93 @@ struct PaymentWebView: View {
     @Environment(\.dismiss) var dismiss
     @State private var isLoading = true
     @State private var showCancelAlert = false
+    @State private var isPaymentSuccessful = false
 
     var body: some View {
-        NavigationView {
-            ZStack {
-                WebView(url: url, isLoading: $isLoading, showCancelAlert: $showCancelAlert, onSuccess: {
+        ZStack {
+            SwipeBackDetector {
+                showCancelAlert = true
+            }
+            .frame(width: 0, height: 0)
+
+            WebView(
+                url: url,
+                isLoading: $isLoading,
+                showCancelAlert: $showCancelAlert,
+                onSuccess: {
+                    isPaymentSuccessful = true
                     dismiss()
                     onSuccess()
-                }, onCancel: {
+                },
+                onCancel: {
                     dismiss()
                     onCancel()
-                })
-                if isLoading {
-                    ProgressView()
-                        .scaleEffect(1.5)
-                        .progressViewStyle(CircularProgressViewStyle(tint: .uiTayRed600))
                 }
-            }
-            .navigationBarTitle("Pago Seguro", displayMode: .inline)
-            .navigationBarItems(leading: Button(action: {
-                showCancelAlert = true
-            }) {
-                HStack {
-                    Image(systemName: "chevron.left")
-                    Text("Atrás")
-                }
-                .foregroundColor(.uiTayRed600)
-            })
-            .alert(isPresented: $showCancelAlert) {
-                Alert(
-                    title: Text("¿Cancelar pedido?"),
-                    message: Text("Si sales de la pantalla de pago, el pedido temporal será cancelado y los productos se borrarán del carrito."),
-                    primaryButton: .destructive(Text("Sí, cancelar")) {
-                        dismiss()
-                        onCancel()
-                    },
-                    secondaryButton: .cancel(Text("Continuar pagando"))
-                )
+            )
+            
+            if isLoading {
+                ProgressView()
+                    .scaleEffect(1.5)
+                    .progressViewStyle(CircularProgressViewStyle(tint: .uiTayRed600))
             }
         }
-        .navigationViewStyle(StackNavigationViewStyle())
+        .uiTayHideToolbar()
+        .edgesIgnoringSafeArea(.bottom)
+        .alert(isPresented: $showCancelAlert) {
+            Alert(
+                title: Text("¿Cancelar pedido?"),
+                message: Text("Si sales de la pantalla de pago, el pedido temporal será cancelado y los productos se borrarán del carrito."),
+                primaryButton: .destructive(Text("Sí, cancelar")) {
+                    dismiss()
+                    onCancel()
+                },
+                secondaryButton: .cancel(Text("Continuar pagando"))
+            )
+        }
+    }
+}
+
+struct SwipeBackDetector: UIViewRepresentable {
+    var onSwipeBack: () -> Void
+
+    func makeUIView(context: Context) -> UIView {
+        let view = UIView(frame: .zero)
+        let recognizer = UIScreenEdgePanGestureRecognizer(target: context.coordinator, action: #selector(Coordinator.handleSwipe(_:)))
+        recognizer.edges = .left
+        recognizer.delegate = context.coordinator
+        
+        DispatchQueue.main.async {
+            if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+               let window = windowScene.windows.first(where: { $0.isKeyWindow }) {
+                window.addGestureRecognizer(recognizer)
+            }
+        }
+        
+        return view
+    }
+
+    func updateUIView(_ uiView: UIView, context: Context) {}
+
+    func makeCoordinator() -> Coordinator {
+        Coordinator(onSwipeBack: onSwipeBack)
+    }
+
+    class Coordinator: NSObject, UIGestureRecognizerDelegate {
+        var onSwipeBack: () -> Void
+
+        init(onSwipeBack: @escaping () -> Void) {
+            self.onSwipeBack = onSwipeBack
+        }
+
+        @objc func handleSwipe(_ recognizer: UIScreenEdgePanGestureRecognizer) {
+            if recognizer.state == .began {
+                onSwipeBack()
+            }
+        }
+
+        func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
+            return true
+        }
     }
 }
 
@@ -60,6 +107,7 @@ struct WebView: UIViewRepresentable {
 
     func makeUIView(context: Context) -> WKWebView {
         let webView = WKWebView()
+        webView.allowsBackForwardNavigationGestures = true
         webView.navigationDelegate = context.coordinator
         let request = URLRequest(url: url)
         webView.load(request)

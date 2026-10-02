@@ -77,7 +77,9 @@ class AuthViewModel: BaseViewModel {
                     area: "1",
                     longitude: self.longitude.trimmingCharacters(in: .whitespacesAndNewlines),
                     latitude: self.latitude.trimmingCharacters(in: .whitespacesAndNewlines),
-                    uid: ""
+                    uid: "",
+                    branchId: "0",
+                    createdAt: ""
                 )
                 
                 let response = try await self.dataUseCase.registerUser(data: request)
