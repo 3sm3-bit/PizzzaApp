@@ -191,7 +191,7 @@ fun ScreenClientHome(
             ) {
                 Column {
                     val firstName = authUiState.names.trim().split("\\s+".toRegex()).firstOrNull { it.isNotBlank() }
-                    val welcomeText = if (!firstName.isNullOrBlank()) "Bienvenid@ $firstName" else "Bienvenido a la"
+                    val welcomeText =  "Hola, $firstName"
                     Text(
                         modifier = Modifier.padding(start = 8.dp),
                         text = welcomeText,
