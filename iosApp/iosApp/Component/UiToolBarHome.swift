@@ -19,9 +19,9 @@ struct UiToolBarHome: View {
         let names = cartManager.userName.trimmingCharacters(in: .whitespacesAndNewlines)
         let components = names.components(separatedBy: .whitespacesAndNewlines).filter { !$0.isEmpty }
         if let firstName = components.first, !firstName.isEmpty {
-            return "Hola, \(firstName)"
+            return "¡Hola, \(firstName)!"
         } else {
-            return "Hola"
+            return "¡Hola!"
         }
     }
 
