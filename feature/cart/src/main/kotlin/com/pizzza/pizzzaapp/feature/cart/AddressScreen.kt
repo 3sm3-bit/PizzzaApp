@@ -33,7 +33,6 @@ import com.valu.uitaycompose.button.UiTayButton
 import com.valu.uitaycompose.extra.UiTayCToolBar
 import com.valu.uitaycompose.model.UiTayButtonModel
 import com.valu.uitaycompose.model.UiToolBarModel
-import com.valu.uitaycompose.utils.tay_red_50
 import com.valu.uitaycompose.utils.tay_red_600
 import com.valu.uitaycompose.utils.textM12
 import kotlinx.coroutines.Dispatchers
@@ -41,6 +40,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.Locale
 
+@Suppress("MissingPermission")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddressScreen(
@@ -162,12 +162,12 @@ fun AddressScreen(
 
     Scaffold(
         topBar = {
-            Surface(color = tay_red_50) {
+            Surface(color = Color.White) {
                 Box(modifier = Modifier.statusBarsPadding()) {
                     UiTayCToolBar(
                         uiTayText = "Selecciona tu Ubicación",
                         uiTayModifier = UiToolBarModel()
-                            .backgroundColor(tay_red_50)
+                            .backgroundColor(Color.White)
                             .textColor(tay_red_600)
                             .iconColor(tay_red_600)
                     ) { _ ->

@@ -67,6 +67,7 @@ kotlin {
             implementation(project(":feature:cart"))
             implementation(project(":feature:orders"))
             implementation(project(":feature:monitoring"))
+            implementation(project(":feature:info"))
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)

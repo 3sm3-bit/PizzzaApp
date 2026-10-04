@@ -23,6 +23,8 @@ import com.pizzza.pizzzaapp.feature.cart.ScreenPaymentWebView
 import com.pizzza.pizzzaapp.feature.home.ScreenClientHome
 import com.pizzza.pizzzaapp.feature.monitoring.ScreenMonitor
 import com.pizzza.pizzzaapp.feature.orders.ScreenDetailOrder
+import com.pizzza.pizzzaapp.feature.info.ScreenInfoMain
+import com.pizzza.pizzzaapp.feature.info.ScreenInfoDetail
 import com.pizzza.pizzzaapp.ui.splash.SplashScreen
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -161,6 +163,24 @@ fun AppNavigation() {
                         }
                     }
                 }
+            )
+        }
+
+        composable<ScreenInitNav.InformationView> {
+            ScreenInfoMain(
+                onNavigateTo = { idNav ->
+                    navController.navigateSafe(idNav)
+                },
+                onBack = onBack
+            )
+        }
+
+        composable<ScreenInitNav.InformationDetail> { backStackEntry ->
+            val route: ScreenInitNav.InformationDetail = backStackEntry.toRoute()
+            ScreenInfoDetail(
+                title = route.title,
+                content = route.content,
+                onBack = onBack
             )
         }
     }

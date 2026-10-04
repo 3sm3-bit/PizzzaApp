@@ -3,6 +3,7 @@ package com.pizzza.pizzzaapp.feature.auth.login
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -48,84 +49,100 @@ fun LoginScreen(
     Scaffold(
         containerColor = Color(0xFFF0F2F5)
     ) { padding ->
-        val scrollState = rememberScrollState()
-        Column(
+        Box(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
                 .imePadding()
-                .padding(horizontal = 24.dp)
-                .verticalScroll(scrollState),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Top
         ) {
-            Spacer(modifier = Modifier.weight(1f))
+            val scrollState = rememberScrollState()
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .verticalScroll(scrollState)
+                    .padding(horizontal = 24.dp)
+                    .padding(bottom = 64.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                Image(painter = painterResource(R.drawable.ic_logo_pizzzeria),
+                    contentDescription = "logo_ic",
+                    modifier = Modifier.width(350.dp).height(100.dp))
 
-            Image(painter = painterResource(R.drawable.ic_logo_pizzzeria),
-                contentDescription = "logo_ic",
-                modifier = Modifier.width(350.dp).height(100.dp))
+                Spacer(modifier = Modifier.height(24.dp))
 
-            UiTayEditLayout(
-                value = uiState.user,
-                onValueChange = { viewModel.onUserChange(it) },
-                hint = "Usuario o email",
-                model = UiEditLayoutModel(
-                    uiStrokeActiveColor = tay_red_600,
-                    uiTextColor = tay_red_600,
-                    uiTextActiveColor = tay_red_600,
-                    uiTitleActiveColor= tay_red_600,
-                    uiTextFont = textM14,
-                    uiTitleFont = textM14
+                UiTayEditLayout(
+                    value = uiState.user,
+                    onValueChange = { viewModel.onUserChange(it) },
+                    hint = "Usuario o email",
+                    model = UiEditLayoutModel(
+                        uiStrokeActiveColor = tay_red_600,
+                        uiTextColor = tay_red_600,
+                        uiTextActiveColor = tay_red_600,
+                        uiTitleActiveColor= tay_red_600,
+                        uiTextFont = textM14,
+                        uiTitleFont = textM14
+                    )
                 )
-            )
 
-            Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(16.dp))
 
-            UiTayEditLayout(
-                value = uiState.pass,
-                onValueChange = { viewModel.onPassChange(it) },
-                hint = "Contraseña",
-                isPassword = true,
-                model = UiEditLayoutModel(
-                    uiStrokeActiveColor = tay_red_600,
-                    uiTextColor = tay_red_600,
-                    uiTextActiveColor = tay_red_600,
-                    uiTitleActiveColor= tay_red_600,
-                    uiIconColor = tay_grey_800,
-                    uiIconActiveColor=  tay_red_600,
-                    uiTextFont = textM14,
-                    uiTitleFont = textM14
+                UiTayEditLayout(
+                    value = uiState.pass,
+                    onValueChange = { viewModel.onPassChange(it) },
+                    hint = "Contraseña",
+                    isPassword = true,
+                    model = UiEditLayoutModel(
+                        uiStrokeActiveColor = tay_red_600,
+                        uiTextColor = tay_red_600,
+                        uiTextActiveColor = tay_red_600,
+                        uiTitleActiveColor= tay_red_600,
+                        uiIconColor = tay_grey_800,
+                        uiIconActiveColor=  tay_red_600,
+                        uiTextFont = textM14,
+                        uiTitleFont = textM14
+                    )
                 )
-            )
 
-            Spacer(modifier = Modifier.height(32.dp))
+                Spacer(modifier = Modifier.height(32.dp))
 
-            UiTayButton(
-                uiTayText = "Iniciar Sesión",
-                uiTayEnable = isButtonEnabled,
-                uiTayClick = {
-                    viewModel.login {
-                        onNavigateTo(ScreenInitNav.ClientHome)
-                    }
-                },
-                uiTayBtnModifier = UiTayButtonModel(
-                    uTBgColor = tay_red_600,
-                    uTStrokeColor = tay_red_600,
-                    uTBgSelectedColor = tay_red_600,
-                    uTStrokeSelectedColor = tay_red_600,
+                UiTayButton(
+                    uiTayText = "Iniciar Sesión",
+                    uiTayEnable = isButtonEnabled,
+                    uiTayClick = {
+                        viewModel.login {
+                            onNavigateTo(ScreenInitNav.ClientHome)
+                        }
+                    },
+                    uiTayBtnModifier = UiTayButtonModel(
+                        uTBgColor = tay_red_600,
+                        uTStrokeColor = tay_red_600,
+                        uTBgSelectedColor = tay_red_600,
+                        uTStrokeSelectedColor = tay_red_600,
+                    )
                 )
-            )
 
-            Spacer(modifier = Modifier.height(24.dp))
+                Spacer(modifier = Modifier.height(24.dp))
+
+                Text(
+                    text = "Registrate ahora",
+                    style = textB14.copy(textDecoration = TextDecoration.Underline),
+                    color = tay_green_600,
+                    modifier = Modifier.clickable {  onNavigateTo(ScreenInitNav.Register) }
+                )
+            }
 
             Text(
-                text = "registrate ahora",
+                text = "Información y Ayuda",
                 style = textB14.copy(textDecoration = TextDecoration.Underline),
-                color = tay_green_600,
-                modifier = Modifier.clickable {  onNavigateTo(ScreenInitNav.Register) }
+                color = tay_red_600,
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .padding(bottom = 24.dp)
+                    .clickable {
+                        onNavigateTo(ScreenInitNav.InformationView)
+                    }
             )
-
-            Spacer(modifier = Modifier.weight(1f))
         }
     }
 }

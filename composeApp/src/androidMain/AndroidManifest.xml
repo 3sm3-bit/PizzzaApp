@@ -12,6 +12,19 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+
+    <queries>
+        <package android:name="com.whatsapp" />
+        <package android:name="com.whatsapp.w4b" />
+        <package android:name="com.topjohnwu.magisk" />
+        <package android:name="eu.chainfire.supersu" />
+        <package android:name="com.noshufou.android.su" />
+        <package android:name="com.koushikdutta.superuser" />
+        <package android:name="com.zachareew.systemuituner" />
+        <package android:name="com.amaze.filemanager" />
+        <package android:name="com.chelpus.lackypatch" />
+        <package android:name="com.joeykrim.rootcheck" />
+    </queries>
     <application
         android:allowBackup="false"
         android:icon="@mipmap/ic_launcher"
