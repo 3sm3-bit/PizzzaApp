@@ -25,6 +25,7 @@ import com.pizzza.pizzzaapp.feature.monitoring.ScreenMonitor
 import com.pizzza.pizzzaapp.feature.orders.ScreenDetailOrder
 import com.pizzza.pizzzaapp.feature.info.ScreenInfoMain
 import com.pizzza.pizzzaapp.feature.info.ScreenInfoDetail
+import com.pizzza.pizzzaapp.feature.info.ScreenInfoWebView
 import com.pizzza.pizzzaapp.ui.splash.SplashScreen
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -180,6 +181,15 @@ fun AppNavigation() {
             ScreenInfoDetail(
                 title = route.title,
                 content = route.content,
+                onBack = onBack
+            )
+        }
+
+        composable<ScreenInitNav.InformationWebView> { backStackEntry ->
+            val route: ScreenInitNav.InformationWebView = backStackEntry.toRoute()
+            ScreenInfoWebView(
+                title = route.title,
+                url = route.url,
                 onBack = onBack
             )
         }

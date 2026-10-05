@@ -1,4 +1,44 @@
 <resources>
     <string name="app_name_principal">PIZZERIA</string>
     <string name="error_not_install">No tiene la aplicacion instalada</string>
+    <string name="guide_how_to_use_app" formatted="false">
+        &lt;b&gt;¡Bienvenido a Pizzzeria!&lt;/b&gt; Disfruta de tus pizzas y platillos favoritos de forma rápida, fácil y segura siguiendo estos simples pasos:&lt;br&gt;&lt;br&gt;
+        &lt;b&gt;1. Crea tu cuenta (Registro)&lt;/b&gt;&lt;br&gt;
+        • Antes de hacer tu primer pedido, es indispensable que tengas una cuenta creada. Si eres nuevo, toca en &lt;b&gt;"Regístrate ahora"&lt;/b&gt; desde la pantalla principal e ingresa tus datos personales. Sin un usuario registrado no podrás iniciar sesión ni realizar pedidos.&lt;br&gt;&lt;br&gt;
+        &lt;b&gt;2. Inicia Sesión&lt;/b&gt;&lt;br&gt;
+        • Una vez registrado, ingresa a la aplicación con tu usuario (o correo electrónico) y tu contraseña.&lt;br&gt;
+        • &lt;i&gt;Dato útil:&lt;/i&gt; Si en algún momento tienes dudas o necesitas soporte antes de iniciar sesión, puedes tocar el enlace &lt;b&gt;"Información y Ayuda"&lt;/b&gt; ubicado en la parte inferior de la pantalla de acceso.&lt;br&gt;&lt;br&gt;
+        &lt;b&gt;3. Arma tu pedido (Menú principal)&lt;/b&gt;&lt;br&gt;
+        • Al entrar verás el menú principal (Home) con diferentes secciones de pizzas, bebidas y agregados.&lt;br&gt;
+        • Toca el producto que desees para personalizarlo a tu gusto: elige el tipo de masa, añade una deliciosa orilla rellena de queso o escribe notas especiales para la cocina.&lt;br&gt;&lt;br&gt;
+        &lt;b&gt;4. Revisa tu Carrito y elige la Entrega&lt;/b&gt;&lt;br&gt;
+        • Todo lo que vayas seleccionando se guardará automáticamente en tu &lt;b&gt;Carrito&lt;/b&gt;.&lt;br&gt;
+        • Desde ahí podrás elegir cómo deseas recibir tu pedido: &lt;b&gt;Entrega a domicilio (Delivery)&lt;/b&gt; o &lt;b&gt;Recojo en local&lt;/b&gt;.&lt;br&gt;
+        • Si eliges Delivery, podrás verificar, ajustar o cambiar la dirección exacta de entrega directamente en el mapa interactivo.&lt;br&gt;&lt;br&gt;
+        &lt;b&gt;5. Resumen y Pago Seguro&lt;/b&gt;&lt;br&gt;
+        • Al continuar, verás el &lt;b&gt;Resumen del Pedido&lt;/b&gt; con el detalle de los precios, el costo de envío y el total a pagar.&lt;br&gt;
+        • Al presionar el botón de pago, la app te conectará de forma segura con la pasarela de pagos oficial (&lt;b&gt;Stripe&lt;/b&gt;).&lt;br&gt;
+        • 🔒 &lt;b&gt;Recomendación de seguridad:&lt;/b&gt; Realiza tu transacción en un lugar privado, asegúrate de que ninguna persona extra esté viendo tu pantalla o tus datos bancarios al ingresar tu tarjeta, y nunca compartas tus contraseñas con nadie.&lt;br&gt;&lt;br&gt;
+        &lt;b&gt;6. Sigue el estado de tu pedido (Mis Órdenes)&lt;/b&gt;&lt;br&gt;
+        • ¡Listo! Una vez que el pago sea exitoso, tu pedido quedará confirmado.&lt;br&gt;
+        • Ve a la sección de &lt;b&gt;Órdenes&lt;/b&gt; para monitorear el estado de tu pedido en tiempo real (&lt;i&gt;Pendiente, Confirmado, Preparándose, En camino&lt;/i&gt;) hasta que el repartidor toque la puerta de tu hogar.
+    </string>
+    <string name="guide_forgot_data" formatted="false">
+        &lt;b&gt;¿Qué hacer si olvidaste tus datos de acceso?&lt;/b&gt;&lt;br&gt;
+        Si creaste tu usuario y por alguna razón no recuerdas tus datos para iniciar sesión (lo cual es necesario para usar la app), y al intentar crear otro usuario el sistema te bloquea porque no se permiten datos repetidos, ten en cuenta lo siguiente:&lt;br&gt;&lt;br&gt;
+        &lt;b&gt;1. Restricción por datos repetidos&lt;/b&gt;&lt;br&gt;
+        • Por políticas de la empresa, no está permitido crear más de un usuario con datos repetitivos o idénticos (como correo, teléfono o documentos ya registrados). Si intentas registrarte nuevamente con la misma información, el sistema no te dejará avanzar.&lt;br&gt;&lt;br&gt;
+        &lt;b&gt;2. Eliminación de usuario en sucursal&lt;/b&gt;&lt;br&gt;
+        • Para poder utilizar tus datos habituales nuevamente, debes proceder con la eliminación de tu usuario anterior.&lt;br&gt;
+        • Este proceso se realiza acudiendo a cualquiera de los establecimientos registrados como sucursal. Puedes verificar las direcciones de las sucursales autorizadas en nuestra página web: &lt;a href="https://lapizzzeria.com/conoce-mas-sobre-la-pizzzeria/"&gt;&lt;b&gt;Ver sucursales de Pizzzeria&lt;/b&gt;&lt;/a&gt;.&lt;br&gt;
+        • Al acudir a la sucursal, debes recurrir al personal autorizado, explicar tu caso y el asesor de atención procederá a la eliminación de tu usuario para que puedas crearte uno nuevo.&lt;br&gt;&lt;br&gt;
+        &lt;b&gt;3. Crear usuario con otros datos&lt;/b&gt;&lt;br&gt;
+        • En caso de que no desees realizar todo este proceso en sucursal, la otra opción es crear otro usuario utilizando &lt;b&gt;datos diferentes&lt;/b&gt;, ya que por políticas internas no se permite tener más de un registro con datos repetidos.
+    </string>
+
+    <string name="text_drawer_item_one">Información y Ayuda</string>
+    <string name="text_drawer_item_two">Nuestro facebook</string>
+    <string name="text_drawer_three">Nuestro instagram</string>
+    <string name="text_drawer_four">Nuestro tiktok</string>
+    <string name="text_drawer_five">Cerrar sesión</string>
 </resources>

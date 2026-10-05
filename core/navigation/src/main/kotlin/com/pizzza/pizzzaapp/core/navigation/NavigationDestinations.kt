@@ -41,6 +41,9 @@ sealed class ScreenInitNav {
     @Serializable
     data class InformationDetail(val title: String, val content: String) : ScreenInitNav()
 
+    @Serializable
+    data class InformationWebView(val title: String, val url: String) : ScreenInitNav()
+
 }
 
 

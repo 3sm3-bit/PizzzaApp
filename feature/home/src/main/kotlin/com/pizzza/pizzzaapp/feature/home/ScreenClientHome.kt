@@ -2,6 +2,7 @@ package com.pizzza.pizzzaapp.feature.home
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -26,9 +27,11 @@ import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
@@ -36,12 +39,14 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -50,14 +55,17 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.pizzza.pizzzaapp.core.navigation.ScreenInitNav
 import com.pizzza.pizzzaapp.core.ui.R
+import com.pizzza.pizzzaapp.core.ui.component.HomeDrawer
+import com.pizzza.pizzzaapp.core.ui.utils.uiTayUrlInstagram
+import com.pizzza.pizzzaapp.core.ui.utils.uiTayUrlTikTok
 import com.pizzza.pizzzaapp.feature.orders.OrdersViewModel
 import com.pizzza.pizzzaapp.feature.cart.CartViewModel
 import com.pizzza.pizzzaapp.feature.home.cart.ScreenCart
@@ -66,6 +74,8 @@ import com.pizzza.pizzzaapp.feature.home.extra.ScreenExtra
 import com.pizzza.pizzzaapp.feature.home.pizza.ScreenPizza
 import com.pizzza.pizzzaapp.feature.home.order.ScreenOrder
 import com.valu.uitaycompose.utils.*
+import com.valu.uitaycompose.utils.extension.uiTayUrlFacebook
+import kotlinx.coroutines.launch
 import org.koin.compose.viewmodel.koinViewModel
 
 data class NavItemData(
@@ -79,7 +89,7 @@ data class NavItemData(
 fun ScreenClientHome(
     onNavigateTo: (ScreenInitNav) -> Unit
 ) {
-
+    val context = LocalContext.current
     val ordersViewModel: OrdersViewModel = koinViewModel()
     val cartViewModel: CartViewModel = koinViewModel()
     val authViewModel: AuthViewModel = koinViewModel()
@@ -87,6 +97,9 @@ fun ScreenClientHome(
     val authUiState by authViewModel.authUiState.collectAsStateWithLifecycle()
     var selectedTab by rememberSaveable { mutableIntStateOf(cartState.initialTab) }
     var showLogoutDialog by remember { mutableStateOf(false) }
+    val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+    var currentActionId by remember { mutableIntStateOf(-1) }
+    val scope = rememberCoroutineScope()
 
     LaunchedEffect(Unit) {
         ordersViewModel.loadProductsFromLocal()
@@ -107,208 +120,224 @@ fun ScreenClientHome(
         NavItemData(3, "Orden", Icons.AutoMirrored.Filled.Assignment)
     )
 
-    Scaffold(
-        containerColor = Color.White,
-        bottomBar = {
-            Surface(
-                modifier = Modifier.navigationBarsPadding(),
-                shape = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp),
-                border = BorderStroke(1.dp, tay_red_600.copy(alpha = 0.5f)),
-                color = Color.White,
-                shadowElevation = 24.dp
-            ) {
-                NavigationBar(
-                    containerColor = Color.White,
-                    tonalElevation = 0.dp,
-                    modifier = Modifier
-                        .height(65.dp)
-                        .clip(RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp))
+    ModalNavigationDrawer(
+        drawerState = drawerState,
+        drawerContent = {
+            HomeDrawer(
+                currentActionId = currentActionId,
+                nameUser = authUiState.names.trim().split("\\s+".toRegex())
+                    .firstOrNull { it.isNotBlank() },
+                onActionClick = { actionId ->
+                    currentActionId = actionId
+                    scope.launch { drawerState.close() }
+                    when (actionId) {
+                        0 -> {onNavigateTo(ScreenInitNav.InformationView)}
+                        1 -> {
+                            context.uiTayUrlFacebook("61571443119838")
+                        }
+                        2 -> {
+                            context.uiTayUrlInstagram("lapizzzeria_")
+                        }
+                        3 -> {
+                            context.uiTayUrlTikTok("lapizzzeria")
+                        }
+                        else -> {showLogoutDialog = true}
+                    }
+                }
+            )
+        },
+        gesturesEnabled = true
+    ) {
+        Scaffold(
+            containerColor = Color.White,
+            bottomBar = {
+                Surface(
+                    modifier = Modifier.navigationBarsPadding(),
+                    shape = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp),
+                    border = BorderStroke(1.dp, tay_red_600.copy(alpha = 0.5f)),
+                    color = Color.White,
+                    shadowElevation = 24.dp
                 ) {
-                    navItems.forEach { item ->
-                        val isSelected = selectedTab == item.index
-                        NavigationBarItem(
-                            selected = isSelected,
-                            onClick = {
-                                selectedTab = item.index
-                            },
-                            icon = {
-                                if (item.index == 2) {
-                                    BadgedBox(
-                                        badge = {
-                                            if (cartState.cart.isNotEmpty()) {
-                                                Badge(containerColor = tay_green_600) {
-                                                    Text(cartState.cart.sumOf { it.quantity }
-                                                        .toString(),
-                                                        color = Color.White)
+                    NavigationBar(
+                        containerColor = Color.White,
+                        tonalElevation = 0.dp,
+                        modifier = Modifier
+                            .height(65.dp)
+                            .clip(RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp))
+                    ) {
+                        navItems.forEach { item ->
+                            val isSelected = selectedTab == item.index
+                            NavigationBarItem(
+                                selected = isSelected,
+                                onClick = {
+                                    selectedTab = item.index
+                                },
+                                icon = {
+                                    if (item.index == 2) {
+                                        BadgedBox(
+                                            badge = {
+                                                if (cartState.cart.isNotEmpty()) {
+                                                    Badge(containerColor = tay_green_600) {
+                                                        Text(cartState.cart.sumOf { it.quantity }
+                                                            .toString(),
+                                                            color = Color.White)
+                                                    }
                                                 }
                                             }
+                                        ) {
+                                            Icon(item.icon, contentDescription = null)
                                         }
-                                    ) {
+                                    } else {
                                         Icon(item.icon, contentDescription = null)
                                     }
-                                } else {
-                                    Icon(item.icon, contentDescription = null)
-                                }
-                            },
-                            label = {
-                                Text(
-                                    item.label, style = if (isSelected) {
-                                        textB12
-                                    } else {
-                                        textM12
-                                    }, color =
-                                        if (isSelected) {
-                                            tay_red_600
+                                },
+                                label = {
+                                    Text(
+                                        item.label, style = if (isSelected) {
+                                            textB12
                                         } else {
-                                            Color.Gray
-                                        }
+                                            textM12
+                                        }, color =
+                                            if (isSelected) {
+                                                tay_red_600
+                                            } else {
+                                                Color.Gray
+                                            }
+                                    )
+                                },
+                                colors = NavigationBarItemDefaults.colors(
+                                    selectedIconColor = tay_red_600,
+                                    selectedTextColor = tay_red_600,
+                                    unselectedIconColor = Color.Gray,
+                                    unselectedTextColor = Color.Gray,
+                                    indicatorColor = Color.Transparent
                                 )
-                            },
-                            colors = NavigationBarItemDefaults.colors(
-                                selectedIconColor = tay_red_600,
-                                selectedTextColor = tay_red_600,
-                                unselectedIconColor = Color.Gray,
-                                unselectedTextColor = Color.Gray,
-                                indicatorColor = Color.Transparent
                             )
+                        }
+                    }
+                }
+            }
+        ) { padding ->
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(padding)
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 8.dp, start = 16.dp, end = 16.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Image(
+                            painter = painterResource(com.valu.uitaycompose.R.drawable.uic_tay_ic_menu),
+                            contentDescription = "ic_menu",
+                            colorFilter = ColorFilter.tint(tay_red_600),
+                            modifier = Modifier
+                                .size(24.dp)
+                                .clickable {
+                                    scope.launch { drawerState.open() }
+                                }
+                        )
+
+                        val firstName = authUiState.names.trim().split("\\s+".toRegex())
+                            .firstOrNull { it.isNotBlank() }
+                        val welcomeText = "¡Hola, $firstName!"
+
+                        Text(
+                            text = welcomeText,
+                            style = textSe18,
+                            color = tay_red_600,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
                         )
                     }
-                }
-            }
-        }
-    ) { padding ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding)
-        ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 8.dp, start = 8.dp, end = 16.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Column {
-                    val firstName = authUiState.names.trim().split("\\s+".toRegex()).firstOrNull { it.isNotBlank() }
-                    val welcomeText =  "¡Hola, $firstName!"
-                    Text(
-                        modifier = Modifier.padding(start = 8.dp),
-                        text = welcomeText,
-                        style = textSe14,
-                        color = tay_red_600,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
-                    Image(painter = painterResource(R.drawable.ic_logo_pizzzeria),
-                        contentDescription = "logo_ic",
-                        contentScale = ContentScale.FillBounds,
-                        alignment = Alignment.CenterStart,
-                        modifier = Modifier
-                            .width(120.dp)
-                            .height(40.dp))
-                }
 
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    if (selectedTab == 0 || selectedTab == 1) {
-                        IconButton(
-                            onClick = { selectedTab = 2 },
-                            modifier = Modifier.size(32.dp)
-                        ) {
-                            BadgedBox(
-                                modifier = Modifier.padding(end = 2.dp, top = 2.dp),
-                                badge = {
-                                    if (cartState.cart.isNotEmpty()) {
-                                        Badge(containerColor = tay_green_600) {
-                                            Text(cartState.cart.sumOf { it.quantity }.toString(),
-                                                color= Color.White)
-                                        }
-                                    }
-                                }
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        if (selectedTab == 3) {
+                            IconButton(
+                                onClick = { ordersViewModel.getGeneralOrderList(forceLoading = true) },
+                                modifier = Modifier.size(32.dp)
                             ) {
                                 Icon(
-                                    Icons.Default.ShoppingCart,
-                                    contentDescription = "Carrito",
-                                    modifier = Modifier
-                                        .size(24.dp)
-                                        .graphicsLayer {
-                                            colorFilter = ColorFilter.tint(tay_red_400)
-                                        }
+                                    imageVector = Icons.Default.Refresh,
+                                    contentDescription = "Refrescar",
+                                    tint = tay_red_400,
+                                    modifier = Modifier.size(24.dp)
                                 )
                             }
-                        }
-                    }
-
-                    if (selectedTab == 3) {
-                        IconButton(
-                            onClick = { ordersViewModel.getGeneralOrderList(forceLoading = true) },
-                            modifier = Modifier.size(32.dp)
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Refresh,
-                                contentDescription = "Refrescar",
-                                tint = tay_red_400,
-                                modifier = Modifier.size(24.dp)
-                            )
-                        }
-                    } else {
-                        Spacer(Modifier.width(2.dp))
-                        IconButton(
-                            onClick = { showLogoutDialog = true },
-                            modifier = Modifier.size(32.dp)
-                        ) {
-                            Icon(
-                                imageVector = Icons.AutoMirrored.Filled.Logout,
-                                contentDescription = "Cerrar Sesión",
-                                tint = tay_red_400,
-                                modifier = Modifier.size(24.dp)
+                        } else {
+                            Image(
+                                painter = painterResource(R.drawable.ic_logo_pizzzeria),
+                                contentDescription = "logo_ic",
+                                contentScale = ContentScale.Fit,
+                                modifier = Modifier
+                                    .width(120.dp)
+                                    .height(40.dp)
                             )
                         }
                     }
                 }
-            }
+                if (showLogoutDialog) {
+                    AlertDialog(
+                        onDismissRequest = { showLogoutDialog = false },
+                        title = {
+                            Text(
+                                text = "Cerrar Sesión",
+                                style = textB20,
+                                color = tay_red_600
+                            )
+                        },
+                        text = {
+                            Text(
+                                text = "¿Estás seguro de que deseas cerrar sesión?",
+                                style = textM14, color = Color.Gray
+                            )
+                        },
+                        confirmButton = {
+                            Button(
+                                onClick = {
+                                    showLogoutDialog = false
+                                    ordersViewModel.resetOrderState()
+                                    cartViewModel.resetState()
+                                    authViewModel.logout {
+                                        onNavigateTo(ScreenInitNav.Login)
+                                    }
+                                },
+                                colors = ButtonDefaults.buttonColors(containerColor = tay_red_600)
+                            ) {
+                                Text("Sí, salir", color = Color.White)
+                            }
+                        },
+                        dismissButton = {
+                            TextButton(onClick = { showLogoutDialog = false }) {
+                                Text("No", color = Color.Gray)
+                            }
+                        },
+                        containerColor = Color.White,
+                        shape = RoundedCornerShape(16.dp)
+                    )
+                }
 
-            if (showLogoutDialog) {
-                AlertDialog(
-                    onDismissRequest = { showLogoutDialog = false },
-                    title = { Text(text = "Cerrar Sesión", style = textB20, color = tay_red_600) },
-                    text = { Text(text = "¿Estás seguro de que deseas cerrar sesión?",
-                        style = textM14,color = Color.Gray) },
-                    confirmButton = {
-                        Button(
-                            onClick = {
-                                showLogoutDialog = false
-                                ordersViewModel.resetOrderState()
-                                cartViewModel.resetState()
-                                authViewModel.logout {
-                                    onNavigateTo(ScreenInitNav.Login)
-                                }
-                            },
-                            colors = ButtonDefaults.buttonColors(containerColor = tay_red_600)
-                        ) {
-                            Text("Sí, salir", color = Color.White)
-                        }
-                    },
-                    dismissButton = {
-                        TextButton(onClick = { showLogoutDialog = false }) {
-                            Text("No", color = Color.Gray)
-                        }
-                    },
-                    containerColor = Color.White,
-                    shape = RoundedCornerShape(16.dp)
-                )
-            }
+                when (selectedTab) {
+                    0 -> ScreenPizza { onNavigateTo(ScreenInitNav.OrderDetail) }
+                    1 -> ScreenExtra { onNavigateTo(ScreenInitNav.OrderDetail) }
+                    2 -> ScreenCart(
+                        onNavigateToAddressSelection = { onNavigateTo(ScreenInitNav.AddressSelection()) },
+                        onNavigateToSummary = { onNavigateTo(ScreenInitNav.OrderSummary) }
+                    )
 
-            when (selectedTab) {
-                0 -> ScreenPizza { onNavigateTo(ScreenInitNav.OrderDetail) }
-                1 -> ScreenExtra { onNavigateTo(ScreenInitNav.OrderDetail) }
-                2 -> ScreenCart(
-                    onNavigateToAddressSelection = { onNavigateTo(ScreenInitNav.AddressSelection()) },
-                    onNavigateToSummary = { onNavigateTo(ScreenInitNav.OrderSummary) }
-                )
-                3 -> ScreenOrder(
-                    onNavigateToMonitor = { onNavigateTo(ScreenInitNav.Monitor) }
-                )
+                    3 -> ScreenOrder(
+                        onNavigateToMonitor = { onNavigateTo(ScreenInitNav.Monitor) }
+                    )
+                }
             }
         }
     }

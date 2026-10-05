@@ -1,10 +1,10 @@
 package com.pizzza.pizzzaapp.feature.info
 
-import android.content.Intent
-import android.net.Uri
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -25,29 +26,30 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.pizzza.pizzzaapp.core.navigation.ScreenInitNav
 import com.pizzza.pizzzaapp.core.ui.R
 import com.pizzza.pizzzaapp.core.ui.utils.openEmail
 import com.pizzza.pizzzaapp.core.ui.utils.openWhatsApp
+import com.valu.uitaycompose.extra.UiTayCToolBar
+import com.valu.uitaycompose.model.UiToolBarModel
 import com.valu.uitaycompose.utils.COUNTRY_CODE_MX
 import com.valu.uitaycompose.utils.extension.uiTayDialedNumber
-import com.valu.uitaycompose.utils.extension.uiTayViewCall
+import com.valu.uitaycompose.utils.tay_red_50
 import com.valu.uitaycompose.utils.tay_red_600
 import com.valu.uitaycompose.utils.textB14
 import com.valu.uitaycompose.utils.textB18
-import com.valu.uitaycompose.utils.textB25
 import com.valu.uitaycompose.utils.textM14
-import com.valu.uitaycompose.utils.textS25
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -56,8 +58,25 @@ fun ScreenInfoMain(
     onBack: () -> Unit
 ) {
     val context = LocalContext.current
+    val guideHtml = androidx.compose.ui.res.stringResource(R.string.guide_how_to_use_app)
+    val forgotDataHtml = androidx.compose.ui.res.stringResource(R.string.guide_forgot_data)
 
     Scaffold(
+        topBar = {
+            Surface(color = Color.White) {
+                Box(modifier = Modifier.statusBarsPadding()) {
+                    UiTayCToolBar(
+                        uiTayText = "Información y Ayuda",
+                        uiTayModifier = UiToolBarModel()
+                            .backgroundColor(Color.White)
+                            .textColor(tay_red_600)
+                            .iconColor(tay_red_600)
+                    ) { _ ->
+                        onBack.invoke()
+                    }
+                }
+            }
+        },
         containerColor = Color.White
     ) { padding ->
         Column(
@@ -68,15 +87,6 @@ fun ScreenInfoMain(
                 .padding(vertical = 32.dp, horizontal = 24.dp),
             verticalArrangement = Arrangement.spacedBy(24.dp)
         ) {
-            Text(
-                modifier = Modifier
-                    .fillMaxWidth(),
-                text = "Canales de Contacto",
-                style = textB25,
-                color = tay_red_600,
-                textAlign = TextAlign.Center
-            )
-
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.Center,
@@ -122,10 +132,13 @@ fun ScreenInfoMain(
             )
 
             Card(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(16.dp)),
                 shape = RoundedCornerShape(16.dp),
                 colors = CardDefaults.cardColors(containerColor = Color.White),
-                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+                border = BorderStroke(3.dp, tay_red_50)
             ) {
                 Column(modifier = Modifier.fillMaxWidth()) {
                     ResourceItem(
@@ -135,12 +148,12 @@ fun ScreenInfoMain(
                             onNavigateTo(
                                 ScreenInitNav.InformationDetail(
                                     title = "¿Cómo usar la app?",
-                                    content = "Bienvenido a Pizzzeria. Para realizar un pedido, simplemente navega por nuestras categorías de pizzas, personaliza tu masa y orilla con queso, añádelas al carrito y selecciona si deseas recojo en local o entrega a domicilio. ¡El pago es rápido y seguro!"
+                                    content = guideHtml
                                 )
                             )
                         }
                     )
-                    HorizontalDivider(color = Color(0xFFF0F2F5), thickness = 1.dp)
+                    HorizontalDivider(color = tay_red_50, thickness = 1.dp)
                     ResourceItem(
                         title = "No recuerdo mis datos",
                         subtitle = "Recuperación de acceso y cuenta",
@@ -148,46 +161,33 @@ fun ScreenInfoMain(
                             onNavigateTo(
                                 ScreenInitNav.InformationDetail(
                                     title = "No recuerdo mis datos",
-                                    content = "Si olvidaste tu contraseña o usuario, puedes contactar a nuestro soporte a través de WhatsApp o correo electrónico para verificar tu identidad y restablecer tus credenciales de acceso de forma segura."
+                                    content = forgotDataHtml
                                 )
                             )
                         }
                     )
-                    HorizontalDivider(color = Color(0xFFF0F2F5), thickness = 1.dp)
+                    HorizontalDivider(color = tay_red_50, thickness = 1.dp)
                     ResourceItem(
                         title = "Sobre Nosotros",
                         subtitle = "Conoce más de nuestra pizzería",
                         onClick = {
                             onNavigateTo(
-                                ScreenInitNav.InformationDetail(
+                                ScreenInitNav.InformationWebView(
                                     title = "Sobre Nosotros",
-                                    content = "Pizzzeria es la cadena líder en ofrecer las mejores pizzas artesanales con ingredientes frescos y de la más alta calidad. Nos apasiona brindar una experiencia única en cada entrega."
+                                    url = "https://lapizzzeria.com/conoce-mas-sobre-la-pizzzeria/"
                                 )
                             )
                         }
                     )
-                    HorizontalDivider(color = Color(0xFFF0F2F5), thickness = 1.dp)
+                    HorizontalDivider(color = tay_red_50, thickness = 1.dp)
                     ResourceItem(
-                        title = "Términos y Condiciones",
+                        title = "Términos, Privacidad y Seguridad del Servicio",
                         subtitle = "Políticas de servicio y uso",
                         onClick = {
                             onNavigateTo(
-                                ScreenInitNav.InformationDetail(
-                                    title = "Términos y Condiciones",
-                                    content = "El uso de esta aplicación móvil implica la aceptación de nuestros términos y condiciones de servicio. Los pedidos están sujetos a disponibilidad de cobertura de entrega y stock en tienda."
-                                )
-                            )
-                        }
-                    )
-                    HorizontalDivider(color = Color(0xFFF0F2F5), thickness = 1.dp)
-                    ResourceItem(
-                        title = "Privacidad y Seguridad",
-                        subtitle = "Protección de datos personales",
-                        onClick = {
-                            onNavigateTo(
-                                ScreenInitNav.InformationDetail(
-                                    title = "Privacidad y Seguridad",
-                                    content = "Tus datos personales y transacciones están protegidos bajo estrictos estándares de seguridad y cifrado. No compartimos tu información con terceros."
+                                ScreenInitNav.InformationWebView(
+                                    title = "Términos, Privacidad y Seguridad",
+                                    url = "https://lapizzzeria.com/aviso-de-privacidad/"
                                 )
                             )
                         }
