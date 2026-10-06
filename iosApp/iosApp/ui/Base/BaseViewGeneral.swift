@@ -32,6 +32,9 @@ struct BaseViewGeneral<ViewModel: BaseViewModel, Content: View>: View {
     var body: some View {
         ZStack(alignment: .top) {
             content
+            
+            Color.white.frame(height: 56).ignoresSafeArea(edges: .top)
+            
             if viewModel.uiTayLoading || managerAPP.isLoading {
                 uiTayNextView { uiTayHideKeyboard() }
                 UITayLoadCircle()
@@ -44,13 +47,13 @@ struct BaseViewGeneral<ViewModel: BaseViewModel, Content: View>: View {
                     subTitle: viewModel.uiTayErrorException.message,
                     dModle: DialogModel(
                         textBtn: "Entiendo",
-                        iconName: "ic_cm_d_error"
+                        iconName: "ic_pizzza",
+                        bgColorDialog: Color.black.opacity(0.4)
                     )
                 ) { _ in
                     onDetectedError(self.viewModel.uiTayErrorAction)
                 }
             }
-            Color.white.frame(height: 56).ignoresSafeArea(edges: .top)
         }
         .focused($isTextFielFicudedd)
         .uiTayOptimizeKeyBoard(optimizeKeyBoard)

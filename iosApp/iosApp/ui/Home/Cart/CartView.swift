@@ -6,6 +6,7 @@ struct CartView: View {
     @ObservedObject var cartManager: CartManager = .shared
     @ObservedObject var viewModel: HomeViewModel
     var onLogout: () -> Void
+    var onOpenDrawer: () -> Void = {}
     @State private var showAddressSelection = false
     @State private var showOrderSummary = false
     @State var destiny: ActionNav?
@@ -21,9 +22,7 @@ struct CartView: View {
     var body: some View {
         ZStack {
             VStack(spacing: 0) {
-                UiToolBarHome(typeFlow: true, visibleCart: false) {
-                    onLogout()
-                }
+                UiToolBarHome(typeFlow: true, onClick: onLogout, onOpenDrawer: onOpenDrawer)
                 
                 if cartManager.cart.isEmpty {
                     Spacer()

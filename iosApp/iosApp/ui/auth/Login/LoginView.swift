@@ -6,45 +6,59 @@ struct LoginView: View {
     @ObservedObject private var viewModel: AuthViewModel = Resolver.shared.resolve(AuthViewModel.self)
     @EnvironmentObject var managerAPP: PizzaManagerAPP
     @State var enableButton: Bool = false
-    @State   var destiny: ActionNav?
+    @State var destiny: ActionNav?
+    @State private var showInfo: Bool = false
 
     var body: some View {
         BaseViewGeneral(viewModel: viewModel){
-            VStack{
-                Image("ic_logo_pizzzeria")
-                    .resizable()
-                    .frame(width: 250, height: 100)
-                
-                UiTayTextLayout(
-                               value: $viewModel.userLolin,
-                                hint: "Usuario o email",
-                                uiTayChangeText :{validButton() }
-                              
-                )
-                Spacer().frame(height: 24)
-           
-                UiTayTextLayout(
-                               value: $viewModel.passLogin,
-                                hint: "Contraseña",
-                                isPassword : true,
-                                uiTayChangeText :{ validButton()}
-                )
-                
-                Spacer().frame(height: 48)
-                
-                UITayButton(text: "Iniciar Sesión") {
-                    viewModel.login()
-                }.disabled(!enableButton)
-                
-                 Text("registrate ahora")
+            ZStack(alignment: .bottom) {
+                VStack {
+                    Spacer()
+                    Image("ic_logo_pizzzeria")
+                        .resizable()
+                        .frame(width: 250, height: 100)
+                    
+                    UiTayTextLayout(
+                        value: $viewModel.userLolin,
+                        hint: "Usuario o email",
+                        uiTayChangeText: { validButton() }
+                    )
+                    Spacer().frame(height: 24)
+               
+                    UiTayTextLayout(
+                        value: $viewModel.passLogin,
+                        hint: "Contraseña",
+                        isPassword: true,
+                        uiTayChangeText: { validButton() }
+                    )
+                    
+                    Spacer().frame(height: 48)
+                    
+                    UITayButton(text: "Iniciar Sesión") {
+                        viewModel.login()
+                    }.disabled(!enableButton)
+                    
+                    Text("registrate ahora")
                         .font(PizzaFonts.bold14)
                         .underline()
                         .foregroundColor(PizzaColors.green600)
-                        .padding(.top, 24).onTapGesture {
+                        .padding(.top, 24)
+                        .onTapGesture {
                             destiny = .uiNext
                         }
+                    Spacer()
+                }
+                .padding(.horizontal, 24)
                 
-            }.padding(.horizontal, 24)
+                Text("Información y Ayuda")
+                    .font(PizzaFonts.bold14)
+                    .underline()
+                    .foregroundColor(Color.uiTayRed600)
+                    .padding(.bottom, 24)
+                    .onTapGesture {
+                        showInfo = true
+                    }
+            }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .ignoresSafeArea(.all)
             .background(Color.white)
@@ -52,9 +66,9 @@ struct LoginView: View {
             if newValue {
                 managerAPP.currentScreen = .home
             }
-        }.uiTayNavigate(to: { RegisterView() }, when: $destiny.cmToBool(.uiNext))
-                   
-        
+        }
+        .uiTayNavigate(to: { RegisterView() }, when: $destiny.cmToBool(.uiNext))
+        .uiTayNavigate(to: { InfoMainView() }, when: $showInfo)
     }
     
     private func validButton(){

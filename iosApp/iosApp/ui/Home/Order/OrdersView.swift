@@ -11,13 +11,14 @@ import Shared
 struct OrdersView: View {
     @ObservedObject var viewModel: HomeViewModel
     var onLogout: () -> Void
+    var onOpenDrawer: () -> Void = {}
     @State private var selectedOrderForMonitoring: ParentOrderModel?
     
     var body: some View {
         VStack(spacing: 0) {            
-            UiToolBarHome(typeFlow: true,visibleCart: false,typeRefresh: true){
+            UiToolBarHome(typeFlow: false,onClick: {
                 viewModel.getGeneralOrderList(forceLoading: true)
-            }
+            }, onOpenDrawer: onOpenDrawer)
             
             if viewModel.orders.isEmpty {
                 Spacer()

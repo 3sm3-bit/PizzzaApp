@@ -12,7 +12,10 @@ struct SplashView: View {
 
     var body: some View {
         
-        BaseViewGeneral(viewModel: viewModel){
+        BaseViewGeneral(viewModel: viewModel,onDetectedError: {value in
+            if value == UiTayActionErrorFlow.finalizeView {
+                exit(0)
+            }}){
             VStack(spacing: 24) {
                 Image("ic_logo_m_pizzzeria")
                     .resizable()
@@ -31,7 +34,7 @@ struct SplashView: View {
             .ignoresSafeArea(.all)
             .background(Color.white)
             .onAppear(){
-                viewModel.loadValidData()
+                viewModel.loadValidate()
             }
            }.onChange(of: viewModel.successLogin) { oldValue, newValue in
                if let isSuccess = newValue {

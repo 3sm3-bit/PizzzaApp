@@ -52,7 +52,7 @@ class BaseViewModel:ObservableObject,Sendable{
         }
     }
     
-    func setErrorCm(code : String = "o",title : String = "",message : String,action : UiTayActionErrorFlow = UiTayActionErrorFlow.actionDefault){
+    func setErrorUI(code : String = "0",title : String = "",message : String,action : UiTayActionErrorFlow = UiTayActionErrorFlow.actionDefault){
         self.uiTayError = true
         self.uiTayErrorAction = action
         self.uiTayErrorException = ErrorGenericModel(code : code,title:title, message: message)

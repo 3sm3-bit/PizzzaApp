@@ -18,6 +18,7 @@ struct PizzaView: View {
     let sizes = ["GRANDE", "MEDIANO", "CHICO"]
     @State   var destiny: ActionNav?
     var onLogout: () -> Void
+    var onOpenDrawer: () -> Void = {}
     
     var filteredPizzas: [ProductModel] {
         cartManager.pizzaProducts.filter { product in
@@ -29,9 +30,7 @@ struct PizzaView: View {
     
     public var body: some View {
         VStack(spacing: 16) {
-            UiToolBarHome(typeFlow: true){
-                onLogout()
-            }
+            UiToolBarHome(typeFlow: true, onClick: onLogout, onOpenDrawer: onOpenDrawer)
             ScrollView(.vertical, showsIndicators: false) {
                 VStack(spacing: 12) {
                     

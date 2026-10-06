@@ -14,6 +14,7 @@ struct ExtraView: View {
     @ObservedObject var cartManager = CartManager.shared
     @State private var selectedCategory = "TODOS"
     var onLogout: () -> Void
+    var onOpenDrawer: () -> Void = {}
     @State private var product   : ProductModel? = nil
     @State   var destiny: ActionNav?
     let categories = ["TODOS", "EXTRAS", "BEBIDAS"]
@@ -35,9 +36,7 @@ struct ExtraView: View {
     
     var body: some View {
         VStack(spacing: 16) {
-            UiToolBarHome(typeFlow: true){
-                onLogout()
-            }
+            UiToolBarHome(typeFlow: true, onClick: onLogout, onOpenDrawer: onOpenDrawer)
             ScrollView {
                 VStack(spacing: 12) {
                     PromotionsBanner(promotions: CartManager.shared.promotionsProducts) { promoProduct in
