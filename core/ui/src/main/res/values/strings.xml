@@ -35,6 +35,25 @@
         &lt;b&gt;3. Crear usuario con otros datos&lt;/b&gt;&lt;br&gt;
         • En caso de que no desees realizar todo este proceso en sucursal, la otra opción es crear otro usuario utilizando &lt;b&gt;datos diferentes&lt;/b&gt;, ya que por políticas internas no se permite tener más de un registro con datos repetidos.
     </string>
+    <string name="guide_terms_and_conditions" formatted="false">
+        &lt;b&gt;TÉRMINOS Y CONDICIONES DE USO Y SERVICIO&lt;/b&gt;&lt;br&gt;&lt;br&gt;
+        &lt;b&gt;1. Objeto y Alcance&lt;/b&gt;&lt;br&gt;
+        Bienvenido a &lt;b&gt;Pizzzeria&lt;/b&gt;. Los presentes Términos y Condiciones regulan el uso de nuestra aplicación móvil y servicios de comercio electrónico para la venta y entrega de alimentos preparados (pizzas, bebidas y acompañamientos). Al utilizar la app, aceptas estas disposiciones.&lt;br&gt;&lt;br&gt;
+        &lt;b&gt;2. Procesamiento de Pagos y Pasarelas (Stripe)&lt;/b&gt;&lt;br&gt;
+        • Las transacciones de pago dentro de nuestra plataforma se procesan a través de la pasarela de pagos segura &lt;b&gt;Stripe&lt;/b&gt; (y/o plataformas externas autorizadas). Es dicha empresa quien procesa y efectúa los cobros de manera independiente, liberando de toda responsabilidad directa sobre la plataforma de cobro a Pizzzeria.&lt;br&gt;
+        • La información financiera y sensible se procesa de forma cifrada en servidores seguros de la pasarela de pago. Pizzzeria almacena únicamente datos de transacciones para efectos de control interno, facturación y contabilidad.&lt;br&gt;&lt;br&gt;
+        &lt;b&gt;3. Información Nutricional e Ingredientes de los Alimentos&lt;/b&gt;&lt;br&gt;
+        • Tratándose de productos alimenticios artesanales, los alimentos comercializados son consistentes con la publicidad y fotografías ofrecidas en la aplicación.&lt;br&gt;
+        • Se incluye el detalle de especificaciones (dimensiones, porciones), ingredientes principales y advertencias sobre alérgenos (como gluten, lácteos y otros componentes de sodio o grasas).&lt;br&gt;&lt;br&gt;
+        &lt;b&gt;4. Condiciones de Pago, Facturación y Comprobantes&lt;/b&gt;&lt;br&gt;
+        • Se detallan las condiciones de pago mediante tarjeta y los medios oficiales para obtener el comprobante fiscal o de transacción comercial, así como el procedimiento aplicable para solicitar correcciones cuando corresponda.&lt;br&gt;&lt;br&gt;
+        &lt;b&gt;5. Garantías, Tiempos y Formas de Entrega&lt;/b&gt;&lt;br&gt;
+        • Se establecen los tiempos estimados de entrega (garantías de tiempo) aplicables a nuestros alimentos a domicilio o recojo en local, así como las formas y lugares de entrega autorizados.&lt;br&gt;&lt;br&gt;
+        &lt;b&gt;6. Seguridad e Inviolabilidad de la Información&lt;/b&gt;&lt;br&gt;
+        • Nuestra plataforma cuenta con certificados digitales y protocolos de seguridad robustos para garantizar la protección e inviolabilidad de la información de los usuarios.&lt;br&gt;&lt;br&gt;
+        &lt;b&gt;7. Contacto y Reclamaciones&lt;/b&gt;&lt;br&gt;
+        Para cualquier reclamación, consulta o aclaración relacionada con el servicio, puedes comunicarte a través de nuestros canales oficiales o soporte en línea de la app.
+    </string>
 
     <string name="text_drawer_item_one">Información y Ayuda</string>
     <string name="text_drawer_item_two">Nuestro facebook</string>

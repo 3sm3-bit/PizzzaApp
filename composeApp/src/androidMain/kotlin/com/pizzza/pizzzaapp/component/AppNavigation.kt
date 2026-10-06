@@ -140,6 +140,9 @@ fun AppNavigation() {
                 onPaymentRedirect = { url ->
                     navController.navigateSafe(ScreenInitNav.PaymentWebView(url))
                 },
+                onNavigateTo = { nav ->
+                    navController.navigateSafe(nav)
+                },
                 onBack = onBack
             )
         }

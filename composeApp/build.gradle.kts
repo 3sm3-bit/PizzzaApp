@@ -1,3 +1,4 @@
+import org.gradle.kotlin.dsl.implementation
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import java.util.Properties
@@ -28,7 +29,7 @@ kotlin {
     sourceSets {
         androidMain.dependencies {
             implementation(libs.androidx.activity.compose)
-            
+            implementation(libs.google.play.update)
             // Koin
             implementation(libs.koin.compose)
             implementation(libs.koin.android)
@@ -161,7 +162,7 @@ androidComponents {
 
 dependencies {
     debugImplementation(libs.compose.uiTooling)
-    
+
     // Testing Android
     androidTestImplementation(libs.androidx.testExt.junit)
     androidTestImplementation(libs.androidx.espresso.core)

@@ -1,5 +1,6 @@
 package com.pizzza.pizzzaapp.feature.orders
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -8,7 +9,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -63,6 +63,7 @@ import com.valu.uitaycompose.utils.textB20
 import com.valu.uitaycompose.utils.textM10
 import com.valu.uitaycompose.utils.textM12
 
+@SuppressLint("DefaultLocale")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ScreenDetailOrder(
@@ -128,8 +129,7 @@ fun ScreenDetailOrder(
                 UiTayUrlImage(
                     modifier = Modifier
                         .fillMaxSize(),
-                    url = product.urlImg,
-                    drawable = R.drawable.peperoni)
+                    url = product.urlImg)
 
                 Image(
                     painter = painterResource(id = R.drawable.ic_arrow_star),

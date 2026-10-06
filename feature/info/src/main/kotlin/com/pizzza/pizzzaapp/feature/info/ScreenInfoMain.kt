@@ -39,12 +39,12 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.pizzza.pizzzaapp.core.navigation.ScreenInitNav
 import com.pizzza.pizzzaapp.core.ui.R
-import com.pizzza.pizzzaapp.core.ui.utils.openEmail
 import com.pizzza.pizzzaapp.core.ui.utils.openWhatsApp
 import com.valu.uitaycompose.extra.UiTayCToolBar
 import com.valu.uitaycompose.model.UiToolBarModel
 import com.valu.uitaycompose.utils.COUNTRY_CODE_MX
 import com.valu.uitaycompose.utils.extension.uiTayDialedNumber
+import com.valu.uitaycompose.utils.extension.uiTayOpenEmail
 import com.valu.uitaycompose.utils.tay_red_50
 import com.valu.uitaycompose.utils.tay_red_600
 import com.valu.uitaycompose.utils.textB14
@@ -60,6 +60,7 @@ fun ScreenInfoMain(
     val context = LocalContext.current
     val guideHtml = androidx.compose.ui.res.stringResource(R.string.guide_how_to_use_app)
     val forgotDataHtml = androidx.compose.ui.res.stringResource(R.string.guide_forgot_data)
+    val termsHtml = androidx.compose.ui.res.stringResource(R.string.guide_terms_and_conditions)
 
     Scaffold(
         topBar = {
@@ -108,7 +109,11 @@ fun ScreenInfoMain(
                     title = "Correo",
                     iconRes = R.drawable.ic_email_contact,
                     onClick = {
-                        context.openEmail()
+                        context.uiTayOpenEmail(
+                            email = "lapizzzeria@outlook.com",
+                             subject = "Hola me gustaría consultar:",
+                             body = "Hola, me gustaría realizar la siguiente consulta:"
+                        )
                     }
                 )
 
@@ -181,12 +186,25 @@ fun ScreenInfoMain(
                     )
                     HorizontalDivider(color = tay_red_50, thickness = 1.dp)
                     ResourceItem(
-                        title = "Términos, Privacidad y Seguridad del Servicio",
-                        subtitle = "Políticas de servicio y uso",
+                        title = "Términos y Condiciones",
+                        subtitle = "Conoce las reglas de uso de la app",
+                        onClick = {
+                            onNavigateTo(
+                                ScreenInitNav.InformationDetail(
+                                    title = "Términos y Condiciones",
+                                    content = termsHtml
+                                )
+                            )
+                        }
+                    )
+                    HorizontalDivider(color = tay_red_50, thickness = 1.dp)
+                    ResourceItem(
+                        title = "Política de Privacidad y Seguridad",
+                        subtitle = "Protección de tus datos personales",
                         onClick = {
                             onNavigateTo(
                                 ScreenInitNav.InformationWebView(
-                                    title = "Términos, Privacidad y Seguridad",
+                                    title = "Política de Privacidad",
                                     url = "https://lapizzzeria.com/aviso-de-privacidad/"
                                 )
                             )

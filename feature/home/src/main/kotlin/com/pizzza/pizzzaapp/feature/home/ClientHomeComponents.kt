@@ -91,7 +91,7 @@ fun ProductCard(product: ProductModel, onClick: () -> Unit) {
 
             ) {
                 UiTayUrlImage(
-                    url = product.urlImg, drawable = R.drawable.peperoni
+                    url = product.urlImg
                 )
             }
 
@@ -172,7 +172,7 @@ fun ExtraProductCard(product: ProductModel, onClick: () -> Unit) {
                     .height(110.dp)
             ) {
                 UiTayUrlImage(
-                    url = product.urlImg, drawable = R.drawable.peperoni
+                    url = product.urlImg
                 )
             }
 
@@ -292,7 +292,7 @@ fun PizzaGridCard(product: ProductModel, onClick: () -> Unit) {
                     .height(110.dp)
             ) {
                 UiTayUrlImage(
-                    url = product.urlImg, drawable = R.drawable.peperoni
+                    url = product.urlImg
                 )
             }
 

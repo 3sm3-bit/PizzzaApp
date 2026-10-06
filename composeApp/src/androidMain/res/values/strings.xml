@@ -1,2 +1,11 @@
 <resources>
+    <string name="text_error_root">Seguridad del Dispositivo</string>
+    <string name="text_error_message_root">Se ha detectado que este dispositivo tiene acceso Root. Por razones de seguridad y para proteger tus datos financieros, ValuShopping no puede ejecutarse en este entorno.</string>
+
+    <string name="text_error_developer">Opciones de Desarrollador</string>
+    <string name="text_error_message_developer">Se ha detectado que las Opciones de Desarrollador están activadas. Por razones de seguridad, debes desactivarlas para usar ValuShopping.</string>
+
+    <string name="text_error_emulator">Dispositivo no Soportado</string>
+    <string name="text_error_message_emulator">Se ha detectado que la aplicación se está ejecutando en un emulador o entorno virtual. Por razones de seguridad, ValuShopping solo puede ejecutarse en dispositivos físicos oficiales.</string>
+
 </resources>

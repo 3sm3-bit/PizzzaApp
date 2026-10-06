@@ -19,7 +19,7 @@ import com.pizzza.pizzzaapp.core.ui.singleton.LocalGlobalUiStateManager
 import com.pizzza.pizzzaapp.core.ui.singleton.AppDataOrder
 import com.pizzza.pizzzaapp.usecases.DataUseCase
 import com.valu.uitaycompose.modal.UiTayDialog
-import com.valu.uitaycompose.loading.UiProgress
+import com.valu.uitaycompose.loading.UiTayProgress
 import com.valu.uitaycompose.model.UiTayDialogModel
 import com.valu.uitaycompose.utils.tay_red_600
 import org.koin.android.ext.android.inject
@@ -105,7 +105,7 @@ abstract class BaseActivity : ComponentActivity() {
                         SetScreenConfig()
 
                         if (uiState.loading) {
-                            UiProgress(colorProgress = tay_red_600)
+                            UiTayProgress(colorProgress = tay_red_600)
                         }
 
                         if (uiState.error) {

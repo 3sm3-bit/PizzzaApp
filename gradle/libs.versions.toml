@@ -31,6 +31,8 @@ kotlinx-coroutines-test = "1.10.1"
 turbine = "1.2.0"
 koin-test = "4.0.0"
 androidx-compose-ui-test = "1.7.8"
+googlePlayUpdate = "2.1.0"
+tayComposeLibrary = "1.0.1"
 
 [libraries]
 # Testing
@@ -45,6 +47,8 @@ androidx-compose-ui-test-manifest = { module = "androidx.compose.ui:ui-test-mani
 androidx-test-runner = { module = "androidx.test:runner", version = "1.6.2" }
 androidx-testExt-junit = { module = "androidx.test.ext:junit", version.ref = "androidx-testExt" }
 androidx-espresso-core = { module = "androidx.test.espresso:espresso-core", version.ref = "androidx-espresso" }
+google-play-update = { group = "com.google.android.play", name = "app-update-ktx", version.ref = "googlePlayUpdate" }
+
 
 # Compose & Lifecycle
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activity" }
@@ -94,7 +98,8 @@ play-services-maps = { module = "com.google.android.gms:play-services-maps", ver
 play-services-location = { module = "com.google.android.gms:play-services-location", version.ref = "play-services-location" }
 
 # Custom Libraries
-tay-compose-library = { module = "com.github.montes8:UITayCompose", version = "1.0.0" }
+tay-compose-library = { group = "com.github.montes8", name = "VMGComposeLibrary", version.ref = "tayComposeLibrary" }
+
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
@@ -107,3 +112,6 @@ ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 room = { id = "androidx.room", version.ref = "room" }
 buildConfig = { id = "com.github.gmazzo.buildconfig", version.ref = "buildconfig" }
 kotlinx-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+
+
+

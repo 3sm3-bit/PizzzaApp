@@ -1,6 +1,5 @@
 package com.pizzza.pizzzaapp.feature.cart
 
-import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -15,11 +14,11 @@ import com.pizzza.pizzzaapp.core.ui.singleton.LocalAppDataOrder
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.valu.uitaycompose.button.UiTayButton
+import com.pizzza.pizzzaapp.core.navigation.ScreenInitNav
 import com.valu.uitaycompose.model.UiTayButtonModel
 import com.valu.uitaycompose.utils.tay_green_600
 import com.valu.uitaycompose.utils.tay_red_600
@@ -38,9 +37,9 @@ fun ScreenOrderSummary(
     cartViewModel: CartViewModel = koinViewModel(),
     onConfirm: () -> Unit,
     onPaymentRedirect: (String) -> Unit,
+    onNavigateTo: (ScreenInitNav) -> Unit = {},
     onBack: () -> Unit,
 ) {
-    val context = LocalContext.current
     val uiState by LocalAppDataOrder.current.state.collectAsStateWithLifecycle()
     val cartProductsTotal = uiState.cart.sumOf {
         val basePrice = it.product.price.toDoubleOrNull() ?: 0.0
@@ -202,7 +201,7 @@ fun ScreenOrderSummary(
                 }
             }
 
-            Spacer(Modifier.height(24.dp))
+            Spacer(Modifier.height(16.dp))
 
             UiTayButton(
                 uiTayText = "Pagar y Enviar Pedido",
