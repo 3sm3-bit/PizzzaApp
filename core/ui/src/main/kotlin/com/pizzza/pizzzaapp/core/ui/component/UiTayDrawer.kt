@@ -36,6 +36,7 @@ import com.valu.uitaycompose.utils.tay_grey_600
 import com.valu.uitaycompose.utils.tay_red_100
 import com.valu.uitaycompose.utils.tay_red_50
 import com.valu.uitaycompose.utils.tay_red_600
+import com.valu.uitaycompose.utils.textS16
 import com.valu.uitaycompose.utils.textSe18
 
 @Composable
@@ -82,7 +83,7 @@ fun UiDrawer(
 
                 Text(
                     text = "¡Hola, $text!",
-                    style = textSe18,
+                    style = textS16,
                     color = Color.Black,
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis

@@ -31,8 +31,8 @@ struct UiToolBarHome: View {
                 }
             
             Text(welcomeText)
-                .font(Font.uiMontS18)
-                .foregroundColor(Color.uiTayRed600)
+                .font(Font.uiMontB18)
+                .foregroundColor(Color.black)
                 .lineLimit(1)
                 .minimumScaleFactor(0.75)
                 .onTapGesture {

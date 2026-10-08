@@ -96,7 +96,6 @@ fun ScreenClientHome(
     onNavigateTo: (ScreenInitNav) -> Unit
 ) {
     val context = LocalContext.current
-    val forgotDataHtml = stringResource(R.string.guide_forgot_data)
     val ordersViewModel: OrdersViewModel = koinViewModel()
     val cartViewModel: CartViewModel = koinViewModel()
     val authViewModel: AuthViewModel = koinViewModel()
