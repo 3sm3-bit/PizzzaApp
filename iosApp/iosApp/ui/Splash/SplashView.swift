@@ -28,7 +28,7 @@ struct SplashView: View {
                         .scaleEffect(1.5)
                     
                 Text(loadingText)
-                        .font(PizzaFonts.medium14)
+                    .font(.aller(14))
                         .foregroundColor(.uiTayGrey600)
             }.frame(maxWidth: .infinity, maxHeight: .infinity)
             .ignoresSafeArea(.all)

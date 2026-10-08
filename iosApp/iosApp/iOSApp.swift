@@ -9,7 +9,7 @@ struct iOSApp: App {
     
     init(){
          IniTaySwitUI.initCMDefault(name: "CMDeviceHelper.cmSmallDevice")
-        registerDependencies()
+         registerDependencies()
        }
 
     var body: some Scene {
