@@ -2,8 +2,6 @@
 //  UiToolBarHome.swift
 //  iosApp
 //
-//  Created by Developer on 20/09/26.
-//
 
 import SwiftUI
 
@@ -24,39 +22,43 @@ struct UiToolBarHome: View {
     }
 
     var body: some View {
-        HStack(spacing: 12) {
+        HStack(spacing: 8) {
             Image(systemName: "line.3.horizontal")
                 .foregroundColor(Color.uiTayRed600)
                 .font(.system(size: 22, weight: .bold))
                 .onTapGesture {
                     onOpenDrawer()
                 }
-                Text(welcomeText)
-                    .font(Font.uiMontS20)
-                    .foregroundColor(Color.uiTayRed600)
-                    .lineLimit(1)
-                    .fixedSize(horizontal: true, vertical: false)
-                Spacer()
+            
+            Text(welcomeText)
+                .font(Font.uiMontS18)
+                .foregroundColor(Color.uiTayRed600)
+                .lineLimit(1)
+                .minimumScaleFactor(0.75)
+                .onTapGesture {
+                    onOpenDrawer()
+                }
+
+            Spacer(minLength: 4)
                 
-            if(typeFlow){
+            if typeFlow {
                 Image(uiName: "ic_logo_pizzzeria")
                     .resizable()
-                    .frame(width: 120, height: 40)
-              
-            }else{
+                    .scaledToFit()
+                    .frame(width: 110, height: 36)
+            } else {
                 Image(systemName: "arrow.clockwise")
-                 .foregroundColor(Color.uiTayRed600)
-                 .font(.system(size: 20, weight: .bold))
-                 .onTapGesture {
-                     onClick()
-                 }
-             }
+                    .foregroundColor(Color.uiTayRed600)
+                    .font(.system(size: 20, weight: .bold))
+                    .onTapGesture {
+                        onClick()
+                    }
+            }
         }
-        .padding(.horizontal)
-        .padding(.top, 8).padding(.trailing,12)
+        .padding(.horizontal, 16)
+        .padding(.top, 8)
         .onAppear {
             cartManager.loadUserAddress()
         }
     }
 }
-
