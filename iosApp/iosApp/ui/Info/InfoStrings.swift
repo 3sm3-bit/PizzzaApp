@@ -52,10 +52,14 @@ struct InfoStrings {
     <b>3. Información Nutricional e Ingredientes de los Alimentos</b><br>
     • Tratándose de productos alimenticios artesanales, los alimentos comercializados son consistentes con la publicidad y fotografías ofrecidas en la aplicación.<br>
     • Se incluye el detalle de especificaciones (dimensiones, porciones), ingredientes principales y advertencias sobre alérgenos (como gluten, lácteos y otros componentes de sodio o grasas).<br><br>
-    <b>4. Condiciones de Pago, Facturación y Comprobantes</b><br>
-    • Se detallan las condiciones de pago mediante tarjeta y los medios oficiales para obtener el comprobante fiscal o de transacción comercial, así como el procedimiento aplicable para solicitar correcciones cuando corresponda.<br><br>
+    <b>4. Condiciones de Pago, Cancelaciones y No Reembolso</b><br>
+    • Proceso de Pedido y Pagos: Los pagos procesados a través de la pasarela segura corresponden a órdenes de alimentos preparados bajo demanda.<br>
+    • Política de Cancelación: El usuario tiene la facultad de solicitar la cancelación de su pedido directamente en la plataforma; sin embargo, no aplican reembolsos ni devoluciones de dinero una vez que el pago ha sido procesado y la orden ha comenzado a ser preparada por el establecimiento.<br>
+    • Cualquier excepción o aclaración excepcional sobre incidencias graves con el producto queda sujeta a revisión directa y exclusiva del equipo de atención al cliente de la sucursal.<br><br>
     <b>5. Garantías, Tiempos y Formas de Entrega</b><br>
-    • Se establecen los tiempos estimados de entrega (garantías de tiempo) aplicables a nuestros alimentos a domicilio o recojo en local, así como las formas y lugares de entrega autorizados.<br><br>
+    • Los tiempos estimados de entrega mostrados en la aplicación son de carácter meramente informativo y referencial.<br>
+    • Sujeto a Disponibilidad y Demanda: Los tiempos de entrega no constituyen una garantía de tiempo fijo y están expresamente sujetos a cambios sin previo aviso debido a factores externos, condiciones climáticas, alta demanda o saturación en cocina y ruta de repartidores.<br>
+    • La empresa no asume penalizaciones ni responsabilidad por retrasos derivados de situaciones ajenas al control operativo normal del establecimiento.<br><br>
     <b>6. Seguridad e Inviolabilidad de la Información</b><br>
     • Nuestra plataforma cuenta con certificados digitales y protocolos de seguridad robustos para garantizar la protección e inviolabilidad de la información de los usuarios.<br><br>
     <b>7. Contacto y Reclamaciones</b><br>
