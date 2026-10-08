@@ -18,7 +18,7 @@ final class PizzaManagerAPP: ObservableObject {
 }
 
 struct AppContentView: View {
-    @StateObject var flowManager = PizzaManagerAPP()
+    @EnvironmentObject var flowManager: PizzaManagerAPP
     
     var body: some View {
         Group {

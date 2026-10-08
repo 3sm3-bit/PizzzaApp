@@ -75,6 +75,12 @@ class CartManager: ObservableObject {
     
     func clearCart() {
         cart = []
+        userName = ""
+        deliveryAddress = ""
+        latitude = ""
+        longitude = ""
+        ordersLoaded = false
+        selectedTab = 0
     }
 
     func updateWithHomeData(_ homeData: HomeDataModel) {

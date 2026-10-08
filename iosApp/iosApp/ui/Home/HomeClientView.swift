@@ -1,12 +1,16 @@
-//
-//  HomeClientView.swift
-//  iosApp
-//
-//  Created by Developer on 12/09/26.
-//
-
 import SwiftUI
 import TaySwitfUILibrary
+enum ActiveHomeAlert: Identifiable {
+    case logout
+    case deleteUser
+
+    var id: Int {
+        switch self {
+        case .logout: return 1
+        case .deleteUser: return 2
+        }
+    }
+}
 
 struct HomeClientView: View {
     
@@ -14,17 +18,16 @@ struct HomeClientView: View {
     @ObservedObject var cartManager = CartManager.shared
     @State private var badgeInfo: (Int, Int) = (2, 0)
     @State var tabs : [UITayTabItem] = []
-    @State private var showLogoutAlert = false
-    @State private var showDeleteUserAlert = false
+    @State private var activeAlert: ActiveHomeAlert? = nil
     @State private var isDrawerOpen = false
     @State private var showInfoView = false
     @EnvironmentObject var managerAPP: PizzaManagerAPP
 
     var views: [AnyView] {[
-        AnyView(PizzaView(viewModel: viewModel, onLogout: { showLogoutAlert = true }, onOpenDrawer: { isDrawerOpen = true })),
-        AnyView(ExtraView(viewModel: viewModel, onLogout: { showLogoutAlert = true }, onOpenDrawer: { isDrawerOpen = true })),
-        AnyView(CartView(viewModel: viewModel, onLogout: { showLogoutAlert = true }, onOpenDrawer: { isDrawerOpen = true })),
-        AnyView(OrdersView(viewModel: viewModel, onLogout: { showLogoutAlert = true }, onOpenDrawer: { isDrawerOpen = true })),
+        AnyView(PizzaView(viewModel: viewModel, onLogout: { activeAlert = .logout }, onOpenDrawer: { isDrawerOpen = true })),
+        AnyView(ExtraView(viewModel: viewModel, onLogout: { activeAlert = .logout }, onOpenDrawer: { isDrawerOpen = true })),
+        AnyView(CartView(viewModel: viewModel, onLogout: { activeAlert = .logout }, onOpenDrawer: { isDrawerOpen = true })),
+        AnyView(OrdersView(viewModel: viewModel, onLogout: { activeAlert = .logout }, onOpenDrawer: { isDrawerOpen = true })),
         AnyView(EmptyView())
     ]}
     
@@ -56,36 +59,39 @@ struct HomeClientView: View {
                         showInfoView = true
                     },
                     onNavigateToDeleteUser: {
-                        showDeleteUserAlert = true
+                        activeAlert = .deleteUser
                     },
                     onLogout: {
-                        showLogoutAlert = true
+                        activeAlert = .logout
                     }
                 )
             }
         }
-        .alert(isPresented: $showLogoutAlert) {
-            Alert(
-                title: Text("Cerrar Sesión"),
-                message: Text("¿Estás seguro de que deseas cerrar sesión?"),
-                primaryButton: .destructive(Text("Sí, salir"), action: {
-                    viewModel.logout()
-                    managerAPP.currentScreen = .auth
-                }),
-                secondaryButton: .cancel(Text("No"))
-            )
-        }
-        .alert(isPresented: $showDeleteUserAlert) {
-            Alert(
-                title: Text("¿Eliminar tu cuenta?"),
-                message: Text("Esta acción es permanente. Al eliminar tu cuenta se borrará todo tu historial de pedidos, direcciones y datos registrados."),
-                primaryButton: .destructive(Text("Sí, eliminar"), action: {
-                    viewModel.deleteUser {
-                        managerAPP.currentScreen = .auth
-                    }
-                }),
-                secondaryButton: .cancel(Text("Cancelar"))
-            )
+        .alert(item: $activeAlert) { alertType in
+            switch alertType {
+            case .logout:
+                return Alert(
+                    title: Text("Cerrar Sesión"),
+                    message: Text("¿Estás seguro de que deseas cerrar sesión?"),
+                    primaryButton: .destructive(Text("Sí, salir"), action: {
+                        viewModel.logout {
+                            managerAPP.currentScreen = .auth
+                        }
+                    }),
+                    secondaryButton: .cancel(Text("No"))
+                )
+            case .deleteUser:
+                return Alert(
+                    title: Text("¿Eliminar tu cuenta?"),
+                    message: Text("Esta acción es permanente. Al eliminar tu cuenta se borrará todo tu historial de pedidos, direcciones y datos registrados."),
+                    primaryButton: .destructive(Text("Sí, eliminar"), action: {
+                        viewModel.deleteUser {
+                            managerAPP.currentScreen = .auth
+                        }
+                    }),
+                    secondaryButton: .cancel(Text("Cancelar"))
+                )
+            }
         }
         .uiTayNavigate(to: { InfoMainView() }, when: $showInfoView)
     }

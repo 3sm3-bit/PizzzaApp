@@ -1,4 +1,4 @@
-//
+
 //  HomeViewModel.swift
 //  iosApp
 //
@@ -49,10 +49,12 @@ class HomeViewModel: BaseViewModel {
         }
     }
 
-    func logout() {
+    func logout(onSuccess: @escaping () -> Void) {
         Task{
             await self.execute() {
                 try await self.dataUseCase.logout()
+                CartManager.shared.clearCart()
+                onSuccess()
             }
         }
     }
