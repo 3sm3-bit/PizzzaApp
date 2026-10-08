@@ -226,10 +226,11 @@ struct CartItemCard: View {
             if item.product.type == "1" || !item.note.isEmpty {
                 VStack(alignment: .leading, spacing: 2) {
                     if item.product.type == "1" {
+                        let hasCheese = item.typeDough != "CRUJIENTE" && item.cheeseFilledCrust
                         HStack(spacing: 0) {
-                            Text("Masa: \(item.typeDough), ")
-                            if item.cheeseFilledCrust {
-                                Text("Con Orilla de Queso")
+                            Text("Masa: \(item.typeDough)")
+                            if hasCheese {
+                                Text(", Con Orilla de Queso")
                                     .foregroundColor(Color.uiTayGreen600)
                             }
                         }
@@ -252,7 +253,8 @@ struct CartItemCard: View {
                     .font(Font.uiMontM12)
                     .foregroundColor(.gray)
                 
-                let unitPrice = (Double(item.product.price) ?? 0.0) + (item.cheeseFilledCrust ? (Double(item.product.priceChosse) ?? 0.0) : 0.0)
+                let hasCheese = item.typeDough != "CRUJIENTE" && item.cheeseFilledCrust
+                let unitPrice = (Double(item.product.price) ?? 0.0) + (hasCheese ? (Double(item.product.priceChosse) ?? 0.0) : 0.0)
                 Text("$\(String(format: "%.2f", unitPrice * Double(item.quantity)))")
                     .font(Font.uiMontB16)
                     .foregroundColor(Color.uiTayRed600)

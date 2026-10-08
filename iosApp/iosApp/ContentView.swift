@@ -187,7 +187,7 @@ struct OrderCardView: View {
                                         .font(.system(size: 14, weight: .bold))
                                 }
                                 
-                                if item.type == "1" && item.cheeseFilledCrust.uppercased() == "SI" {
+                                if item.type == "1" && item.typeDough != "CRUJIENTE" && item.cheeseFilledCrust.uppercased() == "SI" {
                                     HStack {
                                         Text("con orilla de queso")
                                             .font(.system(size: 12))
@@ -327,7 +327,7 @@ struct OrderDetailView: View {
                                         Text("\(item.tamanio) • \(item.typeDough)")
                                             .font(.system(size: 12))
                                             .foregroundColor(Color(hex: 0x65676B))
-                                        if item.cheeseFilledCrust.uppercased() == "SI" {
+                                        if item.typeDough != "CRUJIENTE" && item.cheeseFilledCrust.uppercased() == "SI" {
                                             Text("🧀 Con orilla de queso")
                                                 .font(.system(size: 10, weight: .bold))
                                                 .foregroundColor(Color(hex: 0x10B981))

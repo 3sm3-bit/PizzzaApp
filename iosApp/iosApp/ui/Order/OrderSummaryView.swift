@@ -143,9 +143,13 @@ struct OrderSummaryView: View {
 private struct OrderItemRow: View {
     let item: OrderItemSwift
 
+    private var hasCheese: Bool {
+        item.typeDough != "CRUJIENTE" && item.cheeseFilledCrust
+    }
+
     private var itemPrice: Double {
         let basePrice = Double(item.product.price) ?? 0.0
-        let cheesePrice = item.cheeseFilledCrust ? (Double(item.product.priceChosse) ?? 0.0) : 0.0
+        let cheesePrice = hasCheese ? (Double(item.product.priceChosse) ?? 0.0) : 0.0
         return (basePrice + cheesePrice) * Double(item.quantity)
     }
 
@@ -157,7 +161,7 @@ private struct OrderItemRow: View {
                         .font(Font.uiMontB14)
                     
                     if item.product.type == "1" {
-                        Text("Masa: \(item.typeDough)\(item.cheeseFilledCrust ? " + Orilla Queso" : "")")
+                        Text("Masa: \(item.typeDough)\(hasCheese ? " + Orilla Queso" : "")")
                             .font(PizzaFonts.medium12)
                             .foregroundColor(.gray)
                     }

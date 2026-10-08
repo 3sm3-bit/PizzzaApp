@@ -56,7 +56,7 @@ struct HomeDrawerView: View {
                     )
                     
                     Text("¡Hola, \(userName.isEmpty ? "Cliente" : userName)!")
-                        .font(Font.uiMontB18)
+                        .font(Font.uiMontB16)
                         .foregroundColor(.black)
                         .lineLimit(1)
                     Spacer()

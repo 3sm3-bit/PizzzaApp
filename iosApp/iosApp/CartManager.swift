@@ -28,7 +28,8 @@ class CartManager: ObservableObject {
     var totalPrice: Double {
         cart.reduce(0) { total, item in
             let basePrice = Double(item.product.price) ?? 0.0
-            let crustPrice = item.cheeseFilledCrust ? (Double(item.product.priceChosse) ?? 0.0) : 0.0
+            let isCheese = (item.typeDough != "CRUJIENTE" && item.cheeseFilledCrust)
+            let crustPrice = isCheese ? (Double(item.product.priceChosse) ?? 0.0) : 0.0
             return total + (basePrice + crustPrice) * Double(item.quantity)
         }
     }
@@ -48,13 +49,14 @@ class CartManager: ObservableObject {
         cheeseFilledCrust: Bool = false,
         note: String = ""
     ) {
+        let finalCheeseCrust = (typeDough == "CRUJIENTE") ? false : cheeseFilledCrust
         if product.type == "1" {
             // Pizzas are usually added as separate items if they have different configs
             cart.append(OrderItemSwift(
                 product: product,
                 quantity: quantity,
                 typeDough: typeDough,
-                cheeseFilledCrust: cheeseFilledCrust,
+                cheeseFilledCrust: finalCheeseCrust,
                 note: note
             ))
         } else {
@@ -112,7 +114,8 @@ class CartManager: ObservableObject {
             
             let orders = self.cart.map { item in
                 let basePrice = Double(item.product.price) ?? 0.0
-                let crustPrice = item.cheeseFilledCrust ? (Double(item.product.priceChosse) ?? 0.0) : 0.0
+                let isCheese = (item.typeDough != "CRUJIENTE" && item.cheeseFilledCrust)
+                let crustPrice = isCheese ? (Double(item.product.priceChosse) ?? 0.0) : 0.0
                 let totalItemPrice = (basePrice + crustPrice) * Double(item.quantity)
                 
                 return OrderResponse(
@@ -124,7 +127,7 @@ class CartManager: ObservableObject {
                     nameProduct: item.product.nameProduct,
                     tamanio: item.product.tamanio,
                     typeDough: item.typeDough,
-                    cheeseFilledCrust: item.cheeseFilledCrust ? "SI" : "NO",
+                    cheeseFilledCrust: isCheese ? "SI" : "NO",
                     note: item.note,
                     phone: user.phone,
                     price: item.product.price,
@@ -203,7 +206,8 @@ class CartManager: ObservableObject {
                 
                 let orders = self.cart.map { item in
                     let basePrice = Double(item.product.price) ?? 0.0
-                    let crustPrice = item.cheeseFilledCrust ? (Double(item.product.priceChosse) ?? 0.0) : 0.0
+                    let isCheese = (item.typeDough != "CRUJIENTE" && item.cheeseFilledCrust)
+                    let crustPrice = isCheese ? (Double(item.product.priceChosse) ?? 0.0) : 0.0
                     let totalItemPrice = (basePrice + crustPrice) * Double(item.quantity)
                     let deliveryPrice = self.receptionMode == "DELIVERY" ? String(format: "%.0f", round(cartTotal * 0.20)) : "0"
                     
@@ -216,7 +220,7 @@ class CartManager: ObservableObject {
                         nameProduct: item.product.nameProduct,
                         tamanio: item.product.tamanio,
                         typeDough: item.typeDough,
-                        cheeseFilledCrust: item.cheeseFilledCrust ? "SI" : "NO",
+                        cheeseFilledCrust: isCheese ? "SI" : "NO",
                         note: item.note,
                         phone: user.phone,
                         price: item.product.price,

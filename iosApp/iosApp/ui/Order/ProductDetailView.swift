@@ -14,7 +14,8 @@ struct ProductDetailView: View {
     
     var totalPrice: Double {
         let basePrice = Double(product.price) ?? 0.0
-        let crustPrice = cheeseFilledCrust ? (Double(product.priceChosse) ?? 0.0) : 0.0
+        let effectiveCheeseCrust = (typeDough != "CRUJIENTE") && cheeseFilledCrust
+        let crustPrice = effectiveCheeseCrust ? (Double(product.priceChosse) ?? 0.0) : 0.0
         return (basePrice + crustPrice) * Double(quantity)
     }
     
@@ -125,7 +126,13 @@ struct ProductDetailView: View {
                                             Image(systemName: typeDough == dough ? "largecircle.fill.circle" : "circle")
                                                 .foregroundColor(typeDough == dough ? .uiTayRed600 : .gray)
                                         }
-                                        .onTapGesture { typeDough = dough }
+                                        .contentShape(Rectangle())
+                                        .onTapGesture {
+                                            typeDough = dough
+                                            if dough == "CRUJIENTE" {
+                                                cheeseFilledCrust = false
+                                            }
+                                        }
                                     }
                                     
                                     if typeDough != "CRUJIENTE" {
@@ -155,11 +162,12 @@ struct ProductDetailView: View {
                 }
                 
                 UITayButton(text: "Agregar al Carrito") {
+                    let effectiveCheeseCrust = (typeDough != "CRUJIENTE") && cheeseFilledCrust
                     CartManager.shared.addToCart(
                         product: product,
                         quantity: quantity,
                         typeDough: typeDough,
-                        cheeseFilledCrust: cheeseFilledCrust,
+                        cheeseFilledCrust: effectiveCheeseCrust,
                         note: note
                     )
                     dismiss()
