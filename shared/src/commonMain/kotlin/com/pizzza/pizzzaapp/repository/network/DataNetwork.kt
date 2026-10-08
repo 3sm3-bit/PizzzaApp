@@ -68,6 +68,11 @@ class DataNetwork(
         apiService.registerUser(data)
     }
 
+    override suspend fun deleteUser(userId: String): String = apiCall {
+        val token = dataBase.getUserLocal()?.token
+        apiService.deleteUser(userId, token = token)
+    }
+
     override suspend fun login(data: LoginRequest): LoginResponse = apiCall {
         apiService.login(data)
     }

@@ -56,6 +56,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -95,6 +96,7 @@ fun ScreenClientHome(
     onNavigateTo: (ScreenInitNav) -> Unit
 ) {
     val context = LocalContext.current
+    val forgotDataHtml = stringResource(R.string.guide_forgot_data)
     val ordersViewModel: OrdersViewModel = koinViewModel()
     val cartViewModel: CartViewModel = koinViewModel()
     val authViewModel: AuthViewModel = koinViewModel()
@@ -102,6 +104,7 @@ fun ScreenClientHome(
     val authUiState by authViewModel.authUiState.collectAsStateWithLifecycle()
     var selectedTab by rememberSaveable { mutableIntStateOf(cartState.initialTab) }
     var showLogoutDialog by remember { mutableStateOf(false) }
+    var showDeleteUserDialog by remember { mutableStateOf(false) }
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     var currentActionId by remember { mutableIntStateOf(-1) }
     val scope = rememberCoroutineScope()
@@ -136,7 +139,7 @@ fun ScreenClientHome(
                     currentActionId = actionId
                     scope.launch { drawerState.close() }
                     when (actionId) {
-                        0 -> {onNavigateTo(ScreenInitNav.InformationView)}
+                        0 -> { onNavigateTo(ScreenInitNav.InformationView) }
                         1 -> {
                             context.uiTayUrlFacebook("61571443119838")
                         }
@@ -146,7 +149,10 @@ fun ScreenClientHome(
                         3 -> {
                             context.uiTayUrlTikTok("lapizzzeria")
                         }
-                        else -> {showLogoutDialog = true}
+                        4 -> {
+                            showDeleteUserDialog = true
+                        }
+                        else -> { showLogoutDialog = true }
                     }
                 }
             )
@@ -324,6 +330,47 @@ fun ScreenClientHome(
                         dismissButton = {
                             TextButton(onClick = { showLogoutDialog = false }) {
                                 Text("No", color = Color.Gray)
+                            }
+                        },
+                        containerColor = Color.White,
+                        shape = RoundedCornerShape(16.dp)
+                    )
+                }
+
+                if (showDeleteUserDialog) {
+                    AlertDialog(
+                        onDismissRequest = { showDeleteUserDialog = false },
+                        title = {
+                            Text(
+                                text = "¿Eliminar tu cuenta?",
+                                style = textB20,
+                                color = tay_red_600
+                            )
+                        },
+                        text = {
+                            Text(
+                                text = "Esta acción es permanente. Al eliminar tu cuenta se borrará todo tu historial de pedidos, direcciones y datos registrados.",
+                                style = textM14, color = Color.Gray
+                            )
+                        },
+                        confirmButton = {
+                            Button(
+                                onClick = {
+                                    showDeleteUserDialog = false
+                                    ordersViewModel.resetOrderState()
+                                    cartViewModel.resetState()
+                                    authViewModel.deleteUser {
+                                        onNavigateTo(ScreenInitNav.Login)
+                                    }
+                                },
+                                colors = ButtonDefaults.buttonColors(containerColor = tay_red_600)
+                            ) {
+                                Text("Sí, eliminar", color = Color.White)
+                            }
+                        },
+                        dismissButton = {
+                            TextButton(onClick = { showDeleteUserDialog = false }) {
+                                Text("Cancelar", color = Color.Gray)
                             }
                         },
                         containerColor = Color.White,

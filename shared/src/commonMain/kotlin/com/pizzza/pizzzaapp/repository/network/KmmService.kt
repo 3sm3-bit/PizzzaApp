@@ -96,6 +96,12 @@ class KmmService(private val client: HttpClient) {
         return response.bodyAsText()
     }
 
+    suspend fun deleteUser(userId: String, token: String? = null): String {
+        return client.delete("${BASE_URL}/services/user/$userId") {
+            addAuthToken(token)
+        }.bodyAsText()
+    }
+
     suspend fun login(request: LoginRequest): LoginResponse {
         return client.post("${BASE_URL}/services/user/login") {
             contentType(ContentType.Application.Json)

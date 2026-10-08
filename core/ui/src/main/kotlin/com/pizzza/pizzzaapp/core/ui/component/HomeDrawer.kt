@@ -57,8 +57,13 @@ val drawerItems = listOf(
         action = 3
     ),
     UiTayNavBarItem(
+        titleId = R.string.text_drawer_delete_user,
+        iconId = R.drawable.ic_delete_user,
+        action = 4
+    ),
+    UiTayNavBarItem(
         titleId = R.string.text_drawer_five,
         iconId = R.drawable.ic_logout,
-        action = 4
+        action = 5
     )
 )

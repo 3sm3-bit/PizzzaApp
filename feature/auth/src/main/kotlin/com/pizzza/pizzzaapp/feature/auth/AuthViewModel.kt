@@ -194,4 +194,29 @@ class AuthViewModel(
             onSuccess()
         }
     }
+
+    fun deleteUser(onSuccess: () -> Unit) {
+        execute(globalUiStateManager = globalUiStateManager) {
+            val user = io { dataUseCase.getUserLocal() }
+            val userId = user?.uid ?: ""
+            if (userId.isNotBlank()) {
+                io { dataUseCase.deleteUser(userId) }
+            } else {
+                io { dataUseCase.logout() }
+            }
+            appDataOrder.update { state ->
+                state.copy(
+                    cart = emptyList(),
+                    deliveryAddress = "",
+                    latitude = "",
+                    longitude = "",
+                    selectedOrder = null,
+                    selectedProduct = null,
+                    orders = emptyList(),
+                    ordersLoaded = false
+                )
+            }
+            onSuccess()
+        }
+    }
 }

@@ -10,6 +10,7 @@ struct HomeDrawerView: View {
     @Binding var isOpen: Bool
     let userName: String
     let onNavigateToInfo: () -> Void
+    var onNavigateToDeleteUser: () -> Void = {}
     let onLogout: () -> Void
 
     var body: some View {
@@ -100,6 +101,26 @@ struct HomeDrawerView: View {
                     }
                     
                     Divider().padding(.vertical, 8)
+                    Button(action: {
+                        withAnimation { isOpen = false }
+                        onNavigateToDeleteUser()
+                    }) {
+                        HStack(spacing: 16) {
+                            Image("ic_delete_user")
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 24, height: 24)
+                        
+                            Text("Eliminar usuario")
+                                .font(Font.uiMontM14)
+                                .foregroundColor(Color.uiTayRed600)
+                            
+                            Spacer()
+                        }
+                        .padding(.vertical, 12)
+                        .padding(.horizontal, 8)
+                    }
+
                     Button(action: {
                         withAnimation { isOpen = false }
                         onLogout()

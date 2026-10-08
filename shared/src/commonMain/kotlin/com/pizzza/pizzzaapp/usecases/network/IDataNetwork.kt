@@ -30,6 +30,8 @@ interface IDataNetwork {
 
     suspend fun registerUser(data: UserResponse): String
 
+    suspend fun deleteUser(userId: String): String
+
     suspend fun login(data: LoginRequest): LoginResponse
 
     suspend fun refreshToken(refreshToken: String): RefreshTokenResponse

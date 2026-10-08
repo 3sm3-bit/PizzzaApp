@@ -73,6 +73,13 @@ class DataUseCase(private val iDataNetwork: IDataNetwork, private val iDataDBNet
     suspend fun registerUser(data: UserResponse) = iDataNetwork.registerUser(data)
 
     @Throws(Exception::class)
+    suspend fun deleteUser(userId: String): String {
+        val response = iDataNetwork.deleteUser(userId)
+        iDataDBNetwork.logout()
+        return response
+    }
+
+    @Throws(Exception::class)
     suspend fun login(data: LoginRequest) = iDataNetwork.login(data)
 
     @Throws(Exception::class)

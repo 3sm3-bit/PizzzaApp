@@ -56,4 +56,19 @@ class HomeViewModel: BaseViewModel {
             }
         }
     }
+
+    func deleteUser(onSuccess: @escaping () -> Void) {
+        Task {
+            await self.execute() {
+                let user = try await self.dataUseCase.getUserLocal()
+                if let userId = user?.uid, !userId.isEmpty {
+                    _ = try await self.dataUseCase.deleteUser(userId: userId)
+                } else {
+                    try await self.dataUseCase.logout()
+                }
+                CartManager.shared.clearCart()
+                onSuccess()
+            }
+        }
+    }
 }

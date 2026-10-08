@@ -59,5 +59,6 @@
     <string name="text_drawer_item_two">Nuestro facebook</string>
     <string name="text_drawer_three">Nuestro instagram</string>
     <string name="text_drawer_four">Nuestro tiktok</string>
+    <string name="text_drawer_delete_user">Eliminar usuario</string>
     <string name="text_drawer_five">Cerrar sesión</string>
 </resources>

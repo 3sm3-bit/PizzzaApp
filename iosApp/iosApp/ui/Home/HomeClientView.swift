@@ -15,6 +15,7 @@ struct HomeClientView: View {
     @State private var badgeInfo: (Int, Int) = (2, 0)
     @State var tabs : [UITayTabItem] = []
     @State private var showLogoutAlert = false
+    @State private var showDeleteUserAlert = false
     @State private var isDrawerOpen = false
     @State private var showInfoView = false
     @EnvironmentObject var managerAPP: PizzaManagerAPP
@@ -54,6 +55,9 @@ struct HomeClientView: View {
                     onNavigateToInfo: {
                         showInfoView = true
                     },
+                    onNavigateToDeleteUser: {
+                        showDeleteUserAlert = true
+                    },
                     onLogout: {
                         showLogoutAlert = true
                     }
@@ -69,6 +73,18 @@ struct HomeClientView: View {
                     managerAPP.currentScreen = .auth
                 }),
                 secondaryButton: .cancel(Text("No"))
+            )
+        }
+        .alert(isPresented: $showDeleteUserAlert) {
+            Alert(
+                title: Text("¿Eliminar tu cuenta?"),
+                message: Text("Esta acción es permanente. Al eliminar tu cuenta se borrará todo tu historial de pedidos, direcciones y datos registrados."),
+                primaryButton: .destructive(Text("Sí, eliminar"), action: {
+                    viewModel.deleteUser {
+                        managerAPP.currentScreen = .auth
+                    }
+                }),
+                secondaryButton: .cancel(Text("Cancelar"))
             )
         }
         .uiTayNavigate(to: { InfoMainView() }, when: $showInfoView)
