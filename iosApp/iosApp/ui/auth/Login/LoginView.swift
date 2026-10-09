@@ -38,7 +38,7 @@ struct LoginView: View {
                         viewModel.login()
                     }.disabled(!enableButton)
                     
-                    Text("registrate ahora")
+                    Text("Registrate ahora")
                         .font(PizzaFonts.bold14)
                         .underline()
                         .foregroundColor(PizzaColors.green600)
