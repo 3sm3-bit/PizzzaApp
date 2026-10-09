@@ -34,8 +34,16 @@ class CartManager: ObservableObject {
         }
     }
 
+    var deliveryPercent: Double {
+        if let firstDeliveryProduct = deliveryProducts.first,
+           let priceValue = Double(firstDeliveryProduct.price), priceValue > 0 {
+            return priceValue / 100.0
+        }
+        return 0.20
+    }
+
     var deliveryFee: Double {
-        return receptionMode == "DELIVERY" ? round(totalPrice * 0.20) : 0.0
+        return receptionMode == "DELIVERY" ? round(totalPrice * deliveryPercent) : 0.0
     }
     
     var finalTotal: Double {

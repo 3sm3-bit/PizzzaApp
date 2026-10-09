@@ -47,8 +47,11 @@ fun ScreenOrderSummary(
         (basePrice + crustPrice) * it.quantity
     }
     
+    val deliveryPercent = (uiState.selectedDeliveryProduct ?: uiState.deliveryProducts.firstOrNull())
+        ?.price?.toDoubleOrNull()
+        ?.let { it / 100.0 } ?: 0.20
     val deliveryPrice = if (uiState.receptionMode == "DELIVERY") {
-        kotlin.math.round(cartProductsTotal * 0.20)
+        kotlin.math.round(cartProductsTotal * deliveryPercent)
     } else 0.0
     val cartTotal = cartProductsTotal + deliveryPrice
 

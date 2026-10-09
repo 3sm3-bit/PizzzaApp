@@ -80,7 +80,10 @@ class CartViewModel(
                 val crustPrice = if (item.cheeseFilledCrust) item.product.priceChosse.toDoubleOrNull() ?: 0.0 else 0.0
                 (basePrice + crustPrice) * item.quantity
             }
-            val deliveryPriceDouble = if (state.receptionMode == "DELIVERY") kotlin.math.round(cartProductsTotal * 0.20) else 0.0
+            val deliveryPercent = (state.selectedDeliveryProduct ?: state.deliveryProducts.firstOrNull())
+                ?.price?.toDoubleOrNull()
+                ?.let { it / 100.0 } ?: 0.20
+            val deliveryPriceDouble = if (state.receptionMode == "DELIVERY") kotlin.math.round(cartProductsTotal * deliveryPercent) else 0.0
             val deliveryPriceStr = if (state.receptionMode == "DELIVERY") deliveryPriceDouble.toLong().toString() else "0"
             val total = cartProductsTotal + deliveryPriceDouble
 
@@ -167,8 +170,11 @@ class CartViewModel(
                             val crustPrice = if (item.cheeseFilledCrust) item.product.priceChosse.toDoubleOrNull() ?: 0.0 else 0.0
                             (basePrice + crustPrice) * item.quantity
                         }
+                        val deliveryPercent = (state.selectedDeliveryProduct ?: state.deliveryProducts.firstOrNull())
+                            ?.price?.toDoubleOrNull()
+                            ?.let { it / 100.0 } ?: 0.20
                         val deliveryPriceDouble = if (state.receptionMode == "DELIVERY") {
-                            kotlin.math.round(cartProductsTotal * 0.20)
+                            kotlin.math.round(cartProductsTotal * deliveryPercent)
                         } else 0.0
                         val deliveryPrice = deliveryPriceDouble.toLong().toString()
 

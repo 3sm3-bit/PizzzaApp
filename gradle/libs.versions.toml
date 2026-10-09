@@ -14,6 +14,7 @@ google-maps = "6.1.0"
 materialIconsExtended = "1.7.8"
 play-services-maps = "19.0.0"
 play-services-location = "21.3.0"
+play-services-places = "4.1.0"
 
 ksp = "2.3.11"
 room = "2.8.4"
@@ -96,6 +97,7 @@ navigation-compose = { module = "androidx.navigation:navigation-compose", versio
 google-maps-compose = { module = "com.google.maps.android:maps-compose", version.ref = "google-maps" }
 play-services-maps = { module = "com.google.android.gms:play-services-maps", version.ref = "play-services-maps" }
 play-services-location = { module = "com.google.android.gms:play-services-location", version.ref = "play-services-location" }
+play-services-places = { module = "com.google.android.libraries.places:places", version.ref = "play-services-places" }
 
 # Custom Libraries
 tay-compose-library = { group = "com.github.montes8", name = "VMGComposeLibrary", version.ref = "tayComposeLibrary" }

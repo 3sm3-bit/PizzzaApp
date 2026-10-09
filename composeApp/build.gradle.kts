@@ -45,6 +45,7 @@ kotlin {
             implementation(libs.google.maps.compose)
             implementation(libs.play.services.maps)
             implementation(libs.play.services.location)
+            implementation(libs.play.services.places)
 
             // Custom Library
             implementation(libs.tay.compose.library)
@@ -93,6 +94,7 @@ configure<com.android.build.api.dsl.ApplicationExtension> {
         versionName = "1.0"
 
         manifestPlaceholders["MAPS_API_KEY"] = mapsApiKey
+        resValue("string", "maps_api_key", mapsApiKey)
     }
 
     flavorDimensions += "environment"

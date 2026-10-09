@@ -21,6 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
@@ -28,6 +29,11 @@ import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.libraries.places.api.Places
+import com.google.android.libraries.places.api.model.AutocompletePrediction
+import com.google.android.libraries.places.api.model.Place
+import com.google.android.libraries.places.api.net.FetchPlaceRequest
+import com.google.android.libraries.places.api.net.FindAutocompletePredictionsRequest
 import com.google.maps.android.compose.*
 import com.valu.uitaycompose.button.UiTayButton
 import com.valu.uitaycompose.extra.UiTayCToolBar
@@ -69,25 +75,107 @@ fun AddressScreen(
     var currentLatLng by remember { mutableStateOf(initialLatLng ?: defaultLocation) }
 
     var searchQuery by remember { mutableStateOf("") }
-    var searchResults by remember { mutableStateOf<List<android.location.Address>>(emptyList()) }
+    var placesResults by remember { mutableStateOf<List<AutocompletePrediction>>(emptyList()) }
+    var geocoderResults by remember { mutableStateOf<List<android.location.Address>>(emptyList()) }
     var isSelectingSearch by remember { mutableStateOf(false) }
 
-    fun searchAddress(query: String) {
-        if (query.isBlank()) {
-            searchResults = emptyList()
-            return
+    val placesClient = remember {
+        if (Places.isInitialized()) {
+            Places.createClient(context)
+        } else {
+            null
         }
+    }
+
+    fun performGeocoderSearch(query: String) {
+        android.util.Log.i("PIZZZA_PLACES", "🔄 Ejecutando búsqueda de respaldo con Geocoder para: '$query'")
         scope.launch(Dispatchers.IO) {
             try {
                 val geocoder = Geocoder(context, Locale.getDefault())
                 @Suppress("DEPRECATION")
                 val addresses = geocoder.getFromLocationName(query, 5)
                 withContext(Dispatchers.Main) {
-                    searchResults = addresses ?: emptyList()
+                    geocoderResults = addresses ?: emptyList()
+                    android.util.Log.i("PIZZZA_PLACES", "📍 Geocoder devolvió ${geocoderResults.size} resultados")
                 }
-            } catch (_: Exception) {
-                searchResults = emptyList()
+            } catch (e: Exception) {
+                android.util.Log.e("PIZZZA_PLACES", "❌ Error en Geocoder: ${e.message}")
+                withContext(Dispatchers.Main) {
+                    geocoderResults = emptyList()
+                }
             }
+        }
+    }
+
+    fun searchAddress(query: String) {
+        if (query.isBlank()) {
+            placesResults = emptyList()
+            geocoderResults = emptyList()
+            return
+        }
+
+        val client = placesClient
+        if (client != null && Places.isInitialized()) {
+            android.util.Log.i("PIZZZA_PLACES", "🔍 Buscando predicciones en Places API para: '$query'...")
+            val request = FindAutocompletePredictionsRequest.builder()
+                .setQuery(query)
+                .build()
+
+            client.findAutocompletePredictions(request)
+                .addOnSuccessListener { response ->
+                    val predictions = response.autocompletePredictions
+                    android.util.Log.i("PIZZZA_PLACES", "✅ Places API devolvió ${predictions.size} predicciones")
+                    if (predictions.isNotEmpty()) {
+                        placesResults = predictions
+                        geocoderResults = emptyList()
+                    } else {
+                        placesResults = emptyList()
+                        performGeocoderSearch(query)
+                    }
+                }
+                .addOnFailureListener { exception ->
+                    android.util.Log.e("PIZZZA_PLACES", "❌ Error en Places API: ${exception.message}", exception)
+                    placesResults = emptyList()
+                    performGeocoderSearch(query)
+                }
+        } else {
+            android.util.Log.w("PIZZZA_PLACES", "⚠️ Places Client es NULL o no inicializado. Usando Geocoder directamente.")
+            performGeocoderSearch(query)
+        }
+    }
+
+    fun selectPlacePrediction(prediction: AutocompletePrediction) {
+        keyboardController?.hide()
+        isSelectingSearch = true
+        val placeId = prediction.placeId
+        val placeFields = listOf(Place.Field.LAT_LNG, Place.Field.ADDRESS)
+        val request = FetchPlaceRequest.newInstance(placeId, placeFields)
+
+        if (placesClient != null) {
+            placesClient.fetchPlace(request)
+                .addOnSuccessListener { response ->
+                    val place = response.place
+                    val placeLatLng = place.latLng
+                    val fullAddress = place.address ?: prediction.getFullText(null).toString()
+                    if (placeLatLng != null) {
+                        val latLng = LatLng(placeLatLng.latitude, placeLatLng.longitude)
+                        currentAddress = fullAddress
+                        currentLatLng = latLng
+                        placesResults = emptyList()
+                        searchQuery = ""
+                        scope.launch {
+                            cameraPositionState.animate(
+                                update = CameraUpdateFactory.newLatLngZoom(latLng, 16f)
+                            )
+                            isSelectingSearch = false
+                        }
+                    } else {
+                        isSelectingSearch = false
+                    }
+                }
+                .addOnFailureListener {
+                    isSelectingSearch = false
+                }
         }
     }
 
@@ -206,13 +294,14 @@ fun AddressScreen(
                         searchQuery = it
                         searchAddress(it)
                     },
-                    placeholder = { Text("Buscar dirección...", style = textM12, color = Color.Gray) },
+                    placeholder = { Text("Buscar dirección o lugar...", style = textM12, color = Color.Gray) },
                     leadingIcon = { Icon(Icons.Default.Search, contentDescription = null, tint = tay_red_600) },
                     trailingIcon = {
                         if (searchQuery.isNotBlank()) {
                             IconButton(onClick = {
                                 searchQuery = ""
-                                searchResults = emptyList()
+                                placesResults = emptyList()
+                                geocoderResults = emptyList()
                             }) {
                                 Icon(Icons.Default.Close, contentDescription = null, tint = Color.Gray)
                             }
@@ -229,7 +318,7 @@ fun AddressScreen(
                     modifier = Modifier.fillMaxWidth()
                 )
 
-                if (searchResults.isNotEmpty()) {
+                if (placesResults.isNotEmpty()) {
                     Spacer(Modifier.height(4.dp))
                     Card(
                         modifier = Modifier.fillMaxWidth(),
@@ -238,9 +327,42 @@ fun AddressScreen(
                         elevation = CardDefaults.cardElevation(defaultElevation = 6.dp)
                     ) {
                         LazyColumn(
-                            modifier = Modifier.fillMaxWidth().heightIn(max = 200.dp)
+                            modifier = Modifier.fillMaxWidth().heightIn(max = 320.dp)
                         ) {
-                            items(searchResults) { address ->
+                            items(placesResults) { prediction ->
+                                val primaryText = prediction.getPrimaryText(null).toString()
+                                val secondaryText = prediction.getSecondaryText(null).toString()
+                                ListItem(
+                                    headlineContent = {
+                                        Text(text = primaryText, style = textM12.copy(fontWeight = FontWeight.Bold), color = Color.Black, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                                    },
+                                    supportingContent = {
+                                        if (secondaryText.isNotBlank()) {
+                                            Text(text = secondaryText, style = textM12, color = Color.Gray, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                                        }
+                                    },
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .clickable {
+                                            selectPlacePrediction(prediction)
+                                        }
+                                )
+                                HorizontalDivider(color = Color(0xFFF0F2F5), thickness = 0.5.dp)
+                            }
+                        }
+                    }
+                } else if (geocoderResults.isNotEmpty()) {
+                    Spacer(Modifier.height(4.dp))
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(12.dp),
+                        colors = CardDefaults.cardColors(containerColor = Color.White),
+                        elevation = CardDefaults.cardElevation(defaultElevation = 6.dp)
+                    ) {
+                        LazyColumn(
+                            modifier = Modifier.fillMaxWidth().heightIn(max = 320.dp)
+                        ) {
+                            items(geocoderResults) { address ->
                                 val addressText = address.getAddressLine(0) ?: "Dirección"
                                 ListItem(
                                     headlineContent = {
@@ -254,7 +376,7 @@ fun AddressScreen(
                                             currentAddress = addressText
                                             val latLng = LatLng(address.latitude, address.longitude)
                                             currentLatLng = latLng
-                                            searchResults = emptyList()
+                                            geocoderResults = emptyList()
                                             searchQuery = ""
                                             scope.launch {
                                                 cameraPositionState.animate(
