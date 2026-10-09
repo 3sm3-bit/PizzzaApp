@@ -115,14 +115,16 @@ class CartManager: ObservableObject {
         self.dataUseCase.getUserLocal { [weak self] user, error in
             guard let self = self, let user = user else { return }
             let idOrder = UUID().uuidString
-            let cartTotal = self.totalPrice
-            let deliveryPriceStr = self.receptionMode == "DELIVERY" ? String(format: "%.0f", round(cartTotal * 0.20)) : "0"
+            let isDelivery = self.receptionMode == "DELIVERY"
+            let deliveryFeeDouble = self.deliveryFee
+            let deliveryPriceStr = isDelivery ? String(format: "%.0f", deliveryFeeDouble) : "0"
             
-            let orders = self.cart.map { item in
+            let orders = self.cart.enumerated().map { index, item in
                 let basePrice = Double(item.product.price) ?? 0.0
                 let isCheese = (item.typeDough != "CRUJIENTE" && item.cheeseFilledCrust)
                 let crustPrice = isCheese ? (Double(item.product.priceChosse) ?? 0.0) : 0.0
-                let totalItemPrice = (basePrice + crustPrice) * Double(item.quantity)
+                let itemSubtotal = (basePrice + crustPrice) * Double(item.quantity)
+                let totalItemPrice = (isDelivery && index == 0) ? (itemSubtotal + deliveryFeeDouble) : itemSubtotal
                 
                 return OrderResponse(
                     uid: UUID().uuidString,
@@ -137,7 +139,7 @@ class CartManager: ObservableObject {
                     note: item.note,
                     phone: user.phone,
                     price: item.product.price,
-                    priceTotal: String(format: "%.2f", totalItemPrice),
+                    priceTotal: String(format: "%.0f", totalItemPrice),
                     state: "PENDIENTE",
                     date: "",
                     address: self.receptionMode == "DELIVERY" ? self.deliveryAddress : "",
@@ -208,14 +210,16 @@ class CartManager: ObservableObject {
                 guard let user = user else { return }
                 
                 let idOrder = UUID().uuidString
-                let cartTotal = self.totalPrice
+                let isDelivery = self.receptionMode == "DELIVERY"
+                let deliveryFeeDouble = self.deliveryFee
+                let deliveryPriceStr = isDelivery ? String(format: "%.0f", deliveryFeeDouble) : "0"
                 
-                let orders = self.cart.map { item in
+                let orders = self.cart.enumerated().map { index, item in
                     let basePrice = Double(item.product.price) ?? 0.0
                     let isCheese = (item.typeDough != "CRUJIENTE" && item.cheeseFilledCrust)
                     let crustPrice = isCheese ? (Double(item.product.priceChosse) ?? 0.0) : 0.0
-                    let totalItemPrice = (basePrice + crustPrice) * Double(item.quantity)
-                    let deliveryPrice = self.receptionMode == "DELIVERY" ? String(format: "%.0f", round(cartTotal * 0.20)) : "0"
+                    let itemSubtotal = (basePrice + crustPrice) * Double(item.quantity)
+                    let totalItemPrice = (isDelivery && index == 0) ? (itemSubtotal + deliveryFeeDouble) : itemSubtotal
                     
                     return OrderResponse(
                         uid: UUID().uuidString,
@@ -230,7 +234,7 @@ class CartManager: ObservableObject {
                         note: item.note,
                         phone: user.phone,
                         price: item.product.price,
-                        priceTotal: String(format: "%.2f", totalItemPrice),
+                        priceTotal: String(format: "%.0f", totalItemPrice),
                         state: "CONFIRMADO",
                         date: "",
                         address: self.receptionMode == "DELIVERY" ? self.deliveryAddress : "",

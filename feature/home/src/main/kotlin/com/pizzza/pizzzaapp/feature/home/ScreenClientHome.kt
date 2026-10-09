@@ -262,7 +262,7 @@ fun ScreenClientHome(
                         Text(
                             text = welcomeText,
                             style = textSe18,
-                            color = tay_red_600,
+                            color = Color.Black,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis
                         )

@@ -86,10 +86,12 @@ class CartViewModel(
 
             val user = io { dataUseCase.getUserLocal() }
 
-            val orderRequest = state.cart.map { item ->
+            val orderRequest = state.cart.mapIndexed { index, item ->
                 val isDelivery = state.receptionMode == "DELIVERY"
                 val itemPrice = (item.product.price.toDoubleOrNull() ?: 0.0) +
                         (if (item.cheeseFilledCrust) item.product.priceChosse.toDoubleOrNull() ?: 0.0 else 0.0)
+                val itemSubtotal = itemPrice * item.quantity
+                val itemPriceTotal = if (isDelivery && index == 0) itemSubtotal + deliveryPriceDouble else itemSubtotal
 
                 OrderResponse(
                     uid = UUID.randomUUID().toString().replace("-", "").substring(0, 16),
@@ -104,7 +106,7 @@ class CartViewModel(
                     note = item.note,
                     phone = user?.phone ?: "",
                     price = item.product.price,
-                    priceTotal = (itemPrice * item.quantity).toString(),
+                    priceTotal = if (itemPriceTotal % 1.0 == 0.0) itemPriceTotal.toLong().toString() else String.format(java.util.Locale.US, "%.2f", itemPriceTotal),
                     state = "PENDIENTE",
                     address = if (isDelivery) state.deliveryAddress else "RECOJO EN LOCAL",
                     reception = state.receptionMode,
@@ -165,14 +167,17 @@ class CartViewModel(
                             val crustPrice = if (item.cheeseFilledCrust) item.product.priceChosse.toDoubleOrNull() ?: 0.0 else 0.0
                             (basePrice + crustPrice) * item.quantity
                         }
-                        val deliveryPrice = if (state.receptionMode == "DELIVERY") {
-                            kotlin.math.round(cartProductsTotal * 0.20).toLong().toString()
-                        } else "0"
+                        val deliveryPriceDouble = if (state.receptionMode == "DELIVERY") {
+                            kotlin.math.round(cartProductsTotal * 0.20)
+                        } else 0.0
+                        val deliveryPrice = deliveryPriceDouble.toLong().toString()
 
-                        val orderRequest = state.cart.map { item ->
+                        val orderRequest = state.cart.mapIndexed { index, item ->
                             val isDelivery = state.receptionMode == "DELIVERY"
                             val itemPrice = (item.product.price.toDoubleOrNull() ?: 0.0) +
                                     (if (item.cheeseFilledCrust) item.product.priceChosse.toDoubleOrNull() ?: 0.0 else 0.0)
+                            val itemSubtotal = itemPrice * item.quantity
+                            val itemPriceTotal = if (isDelivery && index == 0) itemSubtotal + deliveryPriceDouble else itemSubtotal
 
                             OrderResponse(
                                 uid = UUID.randomUUID().toString().replace("-", "").substring(0, 16),
@@ -187,7 +192,7 @@ class CartViewModel(
                                 note = item.note,
                                 phone = user?.phone ?: "",
                                 price = item.product.price,
-                                priceTotal = (itemPrice * item.quantity).toString(),
+                                priceTotal = if (itemPriceTotal % 1.0 == 0.0) itemPriceTotal.toLong().toString() else String.format(java.util.Locale.US, "%.2f", itemPriceTotal),
                                 state = "CONFIRMADO",
                                 address = if (isDelivery) state.deliveryAddress else "RECOJO EN LOCAL",
                                 reception = state.receptionMode,

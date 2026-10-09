@@ -182,8 +182,11 @@ struct OrderCardView: View {
                                         .font(.system(size: 14, weight: .medium))
                                         .foregroundColor(Color(hex: 0x1C1E21))
                                     Spacer()
-                                    let subtotal = (Double(item.quantity) ?? 0) * (Double(item.price) ?? 0)
-                                    Text("$\(Int(subtotal))")
+                                    let qty = Double(item.quantity) ?? 1.0
+                                    let basePrice = Double(item.price) ?? 0.0
+                                    let cheesePrice = (item.type == "1" && item.typeDough != "CRUJIENTE" && item.cheeseFilledCrust.uppercased() == "SI") ? (Double(item.priceChosse) ?? 0.0) : 0.0
+                                    let subtotal = Int((basePrice + cheesePrice) * qty)
+                                    Text("$\(subtotal)")
                                         .font(.system(size: 14, weight: .bold))
                                 }
                                 
@@ -335,7 +338,11 @@ struct OrderDetailView: View {
                                     }
                                 }
                                 Spacer()
-                                Text("$\(Int(Double(item.price) ?? 0))")
+                                let qty = Double(item.quantity) ?? 1.0
+                                let basePrice = Double(item.price) ?? 0.0
+                                let cheesePrice = (item.type == "1" && item.typeDough != "CRUJIENTE" && item.cheeseFilledCrust.uppercased() == "SI") ? (Double(item.priceChosse) ?? 0.0) : 0.0
+                                let subtotal = Int((basePrice + cheesePrice) * qty)
+                                Text("$\(subtotal)")
                                     .font(.system(size: 16, weight: .bold))
                             }
                             .padding(16)

@@ -169,8 +169,15 @@ fun OrderItemCard(
                             color = Color.Black,
                             modifier = Modifier.weight(1f)
                         )
+                        val qty = item.quantity.toDoubleOrNull() ?: 1.0
+                        val basePrice = item.price.toDoubleOrNull() ?: 0.0
+                        val cheesePrice = if (item.type == "1" && item.typeDough != "CRUJIENTE" && item.cheeseFilledCrust == "SI") {
+                            item.priceChosse.toDoubleOrNull() ?: 0.0
+                        } else 0.0
+                        val itemSubtotal = ((basePrice + cheesePrice) * qty).toInt()
+
                         Text(
-                            text = "${item.symbol}${item.priceTotal}",
+                            text = "${item.symbol}$itemSubtotal",
                             style = textB12,
                             color = Color.DarkGray
                         )

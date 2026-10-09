@@ -113,7 +113,12 @@ struct OrderItemCard: View {
                         
                         Spacer()
                         
-                        Text("\(item.symbol)\(item.priceTotal)")
+                        let qty = Double(item.quantity) ?? 1.0
+                        let basePrice = Double(item.price) ?? 0.0
+                        let cheesePrice = (item.type == "1" && item.typeDough != "CRUJIENTE" && item.cheeseFilledCrust.uppercased() == "SI") ? (Double(item.priceChosse) ?? 0.0) : 0.0
+                        let itemSubtotal = Int((basePrice + cheesePrice) * qty)
+                        
+                        Text("\(item.symbol)\(itemSubtotal)")
                             .font(PizzaFonts.bold14)
                             .foregroundColor(.black)
                     }
