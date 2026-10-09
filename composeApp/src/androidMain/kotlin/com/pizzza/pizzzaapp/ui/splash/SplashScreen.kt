@@ -81,17 +81,9 @@ fun SplashScreen(
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
 
             Image(painter = painterResource(R.drawable.ic_logo_m_pizzzeria)
-            , contentDescription = "null",modifier = Modifier.width(250.dp).height(200.dp))
+            , contentDescription = "null",modifier = Modifier.width(230.dp).height(180.dp))
             
             Spacer(Modifier.height(16.dp))
-
-            Text(
-                text = "PIZZZERIA",
-                color =tay_red_600,
-                style = textGabbiB35,
-                modifier = Modifier.scale(scale.value)
-            )
-            
             Spacer(Modifier.height(40.dp))
             CircularProgressIndicator(
                     color = tay_red_600,
