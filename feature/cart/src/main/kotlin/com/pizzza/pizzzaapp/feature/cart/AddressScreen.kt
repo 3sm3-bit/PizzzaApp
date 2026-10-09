@@ -31,6 +31,7 @@ import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.libraries.places.api.Places
 import com.google.android.libraries.places.api.model.AutocompletePrediction
+import com.google.android.libraries.places.api.model.AutocompleteSessionToken
 import com.google.android.libraries.places.api.model.Place
 import com.google.android.libraries.places.api.net.FetchPlaceRequest
 import com.google.android.libraries.places.api.net.FindAutocompletePredictionsRequest
@@ -78,6 +79,7 @@ fun AddressScreen(
     var placesResults by remember { mutableStateOf<List<AutocompletePrediction>>(emptyList()) }
     var geocoderResults by remember { mutableStateOf<List<android.location.Address>>(emptyList()) }
     var isSelectingSearch by remember { mutableStateOf(false) }
+    var sessionToken by remember { mutableStateOf<AutocompleteSessionToken?>(null) }
 
     val placesClient = remember {
         if (Places.isInitialized()) {
@@ -111,13 +113,17 @@ fun AddressScreen(
         if (query.isBlank()) {
             placesResults = emptyList()
             geocoderResults = emptyList()
+            sessionToken = null
             return
         }
 
+        val token = sessionToken ?: AutocompleteSessionToken.newInstance().also { sessionToken = it }
+
         val client = placesClient
         if (client != null && Places.isInitialized()) {
-            android.util.Log.i("PIZZZA_PLACES", "🔍 Buscando predicciones en Places API para: '$query'...")
+            android.util.Log.i("PIZZZA_PLACES", "🔍 Buscando predicciones en Places API (con sesión) para: '$query'...")
             val request = FindAutocompletePredictionsRequest.builder()
+                .setSessionToken(token)
                 .setQuery(query)
                 .build()
 
@@ -149,11 +155,15 @@ fun AddressScreen(
         isSelectingSearch = true
         val placeId = prediction.placeId
         val placeFields = listOf(Place.Field.LAT_LNG, Place.Field.ADDRESS)
-        val request = FetchPlaceRequest.newInstance(placeId, placeFields)
+        val currentToken = sessionToken
+        val request = FetchPlaceRequest.builder(placeId, placeFields)
+            .setSessionToken(currentToken)
+            .build()
 
         if (placesClient != null) {
             placesClient.fetchPlace(request)
                 .addOnSuccessListener { response ->
+                    sessionToken = null
                     val place = response.place
                     val placeLatLng = place.latLng
                     val fullAddress = place.address ?: prediction.getFullText(null).toString()
@@ -174,6 +184,7 @@ fun AddressScreen(
                     }
                 }
                 .addOnFailureListener {
+                    sessionToken = null
                     isSelectingSearch = false
                 }
         }
@@ -242,7 +253,7 @@ fun AddressScreen(
 
     LaunchedEffect(cameraPositionState.isMoving) {
         if (!cameraPositionState.isMoving) {
-            if (!isSelectingSearch) {
+            if (!isSelectingSearch && cameraPositionState.cameraMoveStartedReason == CameraMoveStartedReason.GESTURE) {
                 updateAddress(cameraPositionState.position.target)
             }
         }
