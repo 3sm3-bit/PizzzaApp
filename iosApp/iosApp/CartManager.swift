@@ -239,7 +239,7 @@ class CartManager: ObservableObject {
                         date: "",
                         address: self.receptionMode == "DELIVERY" ? self.deliveryAddress : "",
                         reception: self.receptionMode,
-                        priceDelivery: deliveryPrice,
+                        priceDelivery: deliveryPriceStr,
                         priceChosse: item.product.priceChosse,
                         idOrden: idOrder,
                         branchId: self.branchId,
