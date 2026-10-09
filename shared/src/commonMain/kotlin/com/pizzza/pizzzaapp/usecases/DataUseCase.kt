@@ -1,6 +1,7 @@
 package com.pizzza.pizzzaapp.usecases
 
 import com.pizzza.pizzzaapp.model.ProductModel
+import com.pizzza.pizzzaapp.model.BranchModel
 import com.pizzza.pizzzaapp.model.HomeDataModel
 import com.pizzza.pizzzaapp.model.UserModel
 import com.pizzza.pizzzaapp.repository.network.model.LoginRequest
@@ -11,6 +12,8 @@ import com.pizzza.pizzzaapp.usecases.network.IDataDataBase
 import com.pizzza.pizzzaapp.usecases.network.IDataNetwork
 
 class DataUseCase(private val iDataNetwork: IDataNetwork, private val iDataDBNetwork: IDataDataBase) {
+
+    private var cachedBranches: List<BranchModel> = emptyList()
 
     @Throws(Exception::class)
     suspend fun loadParentOrder(userId: String) = iDataNetwork.loadParentOrder(userId)
@@ -45,7 +48,15 @@ class DataUseCase(private val iDataNetwork: IDataNetwork, private val iDataDBNet
         if (products.isEmpty()) {
             products = try { syncProducts() } catch (e: Exception) { emptyList() }
         }
-        val branches = try { iDataNetwork.getBranches() } catch (e: Exception) { emptyList() }
+        val branches = if (cachedBranches.isNotEmpty()) {
+            cachedBranches
+        } else {
+            try {
+                val fetched = iDataNetwork.getBranches()
+                if (fetched.isNotEmpty()) cachedBranches = fetched
+                fetched
+            } catch (e: Exception) { emptyList() }
+        }
         val defaultBranchId = branches.firstOrNull()?.identifier ?: "1"
 
         return HomeDataModel(
@@ -108,5 +119,11 @@ class DataUseCase(private val iDataNetwork: IDataNetwork, private val iDataDBNet
         iDataNetwork.createPaymentSession(amount, email, orderId)
 
     @Throws(Exception::class)
-    suspend fun getBranch() = iDataNetwork.getBranches()
+    suspend fun getBranch(): List<BranchModel> {
+        val branches = iDataNetwork.getBranches()
+        if (branches.isNotEmpty()) {
+            cachedBranches = branches
+        }
+        return branches
+    }
 }
