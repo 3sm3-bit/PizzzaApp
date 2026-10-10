@@ -9,6 +9,7 @@ struct UiToolBarHome: View {
     var typeFlow: Bool
     var onClick: () -> Void = {}
     var onOpenDrawer: () -> Void = {}
+    var onOpenHistory: () -> Void = {}
     @ObservedObject var cartManager = CartManager.shared
     
     var welcomeText: String {
@@ -47,12 +48,21 @@ struct UiToolBarHome: View {
                     .scaledToFit()
                     .frame(width: 110, height: 36)
             } else {
-                Image(systemName: "arrow.clockwise")
-                    .foregroundColor(Color.uiTayRed600)
-                    .font(.system(size: 20, weight: .bold))
-                    .onTapGesture {
-                        onClick()
-                    }
+                HStack(spacing: 12) {
+                    Image(systemName: "clock.arrow.circlepath")
+                        .foregroundColor(Color.uiTayRed600)
+                        .font(.system(size: 20, weight: .bold))
+                        .onTapGesture {
+                            onOpenHistory()
+                        }
+                    
+                    Image(systemName: "arrow.clockwise")
+                        .foregroundColor(Color.uiTayRed600)
+                        .font(.system(size: 20, weight: .bold))
+                        .onTapGesture {
+                            onClick()
+                        }
+                }
             }
         }
         .padding(.horizontal, 16)

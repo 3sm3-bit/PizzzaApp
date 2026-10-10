@@ -10,4 +10,5 @@ func assembleViewModel(uiTayResolver: Resolver) {
     uiTayResolver.register(AppViewModel.self) {MainActor.assumeIsolated {AppViewModel()}}
     uiTayResolver.register(AuthViewModel.self) {MainActor.assumeIsolated {AuthViewModel()}}
     uiTayResolver.register(HomeViewModel.self) {MainActor.assumeIsolated {HomeViewModel()}}
+    uiTayResolver.register(ClientOrderViewModel.self) {MainActor.assumeIsolated {ClientOrderViewModel()}}
 }

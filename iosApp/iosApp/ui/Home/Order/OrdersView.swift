@@ -13,12 +13,15 @@ struct OrdersView: View {
     var onLogout: () -> Void
     var onOpenDrawer: () -> Void = {}
     @State private var selectedOrderForMonitoring: ParentOrderModel?
+    @State private var showOrderHistory = false
     
     var body: some View {
         VStack(spacing: 0) {            
-            UiToolBarHome(typeFlow: false,onClick: {
+            UiToolBarHome(typeFlow: false, onClick: {
                 viewModel.getGeneralOrderList(forceLoading: true)
-            }, onOpenDrawer: onOpenDrawer)
+            }, onOpenDrawer: onOpenDrawer, onOpenHistory: {
+                showOrderHistory = true
+            })
             
             if viewModel.orders.isEmpty {
                 Spacer()
@@ -55,13 +58,16 @@ struct OrdersView: View {
         .fullScreenCover(item: $selectedOrderForMonitoring) { order in
             MonitorView(order: order)
         }
+        .fullScreenCover(isPresented: $showOrderHistory) {
+            OrderHistoryView()
+        }
     }
 }
 
 struct OrderItemCard: View {
     let order: ParentOrderModel
-    @ObservedObject var viewModel: HomeViewModel
-    var onMonitor: () -> Void
+    var viewModel: HomeViewModel? = nil
+    var onMonitor: () -> Void = {}
     
     var displayState: String {
         switch order.state.uppercased() {
