@@ -23,6 +23,7 @@ import com.pizzza.pizzzaapp.feature.cart.ScreenPaymentWebView
 import com.pizzza.pizzzaapp.feature.home.ScreenClientHome
 import com.pizzza.pizzzaapp.feature.monitoring.ScreenMonitor
 import com.pizzza.pizzzaapp.feature.orders.ScreenDetailOrder
+import com.pizzza.pizzzaapp.feature.orders.ScreenOrderHistory
 import com.pizzza.pizzzaapp.feature.info.ScreenInfoMain
 import com.pizzza.pizzzaapp.feature.info.ScreenInfoDetail
 import com.pizzza.pizzzaapp.feature.info.ScreenInfoWebView
@@ -124,6 +125,13 @@ fun AppNavigation() {
 
         composable<ScreenInitNav.OrderDetail> {
             ScreenDetailOrder(onBack = onBack)
+        }
+
+        composable<ScreenInitNav.OrderHistory> {
+            ScreenOrderHistory(
+                onNavigateToMonitor = { navController.navigateSafe(ScreenInitNav.Monitor) },
+                onBack = onBack
+            )
         }
 
         composable<ScreenInitNav.Monitor> {

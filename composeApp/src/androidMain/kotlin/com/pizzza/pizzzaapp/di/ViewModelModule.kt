@@ -1,6 +1,7 @@
 package com.pizzza.pizzzaapp.di
 
 import com.pizzza.pizzzaapp.ui.AppViewModel
+import com.pizzza.pizzzaapp.feature.orders.OrderHistoryViewModel
 import com.pizzza.pizzzaapp.feature.orders.OrdersViewModel
 import com.pizzza.pizzzaapp.feature.cart.CartViewModel
 import com.pizzza.pizzzaapp.feature.auth.AuthViewModel
@@ -14,6 +15,7 @@ val viewModelModule = module {
     single { AppDataOrder() }
     viewModel { AppViewModel(get(), get(),get()) }
     viewModel { OrdersViewModel(get(), get(), get()) }
+    viewModel { OrderHistoryViewModel(get(), get()) }
     viewModel { CartViewModel(get(), get(), get()) }
     viewModel { AuthViewModel(get(), get(), get()) }
 }

@@ -17,6 +17,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Assignment
 import androidx.compose.material.icons.filled.Fastfood
+import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.LocalPizza
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.ShoppingCart
@@ -272,16 +273,32 @@ fun ScreenClientHome(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         if (selectedTab == 3) {
-                            IconButton(
-                                onClick = { ordersViewModel.getGeneralOrderList(forceLoading = true) },
-                                modifier = Modifier.size(32.dp)
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(4.dp)
                             ) {
-                                Icon(
-                                    imageVector = Icons.Default.Refresh,
-                                    contentDescription = "Refrescar",
-                                    tint = tay_red_400,
-                                    modifier = Modifier.size(24.dp)
-                                )
+                                IconButton(
+                                    onClick = { onNavigateTo(ScreenInitNav.OrderHistory) },
+                                    modifier = Modifier.size(32.dp)
+                                ) {
+                                    Icon(
+                                        painter = painterResource(R.drawable.ic_histories),
+                                        contentDescription = "Historial",
+                                        tint = tay_red_600,
+                                        modifier = Modifier.size(24.dp)
+                                    )
+                                }
+                                IconButton(
+                                    onClick = { ordersViewModel.getGeneralOrderList(forceLoading = true) },
+                                    modifier = Modifier.size(32.dp)
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.Refresh,
+                                        contentDescription = "Refrescar",
+                                        tint = tay_red_400,
+                                        modifier = Modifier.size(24.dp)
+                                    )
+                                }
                             }
                         } else {
                             Image(
