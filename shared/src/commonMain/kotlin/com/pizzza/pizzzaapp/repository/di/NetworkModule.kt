@@ -7,6 +7,7 @@ import com.pizzza.pizzzaapp.repository.network.exception.UiTayApiException
 import com.pizzza.pizzzaapp.repository.network.manager.InstantSerializer
 import com.pizzza.pizzzaapp.repository.utils.ConnectivityManager
 import com.pizzza.pizzzaapp.requestLogger
+import com.pizzza.pizzzaapp.shared.BuildConfig
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.HttpResponseValidator
 import io.ktor.client.plugins.HttpTimeout
@@ -142,7 +143,7 @@ val networkModule = module {
 
             install(Logging) {
                 logger = requestLogger
-                level = LogLevel.ALL
+                level = if (BuildConfig.IS_DEBUG) LogLevel.ALL else LogLevel.NONE
             }
 
             install(HttpTimeout) {

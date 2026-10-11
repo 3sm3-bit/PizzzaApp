@@ -103,6 +103,7 @@ struct PizzaView: View {
                     
                     Text(product.nameProduct)
                         .font(Font.uiMontB18)
+                        .foregroundColor(Color.black)
                         .padding(.trailing, 16)
                     
                     Text(product.description_)

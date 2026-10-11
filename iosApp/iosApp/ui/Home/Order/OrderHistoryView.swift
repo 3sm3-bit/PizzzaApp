@@ -87,7 +87,6 @@ struct OrderHistoryCardView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            // Estado y Fecha
             HStack {
                 Text(displayState)
                     .font(PizzaFonts.bold12)
@@ -104,21 +103,19 @@ struct OrderHistoryCardView: View {
                     .foregroundColor(.gray)
             }
 
-            // Descripción del pedido
             if !descriptionText.isEmpty {
                 Text(descriptionText)
                     .font(PizzaFonts.medium12)
                     .foregroundColor(.black)
             }
 
-            // Total / Precio
             HStack {
                 Text("Total:")
                     .font(PizzaFonts.medium12)
                     .foregroundColor(.gray)
                 Spacer()
                 Text("\(order.symbol)\(order.price)")
-                    .font(PizzaFonts.bold18)
+                    .font(.uiMontB18)
                     .foregroundColor(PizzaColors.red600)
             }
         }
