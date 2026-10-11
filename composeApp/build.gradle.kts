@@ -102,6 +102,7 @@ configure<com.android.build.api.dsl.ApplicationExtension> {
     productFlavors {
         create("dev") {
             dimension = "environment"
+            applicationIdSuffix = ".dev"
             resValue("string", "app_name", "Pizzzeria Dev")
         }
         create("pro") {
