@@ -4,6 +4,7 @@
 //
 
 import SwiftUI
+import Shared
 import TaySwitfUILibrary
 
 struct InfoMainView: View {
@@ -16,6 +17,10 @@ struct InfoMainView: View {
     @State private var selectedWebTitle: String? = nil
     @State private var selectedWebUrl: String? = nil
     @State private var showWeb: Bool = false
+
+    private var baseUrl: String {
+        KmmService.companion.BASE_URL.trimmingCharacters(in: CharacterSet(charactersIn: "/"))
+    }
 
     var body: some View {
         VStack(spacing: 0) {
@@ -83,9 +88,9 @@ struct InfoMainView: View {
                             title: "Términos y Condiciones",
                             subtitle: "Conoce las reglas de uso de la app"
                         ) {
-                            selectedDetailTitle = "Términos y Condiciones"
-                            selectedDetailContent = InfoStrings.guideTermsAndConditions
-                            showDetail = true
+                            selectedWebTitle = "Términos y Condiciones"
+                            selectedWebUrl = "\(baseUrl)/legal/termPizzzeria.pdf"
+                            showWeb = true
                         }
                         
                         Divider().background(Color.uiTayRed50)
@@ -95,7 +100,7 @@ struct InfoMainView: View {
                             subtitle: "Protección de tus datos personales"
                         ) {
                             selectedWebTitle = "Política de Privacidad"
-                            selectedWebUrl = "https://lapizzzeria.com/aviso-de-privacidad/"
+                            selectedWebUrl = "\(baseUrl)/legal/privacityPizzzeria.pdf"
                             showWeb = true
                         }
                     }

@@ -40,6 +40,7 @@ import androidx.compose.ui.unit.dp
 import com.pizzza.pizzzaapp.core.navigation.ScreenInitNav
 import com.pizzza.pizzzaapp.core.ui.R
 import com.pizzza.pizzzaapp.core.ui.utils.openWhatsApp
+import com.pizzza.pizzzaapp.repository.network.KmmService
 import com.valu.uitaycompose.extra.UiTayCToolBar
 import com.valu.uitaycompose.model.UiToolBarModel
 import com.valu.uitaycompose.utils.COUNTRY_CODE_MX
@@ -60,7 +61,7 @@ fun ScreenInfoMain(
     val context = LocalContext.current
     val guideHtml = androidx.compose.ui.res.stringResource(R.string.guide_how_to_use_app)
     val forgotDataHtml = androidx.compose.ui.res.stringResource(R.string.guide_forgot_data)
-    val termsHtml = androidx.compose.ui.res.stringResource(R.string.guide_terms_and_conditions)
+    val baseUrl = KmmService.BASE_URL.trimEnd('/')
 
     Scaffold(
         topBar = {
@@ -190,9 +191,9 @@ fun ScreenInfoMain(
                         subtitle = "Conoce las reglas de uso de la app",
                         onClick = {
                             onNavigateTo(
-                                ScreenInitNav.InformationDetail(
+                                ScreenInitNav.InformationWebView(
                                     title = "Términos y Condiciones",
-                                    content = termsHtml
+                                    url = "https://docs.google.com/gview?embedded=true&url=${baseUrl}/legal/termPizzzeria.pdf"
                                 )
                             )
                         }
@@ -205,7 +206,7 @@ fun ScreenInfoMain(
                             onNavigateTo(
                                 ScreenInitNav.InformationWebView(
                                     title = "Política de Privacidad",
-                                    url = "https://lapizzzeria.com/aviso-de-privacidad/"
+                                    url = "https://docs.google.com/gview?embedded=true&url=${baseUrl}/legal/privacityPizzzeria.pdf"
                                 )
                             )
                         }
