@@ -193,7 +193,7 @@ fun ScreenInfoMain(
                             onNavigateTo(
                                 ScreenInitNav.InformationWebView(
                                     title = "Términos y Condiciones",
-                                    url = "https://docs.google.com/gview?embedded=true&url=${baseUrl}/legal/termPizzzeria.pdf"
+                                    url = "https://docs.google.com/gview?embedded=true&url=$baseUrl/legal/termPizzzeria.pdf"
                                 )
                             )
                         }
@@ -206,7 +206,7 @@ fun ScreenInfoMain(
                             onNavigateTo(
                                 ScreenInitNav.InformationWebView(
                                     title = "Política de Privacidad",
-                                    url = "https://docs.google.com/gview?embedded=true&url=${baseUrl}/legal/privacityPizzzeria.pdf"
+                                    url = "https://docs.google.com/gview?embedded=true&url=$baseUrl/legal/privacityPizzzeria.pdf"
                                 )
                             )
                         }

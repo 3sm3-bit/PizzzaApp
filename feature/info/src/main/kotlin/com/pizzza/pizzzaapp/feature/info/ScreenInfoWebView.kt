@@ -54,6 +54,11 @@ fun ScreenInfoWebView(
                         @SuppressLint("SetJavaScriptEnabled")
                         settings.javaScriptEnabled = true
                         settings.domStorageEnabled = true
+                        settings.builtInZoomControls = true
+                        settings.displayZoomControls = false
+                        settings.useWideViewPort = true
+                        settings.loadWithOverviewMode = true
+                        
                         webViewClient = object : WebViewClient() {
                             override fun onPageFinished(view: WebView?, url: String?) {
                                 super.onPageFinished(view, url)
