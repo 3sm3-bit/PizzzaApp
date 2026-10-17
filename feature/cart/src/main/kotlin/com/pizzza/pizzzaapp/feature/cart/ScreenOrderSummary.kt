@@ -150,7 +150,7 @@ fun ScreenOrderSummary(
                                     color = tay_green_600
                                 )
                                 Text(
-                                    text = "$${String.format(java.util.Locale.US, "%.2f", deliveryPrice)}",
+                                    text = "$${deliveryPrice.toLong()}",
                                     style = textB14,
                                     color = tay_green_600
                                 )

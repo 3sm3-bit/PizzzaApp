@@ -7,9 +7,7 @@ import kotlin.math.sin
 import kotlin.math.sqrt
 
 object LocationUtils {
-    /**
-     * Calculates the great-circle distance in kilometers between two coordinates using the Haversine formula.
-     */
+
     fun calculateDistanceInKm(
         lat1: Double,
         lon1: Double,
@@ -28,20 +26,16 @@ object LocationUtils {
         return earthRadiusKm * c
     }
 
-    /**
-     * Calculates delivery price based on distance:
-     * - If distance <= 0.5 km (500 meters), returns minimumDeliveryPrice.
-     * - Otherwise, returns distanceInKm * deliveryPricePerKm.
-     */
     fun calculateDeliveryPrice(
         distanceKm: Double,
         deliveryPricePerKm: Double,
         minimumDeliveryPrice: Double
     ): Double {
-        return if (distanceKm <= 0.5) {
+        val rawPrice = if (distanceKm <= 0.5) {
             minimumDeliveryPrice
         } else {
             distanceKm * deliveryPricePerKm
         }
+        return kotlin.math.round(rawPrice)
     }
 }
