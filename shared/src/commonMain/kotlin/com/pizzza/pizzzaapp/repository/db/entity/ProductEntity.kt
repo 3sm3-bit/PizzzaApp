@@ -15,5 +15,8 @@ data class ProductEntity(
     val currency: String,
     val currencySymbol: String,
     val state: Boolean,
-    val urlImg: String = ""
+    val urlImg: String = "",
+    val coverageLimitKm: String = "",
+    val deliveryPricePerKm: String = "",
+    val minimumDeliveryPrice: String = ""
 )

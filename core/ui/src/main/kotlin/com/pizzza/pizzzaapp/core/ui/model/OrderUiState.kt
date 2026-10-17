@@ -36,3 +36,31 @@ fun OrderUiState.withHomeData(homeData: HomeDataModel) = copy(
     branches = if (homeData.branches.isNotEmpty()) homeData.branches else branches,
     branchId = if (homeData.branches.isNotEmpty()) homeData.defaultBranchId else branchId
 )
+
+fun OrderUiState.calculateDeliveryPrice(): Double {
+    if (receptionMode != "DELIVERY") return 0.0
+    val deliveryProduct = selectedDeliveryProduct ?: deliveryProducts.firstOrNull()
+    val defaultFallbackPrice = deliveryProduct?.price?.toDoubleOrNull() ?: 40.0
+    val selectedBranch = branches.find { it.identifier == branchId }
+    val branchLat = selectedBranch?.latitude?.toDoubleOrNull()
+    val branchLng = selectedBranch?.longitude?.toDoubleOrNull()
+    val deliveryLat = latitude.toDoubleOrNull()
+    val deliveryLng = longitude.toDoubleOrNull()
+
+    return try {
+        if (branchLat != null && branchLng != null && deliveryLat != null && deliveryLng != null) {
+            val distanceKm = com.pizzza.pizzzaapp.utils.LocationUtils.calculateDistanceInKm(branchLat, branchLng, deliveryLat, deliveryLng)
+            val pricePerKm = deliveryProduct?.deliveryPricePerKm?.toDoubleOrNull()
+                ?: deliveryProduct?.price?.toDoubleOrNull()
+                ?: 40.0
+            val minPrice = deliveryProduct?.minimumDeliveryPrice?.toDoubleOrNull()
+                ?: 40.0
+            val calculated = com.pizzza.pizzzaapp.utils.LocationUtils.calculateDeliveryPrice(distanceKm, pricePerKm, minPrice)
+            if (calculated > 0.0) kotlin.math.round(calculated) else defaultFallbackPrice
+        } else {
+            defaultFallbackPrice
+        }
+    } catch (_: Exception) {
+        defaultFallbackPrice
+    }
+}

@@ -5,6 +5,7 @@ import com.pizzza.pizzzaapp.core.ui.base.BaseViewModel
 import com.pizzza.pizzzaapp.core.ui.singleton.GlobalUiStateManager
 import com.pizzza.pizzzaapp.core.ui.model.OrderItem
 import com.pizzza.pizzzaapp.core.ui.model.OrderUiState
+import com.pizzza.pizzzaapp.core.ui.model.calculateDeliveryPrice
 import com.pizzza.pizzzaapp.core.ui.singleton.AppDataOrder
 import com.pizzza.pizzzaapp.usecases.DataUseCase
 import com.pizzza.pizzzaapp.repository.network.model.ConfirmOrderRequest
@@ -80,10 +81,7 @@ class CartViewModel(
                 val crustPrice = if (item.cheeseFilledCrust) item.product.priceChosse.toDoubleOrNull() ?: 0.0 else 0.0
                 (basePrice + crustPrice) * item.quantity
             }
-            val deliveryPercent = (state.selectedDeliveryProduct ?: state.deliveryProducts.firstOrNull())
-                ?.price?.toDoubleOrNull()
-                ?.let { it / 100.0 } ?: 0.20
-            val deliveryPriceDouble = if (state.receptionMode == "DELIVERY") kotlin.math.round(cartProductsTotal * deliveryPercent) else 0.0
+            val deliveryPriceDouble = state.calculateDeliveryPrice()
             val deliveryPriceStr = if (state.receptionMode == "DELIVERY") deliveryPriceDouble.toLong().toString() else "0"
             val total = cartProductsTotal + deliveryPriceDouble
 
@@ -170,12 +168,7 @@ class CartViewModel(
                             val crustPrice = if (item.cheeseFilledCrust) item.product.priceChosse.toDoubleOrNull() ?: 0.0 else 0.0
                             (basePrice + crustPrice) * item.quantity
                         }
-                        val deliveryPercent = (state.selectedDeliveryProduct ?: state.deliveryProducts.firstOrNull())
-                            ?.price?.toDoubleOrNull()
-                            ?.let { it / 100.0 } ?: 0.20
-                        val deliveryPriceDouble = if (state.receptionMode == "DELIVERY") {
-                            kotlin.math.round(cartProductsTotal * deliveryPercent)
-                        } else 0.0
+                        val deliveryPriceDouble = state.calculateDeliveryPrice()
                         val deliveryPrice = deliveryPriceDouble.toLong().toString()
 
                         val orderRequest = state.cart.mapIndexed { index, item ->

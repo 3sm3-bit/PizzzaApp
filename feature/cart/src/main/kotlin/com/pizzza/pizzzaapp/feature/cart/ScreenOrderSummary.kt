@@ -11,6 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.pizzza.pizzzaapp.core.ui.singleton.LocalAppDataOrder
+import com.pizzza.pizzzaapp.core.ui.model.calculateDeliveryPrice
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -47,12 +48,7 @@ fun ScreenOrderSummary(
         (basePrice + crustPrice) * it.quantity
     }
     
-    val deliveryPercent = (uiState.selectedDeliveryProduct ?: uiState.deliveryProducts.firstOrNull())
-        ?.price?.toDoubleOrNull()
-        ?.let { it / 100.0 } ?: 0.20
-    val deliveryPrice = if (uiState.receptionMode == "DELIVERY") {
-        kotlin.math.round(cartProductsTotal * deliveryPercent)
-    } else 0.0
+    val deliveryPrice = uiState.calculateDeliveryPrice()
     val cartTotal = cartProductsTotal + deliveryPrice
 
     Scaffold(

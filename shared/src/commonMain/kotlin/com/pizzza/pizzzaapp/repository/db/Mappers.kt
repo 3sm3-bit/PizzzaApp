@@ -88,7 +88,10 @@ fun ProductEntity.toModel() = ProductModel(
     currency = currency,
     currencySymbol = currencySymbol,
     state = state,
-    urlImg = urlImg
+    urlImg = urlImg,
+    coverageLimitKm = coverageLimitKm,
+    deliveryPricePerKm = deliveryPricePerKm,
+    minimumDeliveryPrice = minimumDeliveryPrice
 )
 
 fun ProductModel.toEntity() = ProductEntity(
@@ -102,7 +105,10 @@ fun ProductModel.toEntity() = ProductEntity(
     currency = currency,
     currencySymbol = currencySymbol,
     state = state,
-    urlImg = urlImg
+    urlImg = urlImg,
+    coverageLimitKm = coverageLimitKm,
+    deliveryPricePerKm = deliveryPricePerKm,
+    minimumDeliveryPrice = minimumDeliveryPrice
 )
 
 fun List<ProductEntity>.toProductModelList() = map { it.toModel() }

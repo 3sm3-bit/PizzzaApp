@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "d5cca68132484cb78c944f9c2b65fc10",
+    "identityHash": "a389603a7a6e926985ed34c1ecf399b6",
     "entities": [
       {
         "tableName": "parent_orders",
@@ -132,7 +132,7 @@
       },
       {
         "tableName": "products",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`uid` TEXT NOT NULL, `nameProduct` TEXT NOT NULL, `type` TEXT NOT NULL, `price` TEXT NOT NULL, `tamanio` TEXT NOT NULL, `description` TEXT NOT NULL, `priceChosse` TEXT NOT NULL, `currency` TEXT NOT NULL, `currencySymbol` TEXT NOT NULL, `state` INTEGER NOT NULL, `urlImg` TEXT NOT NULL, PRIMARY KEY(`uid`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`uid` TEXT NOT NULL, `nameProduct` TEXT NOT NULL, `type` TEXT NOT NULL, `price` TEXT NOT NULL, `tamanio` TEXT NOT NULL, `description` TEXT NOT NULL, `priceChosse` TEXT NOT NULL, `currency` TEXT NOT NULL, `currencySymbol` TEXT NOT NULL, `state` INTEGER NOT NULL, `urlImg` TEXT NOT NULL, `coverageLimitKm` TEXT NOT NULL, `deliveryPricePerKm` TEXT NOT NULL, `minimumDeliveryPrice` TEXT NOT NULL, PRIMARY KEY(`uid`))",
         "fields": [
           {
             "fieldPath": "uid",
@@ -197,6 +197,24 @@
           {
             "fieldPath": "urlImg",
             "columnName": "urlImg",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "coverageLimitKm",
+            "columnName": "coverageLimitKm",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "deliveryPricePerKm",
+            "columnName": "deliveryPricePerKm",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "minimumDeliveryPrice",
+            "columnName": "minimumDeliveryPrice",
             "affinity": "TEXT",
             "notNull": true
           }
@@ -307,7 +325,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'd5cca68132484cb78c944f9c2b65fc10')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'a389603a7a6e926985ed34c1ecf399b6')"
     ]
   }
 }

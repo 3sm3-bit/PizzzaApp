@@ -11,11 +11,46 @@ struct CartView: View {
     @State private var showOrderSummary = false
     @State var destiny: ActionNav?
     
+    var calculatedDistanceKm: Double? {
+        guard let selectedBranch = cartManager.branches.first(where: { $0.identifier == cartManager.branchId }),
+              let branchLat = Double(selectedBranch.latitude),
+              let branchLng = Double(selectedBranch.longitude),
+              let deliveryLat = Double(cartManager.latitude),
+              let deliveryLng = Double(cartManager.longitude) else {
+            return nil
+        }
+        return LocationUtils.shared.calculateDistanceInKm(
+            lat1: branchLat, lon1: branchLng,
+            lat2: deliveryLat, lon2: deliveryLng
+        )
+    }
+
+    var coverageLimitKm: Double {
+        if let firstDeliveryProduct = cartManager.deliveryProducts.first,
+           let limit = Double(firstDeliveryProduct.coverageLimitKm) {
+            return limit
+        }
+        return 5.0
+    }
+
+    var isDistanceValid: Bool {
+        if cartManager.receptionMode == "DELIVERY" {
+            if let dist = calculatedDistanceKm {
+                return dist <= coverageLimitKm
+            }
+            return true
+        }
+        return true
+    }
+
     var isButtonEnabled: Bool {
         if cartManager.receptionMode == "RECOJO" {
             return !cartManager.cart.isEmpty
         } else {
-            return !cartManager.cart.isEmpty && !cartManager.deliveryAddress.isEmpty && cartManager.deliveryAddress != "Selecciona dirección en el mapa"
+            return !cartManager.cart.isEmpty && 
+                   !cartManager.deliveryAddress.isEmpty && 
+                   cartManager.deliveryAddress != "Selecciona dirección en el mapa" &&
+                   isDistanceValid
         }
     }
     
@@ -78,6 +113,12 @@ struct CartView: View {
                                     .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.black, lineWidth: 1))
                                 }
                                 .buttonStyle(PlainButtonStyle())
+
+                                if !isDistanceValid {
+                                    Text("⚠️ Aún no contamos con delivery para tu ubicación. Elige una ubicación más cercana.")
+                                        .font(PizzaFonts.medium12)
+                                        .foregroundColor(Color.uiTayRed600)
+                                }
                             }
                             
                             ForEach(cartManager.cart) { item in

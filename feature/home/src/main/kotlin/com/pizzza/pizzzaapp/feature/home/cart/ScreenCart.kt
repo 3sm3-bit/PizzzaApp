@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.dp
 import com.pizzza.pizzzaapp.feature.cart.CartViewModel
 import com.pizzza.pizzzaapp.feature.cart.CartItemCard
 import com.pizzza.pizzzaapp.core.ui.singleton.LocalAppDataOrder
+import com.pizzza.pizzzaapp.utils.LocationUtils
 import com.valu.uitaycompose.utils.*
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -35,12 +36,33 @@ fun ScreenCart(
 ) {
     val cartViewModel: CartViewModel = koinViewModel()
     val uiState by LocalAppDataOrder.current.state.collectAsStateWithLifecycle()
+
+    val selectedBranch = uiState.branches.find { it.identifier == uiState.branchId }
+    val branchLat = selectedBranch?.latitude?.toDoubleOrNull()
+    val branchLng = selectedBranch?.longitude?.toDoubleOrNull()
+    val deliveryLat = uiState.latitude.toDoubleOrNull()
+    val deliveryLng = uiState.longitude.toDoubleOrNull()
+
+    val calculatedDistanceKm = if (branchLat != null && branchLng != null && deliveryLat != null && deliveryLng != null) {
+        LocationUtils.calculateDistanceInKm(branchLat, branchLng, deliveryLat, deliveryLng)
+    } else null
+
+    val selectedDeliveryProduct = uiState.deliveryProducts.firstOrNull()
+    val coverageLimitKm = selectedDeliveryProduct?.coverageLimitKm?.toDoubleOrNull() ?: 5.0
+
+    val isDistanceValid = if (uiState.receptionMode == "DELIVERY") {
+        calculatedDistanceKm == null || calculatedDistanceKm <= coverageLimitKm
+    } else {
+        true
+    }
+
     val isButtonEnabled = if (uiState.receptionMode == "RECOJO") {
         uiState.cart.isNotEmpty()
     } else {
         (uiState.cart.isNotEmpty()) &&
                 (uiState.deliveryAddress.isNotBlank()) &&
-                (uiState.deliveryAddress != "Selecciona dirección en el mapa")
+                (uiState.deliveryAddress != "Selecciona dirección en el mapa") &&
+                isDistanceValid
     }
 
     LaunchedEffect(Unit) {
@@ -172,6 +194,16 @@ fun ScreenCart(
                                     }
                                 }
                             }
+
+                            if (uiState.receptionMode == "DELIVERY" && !isDistanceValid) {
+                                Spacer(Modifier.height(12.dp))
+                                Text(
+                                    text = "⚠️ Aún no contamos con delivery para tu ubicación. Elige una ubicación más cercana.",
+                                    style = textM12,
+                                    color = tay_red_600,
+                                    modifier = Modifier.fillMaxWidth()
+                                )
+                            }
                         }
                     }
 
@@ -190,6 +222,8 @@ fun ScreenCart(
         }
 
         if (uiState.cart.isNotEmpty()) {
+
+
             Box(
                 modifier = Modifier
                     .align(Alignment.BottomEnd)

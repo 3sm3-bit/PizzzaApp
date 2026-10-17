@@ -27,7 +27,13 @@ data class ProductResponse(
     @SerialName("urlImg")
     val urlImg: String? = "",
     @SerialName("uid")
-    val uid: String? = ""
+    val uid: String? = "",
+    @SerialName("coverageLimitKm")
+    val coverageLimitKm: String? = "",
+    @SerialName("deliveryPricePerKm")
+    val deliveryPricePerKm: String? = "",
+    @SerialName("minimumDeliveryPrice")
+    val minimumDeliveryPrice: String? = ""
 )
 
 fun List<ProductResponse>.toModelList() = map {
@@ -42,7 +48,10 @@ fun List<ProductResponse>.toModelList() = map {
         currencySymbol = it.currencySymbol ?: "",
         state = it.state ?: true,
         urlImg = it.urlImg ?: "",
-        uid = it.uid ?: ""
+        uid = it.uid ?: "",
+        coverageLimitKm = it.coverageLimitKm ?: "",
+        deliveryPricePerKm = it.deliveryPricePerKm ?: "",
+        minimumDeliveryPrice = it.minimumDeliveryPrice ?: ""
     )
 }
 
@@ -57,5 +66,8 @@ fun ProductModel.toResponse() = ProductResponse(
     currencySymbol = currencySymbol,
     state = state,
     urlImg = urlImg,
-    uid = uid
+    uid = uid,
+    coverageLimitKm = coverageLimitKm,
+    deliveryPricePerKm = deliveryPricePerKm,
+    minimumDeliveryPrice = minimumDeliveryPrice
 )

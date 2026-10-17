@@ -11,5 +11,8 @@ data class ProductModel(
     val currencySymbol: String = "",
     val state: Boolean = true,
     val uid: String = "",
-    val urlImg: String = ""
+    val urlImg: String = "",
+    val coverageLimitKm: String = "",
+    val deliveryPricePerKm: String = "",
+    val minimumDeliveryPrice: String = ""
 )

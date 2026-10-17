@@ -34,16 +34,33 @@ class CartManager: ObservableObject {
         }
     }
 
-    var deliveryPercent: Double {
-        if let firstDeliveryProduct = deliveryProducts.first,
-           let priceValue = Double(firstDeliveryProduct.price), priceValue > 0 {
-            return priceValue / 100.0
-        }
-        return 0.20
-    }
-
     var deliveryFee: Double {
-        return receptionMode == "DELIVERY" ? round(totalPrice * deliveryPercent) : 0.0
+        guard receptionMode == "DELIVERY" else { return 0.0 }
+        let fallbackPrice = Double(deliveryProducts.first?.price ?? "") ?? 40.0
+        guard let selectedBranch = branches.first(where: { $0.identifier == branchId }),
+              let branchLat = Double(selectedBranch.latitude),
+              let branchLng = Double(selectedBranch.longitude),
+              let deliveryLat = Double(latitude),
+              let deliveryLng = Double(longitude) else {
+            return fallbackPrice
+        }
+        
+        let distanceKm = LocationUtils.shared.calculateDistanceInKm(
+            lat1: branchLat, lon1: branchLng,
+            lat2: deliveryLat, lon2: deliveryLng
+        )
+        
+        let deliveryProduct = deliveryProducts.first
+        let pricePerKm = Double(deliveryProduct?.deliveryPricePerKm ?? "") ?? Double(deliveryProduct?.price ?? "") ?? 40.0
+        let minPrice = Double(deliveryProduct?.minimumDeliveryPrice ?? "") ?? 40.0
+        
+        let calculatedPrice = LocationUtils.shared.calculateDeliveryPrice(
+            distanceKm: distanceKm,
+            deliveryPricePerKm: pricePerKm,
+            minimumDeliveryPrice: minPrice
+        )
+        let rounded = round(calculatedPrice)
+        return rounded > 0.0 ? rounded : fallbackPrice
     }
     
     var finalTotal: Double {
