@@ -2,6 +2,31 @@ import SwiftUI
 import TaySwitfUILibrary
 import MapKit
 import Contacts
+import CoreLocation
+
+class LocationManager: NSObject, ObservableObject, CLLocationManagerDelegate {
+    private let manager = CLLocationManager()
+    @Published var userLocation: CLLocationCoordinate2D?
+    
+    override init() {
+        super.init()
+        manager.delegate = self
+        manager.desiredAccuracy = kCLLocationAccuracyBest
+    }
+    
+    func requestLocation() {
+        manager.requestWhenInUseAuthorization()
+        manager.startUpdatingLocation()
+    }
+    
+    nonisolated func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+        guard let location = locations.last else { return }
+        Task { @MainActor in
+            userLocation = location.coordinate
+            manager.stopUpdatingLocation()
+        }
+    }
+}
 
 struct AddressSelectionView: View {
     var initialLat: String? = nil
@@ -20,8 +45,8 @@ struct AddressSelectionView: View {
     @State private var searchResults: [MKMapItem] = []
     @State private var isSelectingSearch = false
     
-    // Servicio de ubicación de TaySwitfUILibrary
-    @StateObject private var locationService = UILocation()
+    // Location Manager local
+    @StateObject private var locationService = LocationManager()
     
     @Environment(\.dismiss) var dismiss
 
@@ -196,25 +221,25 @@ struct AddressSelectionView: View {
             .ignoresSafeArea(.all, edges: .bottom)
             .onAppear {
                 if initialLat == nil {
-                    locationService.getCurrentLocation()
+                    locationService.requestLocation()
                 } else {
                     updateAddress()
                 }
             }
-            .onChange(of: locationService.lastLocation) { newLocation in
-                if let coord = newLocation, initialLat == nil {
+            .onChange(of: locationService.userLocation) {
+                if let coord = locationService.userLocation, initialLat == nil {
                     region = MKCoordinateRegion(
                         center: coord,
                         span: MKCoordinateSpan(latitudeDelta: 0.002, longitudeDelta: 0.002)
                     )
                 }
             }
-            .onChange(of: region.center.latitude) { _ in
+            .onChange(of: region.center.latitude) {
                 if !isSelectingSearch {
                     debounceAddressUpdate()
                 }
             }
-            .onChange(of: region.center.longitude) { _ in
+            .onChange(of: region.center.longitude) {
                 if !isSelectingSearch {
                     debounceAddressUpdate()
                 }
@@ -311,7 +336,7 @@ struct AddressSelectionView: View {
             if let postalAddress = placemark.postalAddress {
                 let street = postalAddress.street
                 let neighborhood = placemark.subLocality ?? ""
-                let country = postalAddress.country ?? ""
+                let country = postalAddress.country
                 
                 var parts: [String] = []
                 if !street.isEmpty { parts.append(street) }
