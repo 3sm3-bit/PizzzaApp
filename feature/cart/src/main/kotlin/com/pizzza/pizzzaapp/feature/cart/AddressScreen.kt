@@ -33,6 +33,7 @@ import com.google.android.libraries.places.api.Places
 import com.google.android.libraries.places.api.model.AutocompletePrediction
 import com.google.android.libraries.places.api.model.AutocompleteSessionToken
 import com.google.android.libraries.places.api.model.Place
+import com.google.android.libraries.places.api.model.RectangularBounds
 import com.google.android.libraries.places.api.net.FetchPlaceRequest
 import com.google.android.libraries.places.api.net.FindAutocompletePredictionsRequest
 import com.google.maps.android.compose.*
@@ -43,6 +44,7 @@ import com.valu.uitaycompose.model.UiToolBarModel
 import com.valu.uitaycompose.utils.tay_red_600
 import com.valu.uitaycompose.utils.textM12
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.Locale
@@ -89,13 +91,21 @@ fun AddressScreen(
         }
     }
 
+    val aguascalientesBounds = remember {
+        RectangularBounds.newInstance(
+            LatLng(21.6000, -102.5000),
+            LatLng(22.1500, -102.1000)
+        )
+    }
+
     fun performGeocoderSearch(query: String) {
-        android.util.Log.i("PIZZZA_PLACES", "🔄 Ejecutando búsqueda de respaldo con Geocoder para: '$query'")
+        val localizedQuery = if (query.contains("Aguascalientes", ignoreCase = true)) query else "$query, Aguascalientes, México"
+        android.util.Log.i("PIZZZA_PLACES", "🔄 Ejecutando búsqueda de respaldo con Geocoder para: '$localizedQuery'")
         scope.launch(Dispatchers.IO) {
             try {
                 val geocoder = Geocoder(context, Locale.getDefault())
                 @Suppress("DEPRECATION")
-                val addresses = geocoder.getFromLocationName(query, 5)
+                val addresses = geocoder.getFromLocationName(localizedQuery, 5, 21.6000, -102.5000, 22.1500, -102.1000)
                 withContext(Dispatchers.Main) {
                     geocoderResults = addresses ?: emptyList()
                     android.util.Log.i("PIZZZA_PLACES", "📍 Geocoder devolvió ${geocoderResults.size} resultados")
@@ -121,9 +131,11 @@ fun AddressScreen(
 
         val client = placesClient
         if (client != null && Places.isInitialized()) {
-            android.util.Log.i("PIZZZA_PLACES", "🔍 Buscando predicciones en Places API (con sesión) para: '$query'...")
+            android.util.Log.i("PIZZZA_PLACES", "🔍 Buscando predicciones en Places API para: '$query' (México/Aguascalientes)...")
             val request = FindAutocompletePredictionsRequest.builder()
                 .setSessionToken(token)
+                .setCountries("MX")
+                .setLocationBias(aguascalientesBounds)
                 .setQuery(query)
                 .build()
 
@@ -259,6 +271,17 @@ fun AddressScreen(
         }
     }
 
+    LaunchedEffect(searchQuery) {
+        if (searchQuery.isBlank() || searchQuery.length < 3) {
+            placesResults = emptyList()
+            geocoderResults = emptyList()
+            sessionToken = null
+        } else {
+            delay(1000)
+            searchAddress(searchQuery)
+        }
+    }
+
     Scaffold(
         topBar = {
             Surface(color = Color.White) {
@@ -303,7 +326,11 @@ fun AddressScreen(
                     value = searchQuery,
                     onValueChange = {
                         searchQuery = it
-                        searchAddress(it)
+                        if (it.isBlank()) {
+                            placesResults = emptyList()
+                            geocoderResults = emptyList()
+                            sessionToken = null
+                        }
                     },
                     placeholder = { Text("Buscar dirección o lugar...", style = textM12, color = Color.Gray) },
                     leadingIcon = { Icon(Icons.Default.Search, contentDescription = null, tint = tay_red_600) },
@@ -329,7 +356,7 @@ fun AddressScreen(
                     modifier = Modifier.fillMaxWidth()
                 )
 
-                if (placesResults.isNotEmpty()) {
+                if (searchQuery.isNotBlank() && placesResults.isNotEmpty()) {
                     Spacer(Modifier.height(4.dp))
                     Card(
                         modifier = Modifier.fillMaxWidth(),
@@ -362,7 +389,7 @@ fun AddressScreen(
                             }
                         }
                     }
-                } else if (geocoderResults.isNotEmpty()) {
+                } else if (searchQuery.isNotBlank() && geocoderResults.isNotEmpty()) {
                     Spacer(Modifier.height(4.dp))
                     Card(
                         modifier = Modifier.fillMaxWidth(),
