@@ -20,6 +20,9 @@ struct AddressSelectionView: View {
     @State private var searchResults: [MKMapItem] = []
     @State private var isSelectingSearch = false
     
+    // Servicio de ubicación de TaySwitfUILibrary
+    @StateObject private var locationService = UILocation()
+    
     @Environment(\.dismiss) var dismiss
 
     init(initialLat: String? = nil, initialLng: String? = nil, initialAddress: String? = nil, onConfirm: @escaping (String, String, String) -> Void) {
@@ -193,7 +196,17 @@ struct AddressSelectionView: View {
             .ignoresSafeArea(.all, edges: .bottom)
             .onAppear {
                 if initialLat == nil {
+                    locationService.getCurrentLocation()
+                } else {
                     updateAddress()
+                }
+            }
+            .onChange(of: locationService.lastLocation) { newLocation in
+                if let coord = newLocation, initialLat == nil {
+                    region = MKCoordinateRegion(
+                        center: coord,
+                        span: MKCoordinateSpan(latitudeDelta: 0.002, longitudeDelta: 0.002)
+                    )
                 }
             }
             .onChange(of: region.center.latitude) { _ in
