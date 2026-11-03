@@ -19,7 +19,7 @@ class AppViewModel: BaseViewModel {
     
     func loadValidate(){
         DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-            if(UtilsSecurity.getJailbrokenStatus()){
+            if(!UtilsSecurity.getJailbrokenStatus()){
                 self.setErrorUI(code: "0",title : "Ocurrio un error"
                                 ,message: "Se detecto una vulnerabilidad, intentelo mas tarde",
                                 action: .finalizeView)

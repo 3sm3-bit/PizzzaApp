@@ -339,16 +339,47 @@ struct AddressSelectionView: View {
                 return
             }
             
-            if let postalAddress = placemark.postalAddress {
-                let street = postalAddress.street
-                let neighborhood = placemark.subLocality ?? ""
-                let country = postalAddress.country
-                
-                var parts: [String] = []
-                if !street.isEmpty { parts.append(street) }
-                if !neighborhood.isEmpty { parts.append(neighborhood) }
-                if !country.isEmpty { parts.append(country) }
-                
+            var parts: [String] = []
+            
+            let thoroughfare = placemark.thoroughfare ?? ""
+            let subThoroughfare = placemark.subThoroughfare ?? ""
+            let name = placemark.name ?? ""
+            
+            var streetPart = ""
+            if !thoroughfare.isEmpty {
+                streetPart = thoroughfare
+                if !subThoroughfare.isEmpty {
+                    streetPart += " \(subThoroughfare)"
+                }
+            } else if !name.isEmpty {
+                streetPart = name
+            }
+            
+            if !streetPart.isEmpty {
+                parts.append(streetPart)
+            }
+            
+            let neighborhood = placemark.subLocality ?? ""
+            if !neighborhood.isEmpty {
+                parts.append(neighborhood)
+            }
+            
+            let city = placemark.locality ?? ""
+            if !city.isEmpty {
+                parts.append(city)
+            }
+            
+            let state = placemark.administrativeArea ?? ""
+            if !state.isEmpty {
+                parts.append(state)
+            }
+            
+            let country = placemark.country ?? ""
+            if !country.isEmpty {
+                parts.append(country)
+            }
+            
+            if !parts.isEmpty {
                 self.address = parts.joined(separator: ", ")
             } else {
                 self.address = placemark.name ?? "Ubicación seleccionada"

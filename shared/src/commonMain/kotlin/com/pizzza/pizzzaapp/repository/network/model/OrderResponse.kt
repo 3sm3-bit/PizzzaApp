@@ -98,6 +98,7 @@ fun List<OrderResponse>.loadOrder() = this.map {
         longitude = it.longitude ?: "0",
         currentLatitude = it.currentLatitude ?: "0",
         currentLongitude = it.currentLongitude ?: "0",
-        statePay = it.statePay ?: "PENDIENTE"
+        statePay = it.statePay ?: "PENDIENTE",
+        canal = it.canal ?: "PENDIENTE"
     )
 }

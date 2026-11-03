@@ -276,7 +276,7 @@ class CartManager: ObservableObject {
                         currentLatitude: "0",
                         currentLongitude: "0",
                         statePay: statePay,
-                        canal: "I7K4M3"
+                        canal: "A1P9X2"
                     )
                 }
                 
