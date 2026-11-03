@@ -56,7 +56,7 @@ import com.valu.uitaycompose.utils.textB20
 import com.valu.uitaycompose.utils.textM14
 import kotlinx.coroutines.delay
 import org.koin.compose.viewmodel.koinViewModel
-import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -83,7 +83,7 @@ fun ScreenMonitor(
     LaunchedEffect(Unit) {
         while (true) {
             viewModel.getOrderDetail(order.uid)
-            delay(1.minutes)
+            delay(20.seconds)
         }
     }
 

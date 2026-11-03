@@ -177,7 +177,7 @@ struct OrderItemCard: View {
                         .foregroundColor(.white)
                         .frame(maxWidth: .infinity)
                         .frame(height: 36)
-                        .background(PizzaColors.red600)
+                        .background(Color.uiTayRed600)
                         .cornerRadius(8)
                 }
                 .padding(.top, 4)
