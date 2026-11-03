@@ -100,6 +100,17 @@ fun ScreenMonitor(
         )
     }
 
+    val deliveryMarkerState = rememberMarkerState(position = deliveryLatLng)
+    val driverMarkerState = rememberMarkerState(position = driverLatLng)
+
+    LaunchedEffect(deliveryLatLng) {
+        deliveryMarkerState.position = deliveryLatLng
+    }
+
+    LaunchedEffect(driverLatLng) {
+        driverMarkerState.position = driverLatLng
+    }
+
     val curvedPath = remember(deliveryLatLng, driverLatLng) {
         generateCurvedPath(driverLatLng, deliveryLatLng)
     }
@@ -154,14 +165,14 @@ fun ScreenMonitor(
                 )
 
                 Marker(
-                    state = rememberMarkerState(position = deliveryLatLng),
+                    state = deliveryMarkerState,
                     title = "Entrega",
                     snippet = order.address,
                     icon = houseIcon
                 )
 
                 Marker(
-                    state = rememberMarkerState(position = driverLatLng),
+                    state = driverMarkerState,
                     title = "Repartidor",
                     snippet = "En camino",
                     icon = driverIcon
