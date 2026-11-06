@@ -28,14 +28,9 @@ object LocationUtils {
 
     fun calculateDeliveryPrice(
         distanceKm: Double,
-        deliveryPricePerKm: Double,
-        minimumDeliveryPrice: Double
+        deliveryPricePerKm: Double
     ): Double {
-        val rawPrice = if (distanceKm <= 0.5) {
-            minimumDeliveryPrice
-        } else {
-            distanceKm * deliveryPricePerKm
-        }
-        return kotlin.math.round(rawPrice)
+        val billedKm = kotlin.math.ceil(distanceKm).coerceAtLeast(1.0)
+        return kotlin.math.round(billedKm * deliveryPricePerKm)
     }
 }
