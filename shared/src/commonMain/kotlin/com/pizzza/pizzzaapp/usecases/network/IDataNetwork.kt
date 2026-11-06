@@ -28,6 +28,8 @@ interface IDataNetwork {
 
     suspend fun confirmOrderMobile(ordenGeneralUid: String, request: ConfirmOrderRequest = ConfirmOrderRequest()): CreateOrderMobileResponse
 
+    suspend fun calculatePriceDelivery(branchId: String, latitude: String, longitude: String): String
+
     suspend fun registerUser(data: UserResponse): String
 
     suspend fun deleteUser(userId: String): String

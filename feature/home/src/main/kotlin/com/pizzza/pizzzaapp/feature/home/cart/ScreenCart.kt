@@ -230,7 +230,13 @@ fun ScreenCart(
                     .padding(12.dp)
             ) {
                 Surface(
-                    onClick = { if (isButtonEnabled) onNavigateToSummary() },
+                    onClick = { 
+                        if (isButtonEnabled) {
+                            cartViewModel.fetchAndCalculateDeliveryPrice {
+                                onNavigateToSummary()
+                            }
+                        }
+                    },
                     color = if (isButtonEnabled) tay_green_600 else Color.LightGray,
                     shape = RoundedCornerShape(16.dp),
                     modifier = Modifier

@@ -149,7 +149,11 @@ struct CartView: View {
                 .padding(16)
                 .padding(.bottom, 40)
                 .onTapGesture {
-                    destiny = .uiNext
+                    if isButtonEnabled {
+                        cartManager.fetchServerDeliveryPrice {
+                            destiny = .uiNext
+                        }
+                    }
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomTrailing)
             }
@@ -164,9 +168,7 @@ struct CartView: View {
                 initialLng: cartManager.longitude,
                 initialAddress: cartManager.deliveryAddress
             ) { address, lat, lng in
-                cartManager.deliveryAddress = address
-                cartManager.latitude = lat
-                cartManager.longitude = lng
+                cartManager.updateDeliveryAddress(address: address, lat: lat, lng: lng)
             }
         }, when: $destiny.cmToBool(.uiNextAlter))
         .uiTayNavigate(to: {

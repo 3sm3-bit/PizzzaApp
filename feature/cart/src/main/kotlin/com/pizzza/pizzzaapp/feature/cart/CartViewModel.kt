@@ -66,8 +66,27 @@ class CartViewModel(
             it.copy(
                 deliveryAddress = address,
                 latitude = lat,
-                longitude = lng
+                longitude = lng,
+                serverCalculatedDeliveryPrice = null
             )
+        }
+    }
+
+    fun fetchAndCalculateDeliveryPrice(onReady: () -> Unit) {
+        val state = cartUiState.value
+        if (state.receptionMode != "DELIVERY") {
+            onReady()
+            return
+        }
+        execute(globalUiStateManager = globalUiStateManager) {
+            try {
+                val priceStr = dataUseCase.calculatePriceDelivery(state.branchId, state.latitude, state.longitude)
+                val priceDouble = priceStr.toDoubleOrNull()
+                if (priceDouble != null) {
+                    appDataOrder.update { it.copy(serverCalculatedDeliveryPrice = priceDouble) }
+                }
+            } catch (_: Exception) {}
+            onReady()
         }
     }
 

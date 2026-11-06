@@ -11,6 +11,7 @@ import com.pizzza.pizzzaapp.repository.network.model.RefreshTokenRequest
 import com.pizzza.pizzzaapp.repository.network.model.RefreshTokenResponse
 import com.pizzza.pizzzaapp.repository.network.model.ConfirmOrderRequest
 import com.pizzza.pizzzaapp.repository.network.model.CreateOrderMobileResponse
+import com.pizzza.pizzzaapp.repository.network.model.CalculatePriceDeliveryRequest
 import com.pizzza.pizzzaapp.shared.BuildConfig
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
@@ -78,6 +79,15 @@ class KmmService(private val client: HttpClient) {
             contentType(ContentType.Application.Json)
             setBody(request)
         }.body()
+    }
+
+    suspend fun calculatePriceDelivery(request: CalculatePriceDeliveryRequest, token: String? = null): String {
+        val responseText = client.post("${BASE_URL}/pizzzeria/calculateprinedelivery") {
+            addAuthToken(token)
+            contentType(ContentType.Application.Json)
+            setBody(request)
+        }.bodyAsText()
+        return responseText.trim().removeSurrounding("\"")
     }
 
     suspend fun confirmOrderMobile(ordenGeneralUid: String, request: ConfirmOrderRequest = ConfirmOrderRequest(), token: String? = null): CreateOrderMobileResponse {

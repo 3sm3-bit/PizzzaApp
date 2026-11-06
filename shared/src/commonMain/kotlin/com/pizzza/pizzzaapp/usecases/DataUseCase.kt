@@ -81,6 +81,10 @@ class DataUseCase(private val iDataNetwork: IDataNetwork, private val iDataDBNet
         iDataNetwork.confirmOrderMobile(ordenGeneralUid, request)
 
     @Throws(Exception::class)
+    suspend fun calculatePriceDelivery(branchId: String, latitude: String, longitude: String) =
+        iDataNetwork.calculatePriceDelivery(branchId, latitude, longitude)
+
+    @Throws(Exception::class)
     suspend fun registerUser(data: UserResponse) = iDataNetwork.registerUser(data)
 
     @Throws(Exception::class)

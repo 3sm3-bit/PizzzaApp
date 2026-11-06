@@ -42,6 +42,12 @@ class DataNetwork(
         apiService.confirmOrderMobile(ordenGeneralUid, request = request, token = token)
     }
 
+    override suspend fun calculatePriceDelivery(branchId: String, latitude: String, longitude: String): String = apiCall {
+        val token = dataBase.getUserLocal()?.token
+        val request = com.pizzza.pizzzaapp.repository.network.model.CalculatePriceDeliveryRequest(branchId = branchId, latitude = latitude, longitude = longitude)
+        apiService.calculatePriceDelivery(request, token = token)
+    }
+
     override suspend fun loadParentOrder(userId: String): List<ParentOrderModel> {
         return apiCall({
             val token = dataBase.getUserLocal()?.token

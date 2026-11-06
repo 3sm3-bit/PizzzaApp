@@ -22,6 +22,7 @@ class CartManager: ObservableObject {
     @Published var selectedProduct: ProductModel? = nil
     @Published var pendingOrderUid: String = ""
     @Published var userName: String = ""
+    @Published var serverCalculatedDeliveryFee: Double? = nil
     
     private let dataUseCase = KoinHelper.shared.getDataUseCase()
     
@@ -36,30 +37,8 @@ class CartManager: ObservableObject {
 
     var deliveryFee: Double {
         guard receptionMode == "DELIVERY" else { return 0.0 }
-        let fallbackPrice = Double(deliveryProducts.first?.price ?? "") ?? 40.0
-        guard let selectedBranch = branches.first(where: { $0.identifier == branchId }),
-              let branchLat = Double(selectedBranch.latitude),
-              let branchLng = Double(selectedBranch.longitude),
-              let deliveryLat = Double(latitude),
-              let deliveryLng = Double(longitude) else {
-            return fallbackPrice
-        }
-        
-        let distanceKm = LocationUtils.shared.calculateDistanceInKm(
-            lat1: branchLat, lon1: branchLng,
-            lat2: deliveryLat, lon2: deliveryLng
-        )
-        
-        let deliveryProduct = deliveryProducts.first
-        let pricePerKm = Double(deliveryProduct?.deliveryPricePerKm ?? "") ?? Double(deliveryProduct?.price ?? "") ?? 40.0
-        let minPrice = Double(deliveryProduct?.minimumDeliveryPrice ?? "") ?? 40.0
-        
-        let calculatedPrice = LocationUtils.shared.calculateDeliveryPrice(
-            distanceKm: distanceKm,
-            deliveryPricePerKm: pricePerKm
-        )
-        let rounded = round(calculatedPrice)
-        return rounded > 0.0 ? rounded : fallbackPrice
+        if let serverFee = serverCalculatedDeliveryFee { return serverFee }
+        return Double(deliveryProducts.first?.price ?? "") ?? 40.0
     }
     
     var finalTotal: Double {
@@ -103,8 +82,33 @@ class CartManager: ObservableObject {
         deliveryAddress = ""
         latitude = ""
         longitude = ""
+        serverCalculatedDeliveryFee = nil
         ordersLoaded = false
         selectedTab = 0
+    }
+
+    func updateDeliveryAddress(address: String, lat: String, lng: String) {
+        self.deliveryAddress = address
+        self.latitude = lat
+        self.longitude = lng
+        self.serverCalculatedDeliveryFee = nil
+    }
+
+    func fetchServerDeliveryPrice(completion: @escaping () -> Void) {
+        guard receptionMode == "DELIVERY", !branchId.isEmpty, !latitude.isEmpty, !longitude.isEmpty else {
+            completion()
+            return
+        }
+        dataUseCase.calculatePriceDelivery(branchId: branchId, latitude: latitude, longitude: longitude) { [weak self] result, error in
+            if let priceStr = result, let price = Double(priceStr) {
+                DispatchQueue.main.async {
+                    self?.serverCalculatedDeliveryFee = price
+                }
+            }
+            DispatchQueue.main.async {
+                completion()
+            }
+        }
     }
 
     func updateWithHomeData(_ homeData: HomeDataModel) {
