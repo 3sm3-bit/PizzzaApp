@@ -56,8 +56,7 @@ class CartManager: ObservableObject {
         
         let calculatedPrice = LocationUtils.shared.calculateDeliveryPrice(
             distanceKm: distanceKm,
-            deliveryPricePerKm: pricePerKm,
-            minimumDeliveryPrice: minPrice
+            deliveryPricePerKm: pricePerKm
         )
         let rounded = round(calculatedPrice)
         return rounded > 0.0 ? rounded : fallbackPrice
