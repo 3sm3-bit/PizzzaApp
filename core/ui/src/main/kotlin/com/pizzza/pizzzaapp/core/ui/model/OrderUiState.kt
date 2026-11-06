@@ -55,7 +55,7 @@ fun OrderUiState.calculateDeliveryPrice(): Double {
                 ?: 40.0
             val minPrice = deliveryProduct?.minimumDeliveryPrice?.toDoubleOrNull()
                 ?: 40.0
-            val calculated = com.pizzza.pizzzaapp.utils.LocationUtils.calculateDeliveryPrice(distanceKm, pricePerKm, minPrice)
+            val calculated = com.pizzza.pizzzaapp.utils.LocationUtils.calculateDeliveryPrice(distanceKm, pricePerKm)
             if (calculated > 0.0) kotlin.math.round(calculated) else defaultFallbackPrice
         } else {
             defaultFallbackPrice
