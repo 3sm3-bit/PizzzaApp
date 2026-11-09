@@ -180,7 +180,7 @@ struct MapViewRepresentable: UIViewRepresentable {
                 annotationView?.glyphImage = UIImage(systemName: "house.fill")
             } else {
                 annotationView?.markerTintColor = .systemRed
-                annotationView?.glyphImage = UIImage(systemName: "bicycle")
+                annotationView?.glyphImage = UIImage(named: "ic_map_boy")
             }
             
             return annotationView
