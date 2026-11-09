@@ -91,7 +91,8 @@ fun ProductEntity.toModel() = ProductModel(
     urlImg = urlImg,
     coverageLimitKm = coverageLimitKm,
     deliveryPricePerKm = deliveryPricePerKm,
-    minimumDeliveryPrice = minimumDeliveryPrice
+    minimumDeliveryPrice = minimumDeliveryPrice,
+    idProductPoster = idProductPoster
 )
 
 fun ProductModel.toEntity() = ProductEntity(
@@ -108,7 +109,8 @@ fun ProductModel.toEntity() = ProductEntity(
     urlImg = urlImg,
     coverageLimitKm = coverageLimitKm,
     deliveryPricePerKm = deliveryPricePerKm,
-    minimumDeliveryPrice = minimumDeliveryPrice
+    minimumDeliveryPrice = minimumDeliveryPrice,
+    idProductPoster = idProductPoster
 )
 
 fun List<ProductEntity>.toProductModelList() = map { it.toModel() }

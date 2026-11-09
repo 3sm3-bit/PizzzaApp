@@ -33,7 +33,9 @@ data class ProductResponse(
     @SerialName("deliveryPricePerKm")
     val deliveryPricePerKm: String? = "",
     @SerialName("minimumDeliveryPrice")
-    val minimumDeliveryPrice: String? = ""
+    val minimumDeliveryPrice: String? = "",
+    @SerialName("idProductPoster")
+    val idProductPoster: String? = ""
 )
 
 fun List<ProductResponse>.toModelList() = map {
@@ -51,7 +53,8 @@ fun List<ProductResponse>.toModelList() = map {
         uid = it.uid ?: "",
         coverageLimitKm = it.coverageLimitKm ?: "",
         deliveryPricePerKm = it.deliveryPricePerKm ?: "",
-        minimumDeliveryPrice = it.minimumDeliveryPrice ?: ""
+        minimumDeliveryPrice = it.minimumDeliveryPrice ?: "",
+        idProductPoster = it.idProductPoster ?: ""
     )
 }
 
@@ -69,5 +72,6 @@ fun ProductModel.toResponse() = ProductResponse(
     uid = uid,
     coverageLimitKm = coverageLimitKm,
     deliveryPricePerKm = deliveryPricePerKm,
-    minimumDeliveryPrice = minimumDeliveryPrice
+    minimumDeliveryPrice = minimumDeliveryPrice,
+    idProductPoster = idProductPoster
 )

@@ -14,5 +14,6 @@ data class ProductModel(
     val urlImg: String = "",
     val coverageLimitKm: String = "",
     val deliveryPricePerKm: String = "",
-    val minimumDeliveryPrice: String = ""
+    val minimumDeliveryPrice: String = "",
+    val idProductPoster: String = ""
 )

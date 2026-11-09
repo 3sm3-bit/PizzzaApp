@@ -65,7 +65,9 @@ class OrderResponse (
     @SerialName("statePay")
     val statePay: String? = "PENDIENTE",
     @SerialName("canal")
-    val canal: String? = "A1P9X2"
+    val canal: String? = "A1P9X2",
+    @SerialName("idProductPoster")
+    val idProductPoster: String? = ""
 )
 
 fun List<OrderResponse>.loadOrder() = this.map {

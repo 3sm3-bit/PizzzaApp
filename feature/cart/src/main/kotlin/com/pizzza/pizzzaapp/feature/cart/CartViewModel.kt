@@ -138,7 +138,8 @@ class CartViewModel(
                     latitude = if (isDelivery) state.latitude else "0",
                     longitude = if (isDelivery) state.longitude else "0",
                     statePay = "PENDIENTE",
-                    canal = "A1P9X2"
+                    canal = "A1P9X2",
+                    idProductPoster = item.product.idProductPoster
                 )
             }
 
@@ -222,7 +223,8 @@ class CartViewModel(
                                 latitude = if (isDelivery) state.latitude else "0",
                                 longitude = if (isDelivery) state.longitude else "0",
                                 statePay = statePay,
-                                canal = "A1P9X2"
+                                canal = "A1P9X2",
+                                idProductPoster = item.product.idProductPoster
                             )
                         }
 

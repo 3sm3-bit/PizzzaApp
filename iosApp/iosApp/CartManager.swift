@@ -184,7 +184,8 @@ class CartManager: ObservableObject {
                     currentLatitude: "0",
                     currentLongitude: "0",
                     statePay: "PENDIENTE",
-                    canal: "I7K4M3"
+                    canal: "I7K4M3",
+                    idProductPoster: item.product.idProductPoster
                 )
             }
             
@@ -279,7 +280,8 @@ class CartManager: ObservableObject {
                         currentLatitude: "0",
                         currentLongitude: "0",
                         statePay: statePay,
-                        canal: "A1P9X2"
+                        canal: "A1P9X2",
+                        idProductPoster: item.product.idProductPoster
                     )
                 }
                 
