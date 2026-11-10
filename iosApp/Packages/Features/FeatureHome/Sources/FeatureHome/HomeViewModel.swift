@@ -1,0 +1,83 @@
+
+//  HomeViewModel.swift
+//  iosApp
+//
+//  Created by Developer on 12/09/26.
+//
+import Shared
+import Combine
+import CoreDomain
+import CoreUI
+
+@MainActor
+public class HomeViewModel: BaseViewModel {
+
+    public override init() {
+        super.init()
+    }
+    
+    private let dataUseCase = KoinHelper.shared.getDataUseCase()
+    @Published var pizzaProducts: [ProductModel] = []
+    @Published var orders: [ParentOrderModel] = []
+    @Published var isLoadingOrders: Bool = false
+    
+    func getGeneralOrderList(forceLoading: Bool = false) {
+        let isAlreadyLoaded = CartManager.shared.ordersLoaded
+        
+        if isAlreadyLoaded && !forceLoading { return }
+        
+        Task {
+            await self.execute(loading: forceLoading) {
+                let user = try await self.dataUseCase.getUserLocal()
+                let response = try await self.dataUseCase.loadParentOrder(userId: user?.uid ?? "")
+                
+                // Ordenar por prioridad igual que en Android
+                self.orders = response.sorted { o1, o2 in
+                    func priority(_ s: String) -> Int {
+                        switch s.trimmingCharacters(in: .whitespacesAndNewlines).uppercased() {
+                        case "CONFIRMADO": return 1
+                        case "LISTO": return 2
+                        default: return 3
+                        }
+                    }
+                    return priority(o1.state) < priority(o2.state)
+                }
+                CartManager.shared.ordersLoaded = true
+            }
+        }
+    }
+    
+    func loadProductsFromLocal() {
+        Task {
+            await self.execute(loading: false) {
+                let homeData = try await self.dataUseCase.loadHomeDataFromLocal()
+                CartManager.shared.updateWithHomeData(homeData)
+            }
+        }
+    }
+
+    func logout(onSuccess: @escaping () -> Void) {
+        Task{
+            await self.execute() {
+                try await self.dataUseCase.logout()
+                CartManager.shared.clearCart()
+                onSuccess()
+            }
+        }
+    }
+
+    func deleteUser(onSuccess: @escaping () -> Void) {
+        Task {
+            await self.execute() {
+                let user = try await self.dataUseCase.getUserLocal()
+                if let userId = user?.uid, !userId.isEmpty {
+                    _ = try await self.dataUseCase.deleteUser(userId: userId)
+                } else {
+                    try await self.dataUseCase.logout()
+                }
+                CartManager.shared.clearCart()
+                onSuccess()
+            }
+        }
+    }
+}

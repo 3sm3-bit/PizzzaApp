@@ -32,3 +32,9 @@ keystore.properties
 .artifacts/
 .kotlin/
 .DS_Store
+
+# iOS: XCFramework de KMP generado por scripts/build-shared-xcframework.sh
+iosApp/Packages/Core/SharedKMP/Shared.xcframework/
+iosApp/build-shared-xcframework.log
+iosApp/Packages/.swiftpm/
+iosApp/Packages/.build/

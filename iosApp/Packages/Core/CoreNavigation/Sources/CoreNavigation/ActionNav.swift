@@ -1,0 +1,24 @@
+//
+//  ActionNav.swift
+//  CoreNavigation
+//
+//  Created by Developer on 12/09/26.
+//
+
+public enum ActionNav: Sendable {
+    case uiNext
+    case uiNextAlter
+    case uimBack
+    case uiDefalut
+}
+
+extension ActionNav: Equatable {
+    public static nonisolated func == (typeGeneric: ActionNav, currentGeneric: ActionNav) -> Bool {
+        switch (typeGeneric, currentGeneric) {
+        case (.uiNext, .uiNext): return true
+        case (.uimBack, .uimBack): return true
+        case (.uiNextAlter, .uiNextAlter): return true
+        default: return false
+        }
+    }
+}
