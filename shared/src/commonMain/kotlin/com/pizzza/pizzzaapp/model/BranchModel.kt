@@ -8,5 +8,7 @@ data class BranchModel(
     val phone: String,
     val latitude: String,
     val longitude: String,
-    val uid: String
+    val uid: String,
+    val closesAt: String = "",
+    val opensAt: String = ""
 )

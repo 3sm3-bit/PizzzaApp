@@ -21,7 +21,11 @@ data class BranchResponse(
     @SerialName("longitude")
     val longitude: String? = "",
     @SerialName("uid")
-    val uid: String? = ""
+    val uid: String? = "",
+    @SerialName("closesAt")
+    val closesAt: String? = "",
+    @SerialName("opensAt")
+    val opensAt: String? = ""
 )
 
 fun List<BranchResponse>.toModelList() = map {
@@ -33,7 +37,9 @@ fun List<BranchResponse>.toModelList() = map {
         phone = it.phone ?: "",
         latitude = it.latitude ?: "",
         longitude = it.longitude ?: "",
-        uid = it.uid ?: ""
+        uid = it.uid ?: "",
+        closesAt = it.closesAt ?: "",
+        opensAt = it.opensAt ?: ""
     )
 }
 
@@ -45,5 +51,7 @@ fun BranchModel.toResponse() = BranchResponse(
     phone = phone,
     latitude = latitude,
     longitude = longitude,
-    uid = uid
+    uid = uid,
+    closesAt = closesAt,
+    opensAt = opensAt
 )

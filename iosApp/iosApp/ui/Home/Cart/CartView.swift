@@ -44,13 +44,16 @@ struct CartView: View {
     }
 
     var isButtonEnabled: Bool {
+        let selectedBranch = cartManager.branches.first(where: { $0.identifier == cartManager.branchId }) ?? cartManager.branches.first
+        let isOpen = isBranchOpen(opensAt: selectedBranch?.closesAt, closesAt: selectedBranch?.closesAt)
         if cartManager.receptionMode == "RECOJO" {
-            return !cartManager.cart.isEmpty
+            return !cartManager.cart.isEmpty && isOpen
         } else {
             return !cartManager.cart.isEmpty && 
                    !cartManager.deliveryAddress.isEmpty && 
                    cartManager.deliveryAddress != "Selecciona dirección en el mapa" &&
-                   isDistanceValid
+                   isDistanceValid &&
+                   isOpen
         }
     }
     
@@ -73,8 +76,20 @@ struct CartView: View {
                 } else {
                     ScrollView {
                         VStack(alignment: .leading, spacing: 16) {
-                            Text("Selecciona modo de recojo")
-                                .font(PizzaFonts.bold16)
+                            HStack {
+                                Text("Selecciona modo de recojo")
+                                    .font(PizzaFonts.bold16)
+                                Spacer()
+                                let selectedBranch = cartManager.branches.first(where: { $0.identifier == cartManager.branchId }) ?? cartManager.branches.first
+                                let isOpen = isBranchOpen(opensAt: selectedBranch?.opensAt, closesAt: selectedBranch?.closesAt)
+                                Text(isOpen ? "● Abierto" : "● Cerrado")
+                                    .font(PizzaFonts.bold12)
+                                    .padding(.horizontal, 8)
+                                    .padding(.vertical, 4)
+                                    .background(isOpen ? PizzaColors.green600.opacity(0.1) : PizzaColors.red600.opacity(0.1))
+                                    .foregroundColor(isOpen ? PizzaColors.green600 : PizzaColors.red600)
+                                    .cornerRadius(8)
+                            }
                             
                             HStack(spacing: 12) {
                                 ModeButton(label: "DOMICILIO", isSelected: cartManager.receptionMode == "DELIVERY") {
@@ -305,4 +320,30 @@ struct CartItemCard: View {
         }.padding(14)
         .uiTayBgShadowDark()
     }
+}
+
+private func isBranchOpen(opensAt: String?, closesAt: String?) -> Bool {
+    let openStr = (opensAt?.isEmpty == false) ? opensAt! : "11:00"
+    let closeStr = (closesAt?.isEmpty == false) ? closesAt! : "19:00"
+    
+    let now = Date()
+    let calendar = Calendar.current
+    let components = calendar.dateComponents([.hour, .minute], from: now)
+    
+    guard let currentHour = components.hour, let currentMinute = components.minute else { return true }
+    let currentTimeMinutes = currentHour * 60 + currentMinute
+    
+    let openParts = openStr.split(separator: ":")
+    let closeParts = closeStr.split(separator: ":")
+    
+    guard openParts.count == 2, closeParts.count == 2,
+          let openH = Int(openParts[0]), let openM = Int(openParts[1]),
+          let closeH = Int(closeParts[0]), let closeM = Int(closeParts[1]) else {
+        return true
+    }
+    
+    let openMinutes = openH * 60 + openM
+    let closeMinutes = closeH * 60 + closeM
+    
+    return currentTimeMinutes >= openMinutes && currentTimeMinutes <= closeMinutes
 }

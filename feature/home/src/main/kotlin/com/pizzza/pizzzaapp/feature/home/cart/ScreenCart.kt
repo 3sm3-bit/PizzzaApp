@@ -14,6 +14,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -56,13 +57,16 @@ fun ScreenCart(
         true
     }
 
+    val isOpen = isBranchOpen(selectedBranch?.opensAt, selectedBranch?.closesAt)
+
     val isButtonEnabled = if (uiState.receptionMode == "RECOJO") {
-        uiState.cart.isNotEmpty()
+        uiState.cart.isNotEmpty() && isOpen
     } else {
         (uiState.cart.isNotEmpty()) &&
                 (uiState.deliveryAddress.isNotBlank()) &&
                 (uiState.deliveryAddress != "Selecciona dirección en el mapa") &&
-                isDistanceValid
+                isDistanceValid &&
+                isOpen
     }
 
     LaunchedEffect(Unit) {
@@ -102,7 +106,28 @@ fun ScreenCart(
                 ) {
                     item {
                         Column(modifier = Modifier.fillMaxWidth()) {
-                            Text("Selecciona modo de recojo", style = textB16, color = Color.Black)
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text("Selecciona modo de recojo", style = textB16, color = Color.Black)
+                                
+                                val isOpen = remember(selectedBranch?.identifier) {
+                                    isBranchOpen(selectedBranch?.opensAt, selectedBranch?.closesAt)
+                                }
+                                Surface(
+                                    shape = RoundedCornerShape(8.dp),
+                                    color = if (isOpen) tay_green_600.copy(alpha = 0.1f) else tay_red_600.copy(alpha = 0.1f)
+                                ) {
+                                    Text(
+                                        text = if (isOpen) "● Abierto" else "● Cerrado",
+                                        style = textB12,
+                                        color = if (isOpen) tay_green_600 else tay_red_600,
+                                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                                    )
+                                }
+                            }
                             Spacer(Modifier.height(8.dp))
                             
                             Row(
@@ -256,4 +281,22 @@ fun ScreenCart(
             }
         }
     }
+}
+
+private fun isBranchOpen(opensAt: String?, closesAt: String?): Boolean {
+    val openTime = if (!opensAt.isNullOrBlank()) opensAt else "11:00"
+    val closeTime = if (!closesAt.isNullOrBlank()) closesAt else "19:00"
+    try {
+        val now = java.util.Calendar.getInstance()
+        val currentMinutes = now.get(java.util.Calendar.HOUR_OF_DAY) * 60 + now.get(java.util.Calendar.MINUTE)
+
+        val openParts = openTime.split(":")
+        val closeParts = closeTime.split(":")
+        if (openParts.size == 2 && closeParts.size == 2) {
+            val openMinutes = openParts[0].toInt() * 60 + openParts[1].toInt()
+            val closeMinutes = closeParts[0].toInt() * 60 + closeParts[1].toInt()
+            return currentMinutes in openMinutes..closeMinutes
+        }
+    } catch (_: Exception) {}
+    return true
 }
