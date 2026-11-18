@@ -45,7 +45,7 @@ struct CartView: View {
 
     var isButtonEnabled: Bool {
         let selectedBranch = cartManager.branches.first(where: { $0.identifier == cartManager.branchId }) ?? cartManager.branches.first
-        let isOpen = isBranchOpen(opensAt: selectedBranch?.closesAt, closesAt: selectedBranch?.closesAt)
+        let isOpen = isBranchOpen(opensAt: selectedBranch?.opensAt, closesAt: selectedBranch?.closesAt)
         if cartManager.receptionMode == "RECOJO" {
             return !cartManager.cart.isEmpty && isOpen
         } else {
