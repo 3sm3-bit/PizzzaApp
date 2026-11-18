@@ -1,6 +1,7 @@
 import SwiftUI
 
 import TaySwitfUILibrary
+import CoreNavigation
 
 @main
 struct iOSApp: App {

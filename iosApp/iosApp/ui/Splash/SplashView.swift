@@ -1,6 +1,9 @@
 import SwiftUI
 import Shared
 import TaySwitfUILibrary
+import CoreDomain
+import CoreNavigation
+import CoreUI
 
 struct SplashView: View {
 

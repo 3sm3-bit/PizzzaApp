@@ -6,6 +6,7 @@
 //
 
 import Swinject
+import CoreDomain
 
 @propertyWrapper
 struct Inject<Component> {

@@ -1,7 +1,8 @@
 import Foundation
 import Shared
-internal import Combine
-import Shared
+import Combine
+import CoreDomain
+import CoreUI
 
 @MainActor
 class AppViewModel: BaseViewModel {
