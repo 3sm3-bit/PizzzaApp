@@ -21,7 +21,5 @@
 	<array>
 		<string>fetch</string>
 	</array>
-	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>Necesitamos tu ubicación para centrar el mapa y facilitar la selección de la dirección de entrega de tu pedido.</string>
 </dict>
 </plist>
