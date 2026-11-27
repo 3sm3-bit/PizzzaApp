@@ -21,6 +21,8 @@ public class CartManager: ObservableObject {
     @Published public var branchId: String = "1"
     @Published public var selectedProduct: ProductModel? = nil
     @Published public var pendingOrderUid: String = ""
+    /// true mientras se crea la orden y la sesión de pago (bloquea doble toque).
+    @Published public private(set) var isStartingPayment: Bool = false
     @Published public var userName: String = ""
     @Published public var serverCalculatedDeliveryFee: Double? = nil
     
@@ -138,10 +140,16 @@ public class CartManager: ObservableObject {
     }
     
     public func startPayment(onUrlReady: @escaping (String) -> Void) {
-        guard !cart.isEmpty else { return }
-        
+        // Evita que un doble toque cree dos órdenes en el servidor.
+        guard !cart.isEmpty, !isStartingPayment else { return }
+        isStartingPayment = true
+
+        let finish: () -> Void = { [weak self] in
+            DispatchQueue.main.async { self?.isStartingPayment = false }
+        }
+
         self.dataUseCase.getUserLocal { [weak self] user, error in
-            guard let self = self, let user = user else { return }
+            guard let self = self, let user = user else { finish(); return }
             let idOrder = UUID().uuidString
             let isDelivery = self.receptionMode == "DELIVERY"
             let deliveryFeeDouble = self.deliveryFee
@@ -202,10 +210,11 @@ public class CartManager: ObservableObject {
                 
                 // 2. POST /services/payment/create -> devuelve Stripe checkout URL
                 self.dataUseCase.createPaymentSession(amount: self.finalTotal, email: user.email, orderId: orderId) { url, error in
-                    if let paymentUrl = url, !paymentUrl.isEmpty {
-                        DispatchQueue.main.async {
+                    DispatchQueue.main.async {
+                        if let paymentUrl = url, !paymentUrl.isEmpty {
                             onUrlReady(paymentUrl)
                         }
+                        self.isStartingPayment = false
                     }
                 }
             }
@@ -217,9 +226,13 @@ public class CartManager: ObservableObject {
     public func confirmOrder(statePay: String = "PENDIENTE", onSuccess: @escaping () -> Void) {
         guard !isConfirmingOrder else { return }
         isConfirmingOrder = true
-        
-        defer { self.isConfirmingOrder = false }
-        
+
+        // Se libera cuando termina la petición, no al salir de la función
+        // (antes un `defer` lo liberaba al instante y el guard no protegía nada).
+        let finish: () -> Void = { [weak self] in
+            DispatchQueue.main.async { self?.isConfirmingOrder = false }
+        }
+
         let pendingUid = self.pendingOrderUid
         
         if !pendingUid.isEmpty {
@@ -230,13 +243,14 @@ public class CartManager: ObservableObject {
                     self.pendingOrderUid = ""
                     self.ordersLoaded = false
                     self.selectedTab = 3
+                    self.isConfirmingOrder = false
                     onSuccess()
                 }
             }
         } else {
             // Fallback si no había pendingOrderUid
             dataUseCase.getUserLocal { user, error in
-                guard let user = user else { return }
+                guard let user = user else { finish(); return }
                 
                 let idOrder = UUID().uuidString
                 let isDelivery = self.receptionMode == "DELIVERY"
@@ -293,6 +307,7 @@ public class CartManager: ObservableObject {
                                 self.pendingOrderUid = ""
                                 self.ordersLoaded = false
                                 self.selectedTab = 3
+                                self.isConfirmingOrder = false
                                 onSuccess()
                             }
                         }
@@ -302,6 +317,7 @@ public class CartManager: ObservableObject {
                             self.pendingOrderUid = ""
                             self.ordersLoaded = false
                             self.selectedTab = 3
+                            self.isConfirmingOrder = false
                             onSuccess()
                         }
                     }

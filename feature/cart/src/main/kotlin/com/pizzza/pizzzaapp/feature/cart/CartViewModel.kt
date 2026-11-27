@@ -12,6 +12,7 @@ import com.pizzza.pizzzaapp.repository.network.model.ConfirmOrderRequest
 import com.pizzza.pizzzaapp.repository.network.model.OrderResponse
 import kotlinx.coroutines.flow.StateFlow
 import java.util.UUID
+import java.util.concurrent.atomic.AtomicBoolean
 
 class CartViewModel(
     private val dataUseCase: DataUseCase,
@@ -91,86 +92,91 @@ class CartViewModel(
     }
 
     fun startPayment(onUrlReady: (String) -> Unit) {
+        // Evita que un doble toque cree dos órdenes en el servidor.
+        if (!isStartingPayment.compareAndSet(false, true)) return
         execute(globalUiStateManager = globalUiStateManager) {
-            val state = cartUiState.value
-            if (state.cart.isEmpty()) return@execute
+            try {
+                val state = cartUiState.value
+                if (state.cart.isEmpty()) return@execute
 
-            val cartProductsTotal = state.cart.sumOf { item ->
-                val basePrice = item.product.price.toDoubleOrNull() ?: 0.0
-                val crustPrice = if (item.cheeseFilledCrust) item.product.priceChosse.toDoubleOrNull() ?: 0.0 else 0.0
-                (basePrice + crustPrice) * item.quantity
-            }
-            val deliveryPriceDouble = state.calculateDeliveryPrice()
-            val deliveryPriceStr = if (state.receptionMode == "DELIVERY") deliveryPriceDouble.toLong().toString() else "0"
-            val total = cartProductsTotal + deliveryPriceDouble
+                val cartProductsTotal = state.cart.sumOf { item ->
+                    val basePrice = item.product.price.toDoubleOrNull() ?: 0.0
+                    val crustPrice = if (item.cheeseFilledCrust) item.product.priceChosse.toDoubleOrNull() ?: 0.0 else 0.0
+                    (basePrice + crustPrice) * item.quantity
+                }
+                val deliveryPriceDouble = state.calculateDeliveryPrice()
+                val deliveryPriceStr = if (state.receptionMode == "DELIVERY") deliveryPriceDouble.toLong().toString() else "0"
+                val total = cartProductsTotal + deliveryPriceDouble
 
-            val user = io { dataUseCase.getUserLocal() }
+                val user = io { dataUseCase.getUserLocal() }
 
-            val orderRequest = state.cart.mapIndexed { index, item ->
-                val isDelivery = state.receptionMode == "DELIVERY"
-                val itemPrice = (item.product.price.toDoubleOrNull() ?: 0.0) +
-                        (if (item.cheeseFilledCrust) item.product.priceChosse.toDoubleOrNull() ?: 0.0 else 0.0)
-                val itemSubtotal = itemPrice * item.quantity
-                val itemPriceTotal = if (isDelivery && index == 0) itemSubtotal + deliveryPriceDouble else itemSubtotal
+                val orderRequest = state.cart.mapIndexed { index, item ->
+                    val isDelivery = state.receptionMode == "DELIVERY"
+                    val itemPrice = (item.product.price.toDoubleOrNull() ?: 0.0) +
+                            (if (item.cheeseFilledCrust) item.product.priceChosse.toDoubleOrNull() ?: 0.0 else 0.0)
+                    val itemSubtotal = itemPrice * item.quantity
+                    val itemPriceTotal = if (isDelivery && index == 0) itemSubtotal + deliveryPriceDouble else itemSubtotal
 
-                OrderResponse(
-                    uid = UUID.randomUUID().toString().replace("-", "").substring(0, 16),
-                    nameClient = "${user?.names}",
-                    quantity = item.quantity.toString(),
-                    type = item.product.type,
-                    symbol = item.product.currencySymbol,
-                    nameProduct = item.product.nameProduct,
-                    tamanio = item.product.tamanio,
-                    typeDough = item.typeDough,
-                    cheeseFilledCrust = if (item.cheeseFilledCrust) "SI" else "NO",
-                    note = item.note,
-                    phone = user?.phone ?: "",
-                    price = item.product.price,
-                    priceTotal = if (itemPriceTotal % 1.0 == 0.0) itemPriceTotal.toLong().toString() else String.format(java.util.Locale.US, "%.2f", itemPriceTotal),
-                    state = "PENDIENTE",
-                    address = if (isDelivery) state.deliveryAddress else "RECOJO EN LOCAL",
-                    reception = state.receptionMode,
-                    priceDelivery = deliveryPriceStr,
-                    priceChosse = item.product.priceChosse,
-                    idOrden = "",
-                    branchId = state.branchId,
-                    userId = user?.uid ?: "",
-                    latitude = if (isDelivery) state.latitude else "0",
-                    longitude = if (isDelivery) state.longitude else "0",
-                    statePay = "PENDIENTE",
-                    canal = "A1P9X2",
-                    idProductPoster = item.product.idProductPoster
-                )
-            }
+                    OrderResponse(
+                        uid = UUID.randomUUID().toString().replace("-", "").substring(0, 16),
+                        nameClient = "${user?.names}",
+                        quantity = item.quantity.toString(),
+                        type = item.product.type,
+                        symbol = item.product.currencySymbol,
+                        nameProduct = item.product.nameProduct,
+                        tamanio = item.product.tamanio,
+                        typeDough = item.typeDough,
+                        cheeseFilledCrust = if (item.cheeseFilledCrust) "SI" else "NO",
+                        note = item.note,
+                        phone = user?.phone ?: "",
+                        price = item.product.price,
+                        priceTotal = if (itemPriceTotal % 1.0 == 0.0) itemPriceTotal.toLong().toString() else String.format(java.util.Locale.US, "%.2f", itemPriceTotal),
+                        state = "PENDIENTE",
+                        address = if (isDelivery) state.deliveryAddress else "RECOJO EN LOCAL",
+                        reception = state.receptionMode,
+                        priceDelivery = deliveryPriceStr,
+                        priceChosse = item.product.priceChosse,
+                        idOrden = "",
+                        branchId = state.branchId,
+                        userId = user?.uid ?: "",
+                        latitude = if (isDelivery) state.latitude else "0",
+                        longitude = if (isDelivery) state.longitude else "0",
+                        statePay = "PENDIENTE",
+                        canal = "A1P9X2",
+                        idProductPoster = item.product.idProductPoster
+                    )
+                }
 
-            val mobileResponse = io { dataUseCase.createOrderMobile(orderRequest) }
-            val generalUid = mobileResponse.ordenGeneral?.uid ?: ""
-            if (generalUid.isNotBlank()) {
-                appDataOrder.update { it.copy(pendingOrderUid = generalUid) }
-            }
+                val mobileResponse = io { dataUseCase.createOrderMobile(orderRequest) }
+                val generalUid = mobileResponse.ordenGeneral?.uid ?: ""
+                if (generalUid.isNotBlank()) {
+                    appDataOrder.update { it.copy(pendingOrderUid = generalUid) }
+                }
 
-            val orderId = generalUid.ifBlank { UUID.randomUUID().toString() }
-            val paymentUrl = io { 
-                dataUseCase.createPaymentSession(
-                    amount = total,
-                    email = user?.email ?: "",
-                    orderId = orderId
-                ) 
-            }
+                val orderId = generalUid.ifBlank { UUID.randomUUID().toString() }
+                val paymentUrl = io { 
+                    dataUseCase.createPaymentSession(
+                        amount = total,
+                        email = user?.email ?: "",
+                        orderId = orderId
+                    ) 
+                }
             
-            if (paymentUrl.isNotBlank()) {
-                onUrlReady(paymentUrl)
+                if (paymentUrl.isNotBlank()) {
+                    onUrlReady(paymentUrl)
+                }
+            } finally {
+                isStartingPayment.set(false)
             }
         }
     }
 
-    private var isConfirmingOrder = false
-
     fun confirmOrder(statePay: String = "PENDIENTE", onComplete: () -> Unit) {
-        if (isConfirmingOrder) return
+        // El guard es compartido entre instancias: MainActivity (deep link) y
+        // PaymentWebView usan CartViewModel distintos y ambos pueden confirmar.
+        if (!isConfirmingOrder.compareAndSet(false, true)) return
         val state = cartUiState.value
 
-        isConfirmingOrder = true
         execute(globalUiStateManager = globalUiStateManager) {
             try {
                 val pendingUid = state.pendingOrderUid
@@ -249,7 +255,7 @@ class CartViewModel(
                 }
                 onComplete()
             } finally {
-                isConfirmingOrder = false
+                isConfirmingOrder.set(false)
             }
         }
     }
@@ -280,5 +286,10 @@ class CartViewModel(
 
     fun resetState() {
         appDataOrder.reset()
+    }
+
+    private companion object {
+        val isStartingPayment = AtomicBoolean(false)
+        val isConfirmingOrder = AtomicBoolean(false)
     }
 }

@@ -137,6 +137,8 @@ struct OrderSummaryView: View {
                 }
             }
         }
+        .disabled(cartManager.isStartingPayment)
+        .opacity(cartManager.isStartingPayment ? 0.6 : 1)
         .padding(.horizontal, 20)
         .padding(.bottom, 24)
     }
