@@ -9,37 +9,35 @@ struct PaymentWebView: View {
     @Environment(\.dismiss) var dismiss
     @State private var isLoading = true
     @State private var showCancelAlert = false
-    @State private var isPaymentSuccessful = false
 
     var body: some View {
-        ZStack {
-            SwipeBackDetector {
+        VStack(spacing: 0) {
+            // Salir solo con este botón: sin gestos de regreso, para que el usuario
+            // no cierre el WebView mientras Stripe redirige a la URL de éxito.
+            UiTayCToolBar(uiTayText: "Pago") { _ in
                 showCancelAlert = true
             }
-            .frame(width: 0, height: 0)
 
-            WebView(
-                url: url,
-                isLoading: $isLoading,
-                showCancelAlert: $showCancelAlert,
-                onSuccess: {
-                    isPaymentSuccessful = true
-                    dismiss()
-                    onSuccess()
-                },
-                onCancel: {
-                    dismiss()
-                    onCancel()
+            ZStack {
+                WebView(
+                    url: url,
+                    isLoading: $isLoading,
+                    showCancelAlert: $showCancelAlert,
+                    onSuccess: {
+                        dismiss()
+                        onSuccess()
+                    }
+                )
+
+                if isLoading {
+                    ProgressView()
+                        .scaleEffect(1.5)
+                        .progressViewStyle(CircularProgressViewStyle(tint: .uiTayRed600))
                 }
-            )
-            
-            if isLoading {
-                ProgressView()
-                    .scaleEffect(1.5)
-                    .progressViewStyle(CircularProgressViewStyle(tint: .uiTayRed600))
             }
         }
         .uiTayHideToolbar()
+        .navigationBarBackButtonHidden(true)
         .edgesIgnoringSafeArea(.bottom)
         .alert(isPresented: $showCancelAlert) {
             Alert(
@@ -55,63 +53,19 @@ struct PaymentWebView: View {
     }
 }
 
-struct SwipeBackDetector: UIViewRepresentable {
-    var onSwipeBack: () -> Void
-
-    func makeUIView(context: Context) -> UIView {
-        let view = UIView(frame: .zero)
-        let recognizer = UIScreenEdgePanGestureRecognizer(target: context.coordinator, action: #selector(Coordinator.handleSwipe(_:)))
-        recognizer.edges = .left
-        recognizer.delegate = context.coordinator
-        
-        DispatchQueue.main.async {
-            if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
-               let window = windowScene.windows.first(where: { $0.isKeyWindow }) {
-                window.addGestureRecognizer(recognizer)
-            }
-        }
-        
-        return view
-    }
-
-    func updateUIView(_ uiView: UIView, context: Context) {}
-
-    func makeCoordinator() -> Coordinator {
-        Coordinator(onSwipeBack: onSwipeBack)
-    }
-
-    class Coordinator: NSObject, UIGestureRecognizerDelegate {
-        var onSwipeBack: () -> Void
-
-        init(onSwipeBack: @escaping () -> Void) {
-            self.onSwipeBack = onSwipeBack
-        }
-
-        @objc func handleSwipe(_ recognizer: UIScreenEdgePanGestureRecognizer) {
-            if recognizer.state == .began {
-                onSwipeBack()
-            }
-        }
-
-        func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
-            return true
-        }
-    }
-}
-
 struct WebView: UIViewRepresentable {
     let url: URL
     @Binding var isLoading: Bool
     @Binding var showCancelAlert: Bool
     var onSuccess: () -> Void
-    var onCancel: () -> Void
 
     func makeUIView(context: Context) -> WKWebView {
         let webView = WKWebView()
-        webView.allowsBackForwardNavigationGestures = true
+        // Sin gesto atrás/adelante: podía sacar al usuario de la página de éxito de Stripe.
+        webView.allowsBackForwardNavigationGestures = false
         webView.navigationDelegate = context.coordinator
-        let request = URLRequest(url: url)
-        webView.load(request)
+        context.coordinator.observeUrl(of: webView)
+        webView.load(URLRequest(url: url))
         return webView
     }
 
@@ -123,36 +77,70 @@ struct WebView: UIViewRepresentable {
 
     class Coordinator: NSObject, WKNavigationDelegate {
         var parent: WebView
+        private var urlObservation: NSKeyValueObservation?
+        private var didSucceed = false
 
         init(_ parent: WebView) {
             self.parent = parent
+        }
+
+        deinit {
+            urlObservation?.invalidate()
+        }
+
+        /// Detecta también cambios de URL hechos por JavaScript (pushState),
+        /// que no pasan por `decidePolicyFor`.
+        func observeUrl(of webView: WKWebView) {
+            urlObservation = webView.observe(\.url, options: [.new]) { [weak self] webView, _ in
+                guard let urlString = webView.url?.absoluteString else { return }
+                DispatchQueue.main.async {
+                    _ = self?.handle(urlString)
+                }
+            }
+        }
+
+        /// Devuelve true si la URL es de éxito o cancelación y ya se manejó.
+        private func handle(_ urlString: String) -> Bool {
+            if urlString.contains("pizzitas://payment/success") || urlString.contains("pizzzaapp.com/success") {
+                // La URL de éxito puede llegar por varias vías; confirmamos una sola vez.
+                if !didSucceed {
+                    didSucceed = true
+                    parent.onSuccess()
+                }
+                return true
+            }
+            if urlString.contains("pizzitas://payment/cancel") || urlString.contains("pizzzaapp.com/cancel") {
+                if !didSucceed {
+                    parent.showCancelAlert = true
+                }
+                return true
+            }
+            return false
         }
 
         func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
             parent.isLoading = false
         }
 
-        func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
-            if let urlString = webView.url?.absoluteString {
-                if urlString.contains("pizzitas://payment/cancel") || urlString.contains("pizzzaapp.com/cancel") {
-                    parent.showCancelAlert = true
-                }
-            }
-        }
-
         func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
-            if let urlString = navigationAction.request.url?.absoluteString {
-                if urlString.contains("pizzitas://payment/success") || urlString.contains("pizzzaapp.com/success") {
-                    parent.onSuccess()
-                    decisionHandler(.cancel)
-                    return
-                } else if urlString.contains("pizzitas://payment/cancel") || urlString.contains("pizzzaapp.com/cancel") {
-                    parent.showCancelAlert = true
-                    decisionHandler(.cancel)
-                    return
-                }
+            if let urlString = navigationAction.request.url?.absoluteString, handle(urlString) {
+                decisionHandler(.cancel)
+                return
             }
             decisionHandler(.allow)
+        }
+
+        /// iOS puede matar el proceso del WebView si la app pasa a segundo plano
+        /// (por ejemplo, para aprobar el pago en la app del banco). Sin esto la
+        /// página queda en blanco y nunca llega la redirección de éxito.
+        func webViewWebContentProcessDidTerminate(_ webView: WKWebView) {
+            guard !didSucceed else { return }
+            parent.isLoading = true
+            if webView.url != nil {
+                webView.reload()
+            } else {
+                webView.load(URLRequest(url: parent.url))
+            }
         }
     }
 }
